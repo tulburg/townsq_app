@@ -65,7 +65,9 @@ class MessagesViewController: UIViewController, UITableViewDelegate, UITableView
 		messageField.translatesAutoresizingMaskIntoConstraints = true
 		messageField.sizeToFit()
 		messageField.isScrollEnabled = false
+		messageField.contentInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
 		messageField.layer.borderWidth = 2
+		messageField.layer.cornerRadius = 12
 		messageField.layer.borderColor = Color.purple.cgColor
 		messageField.textColor = Color.textDark
 		messageField.font = UIFont.systemFont(ofSize: 18)
@@ -193,15 +195,21 @@ class MessagesViewController: UIViewController, UITableViewDelegate, UITableView
 	}
 	
 	func textViewDidBeginEditing(_ textView: UITextView) {
-		textView.text = ""
+		if textView.text == "Message here" {
+			textView.text = ""
+		}
+	}
+	
+	func textViewDidEndEditing(_ textView: UITextView) {
+		if textView.text.count == 0 {
+			textView.text = "Message here"
+		}
 	}
 	
 	func textViewDidChange(_ textView: UITextView) {
 		let fixedWidth = textView.frame.size.width
 		textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
 		let newSize = textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
-//		var newFrame = textView.frame
-//		newFrame.size = CGSize(width: max(newSize.width, fixedWidth), height: newSize.height)
 		messageFieldHeightConstraint.constant = newSize.height
 		UIView.animate(withDuration: 0.2, animations: {
 			self.messageField.superview?.layoutIfNeeded()

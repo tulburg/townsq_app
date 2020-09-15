@@ -24,6 +24,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		self.tabBarItem.setBadgeTextAttributes([NSAttributedString.Key.backgroundColor: Color.red, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16)], for: .normal)
 		
 		let counter = self.makeFeedAcitivityCounter()
+		counter.isHidden = true;
 		
 		let feedTable = initFeedTableView()
 		self.view.addSubviews(views: feedTable, counter)
@@ -31,6 +32,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		self.view.addConstraints(format: "V:|-0-[v0]-0-|", views: feedTable)
 		
 		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2, execute: {
+			counter.isHidden = false;
 			let image = counter.getImage()!.withRenderingMode(.alwaysOriginal)
 			self.tabBarItem.image = image
 			counter.isHidden = true
@@ -162,7 +164,7 @@ class FeedCell: UITableViewCell {
   
 	func makeFeedAcitivityCounter() -> UIView {
 		let container = UIView()
-		container.backgroundColor = Color.purple
+		container.backgroundColor = Color.cyan
 		container.layer.cornerRadius = 8
 		let label = UILabel()
 		label.font = UIFont.boldSystemFont(ofSize: 10)

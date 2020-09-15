@@ -47,19 +47,15 @@ class TabBarController: UITabBarController {
 		
 		if item.tag == 0 {
 			self.title = "New Broadcast"
-			self.tabBar.tintColor = Color.editTab
 		} else if item.tag == 1 {
 			self.title = "Home"
-			self.tabBar.tintColor = Color.homeTab
 			let tabImage = UIImage(named: "home")
 			tabImage?.withTintColor(Color.homeTabLight, renderingMode: .alwaysTemplate)
 			item.image = tabImage
 		}else if item.tag == 2 {
 			self.title = "Profile"
-			self.tabBar.tintColor = Color.profileTab
 		}else if item.tag == 3 {
 			self.title = "Settings"
-			self.tabBar.tintColor = Color.settingsTab
 		}
 		
 		if item.tag != 1 {
