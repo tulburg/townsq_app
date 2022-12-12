@@ -13,7 +13,7 @@ class FeedCell: UITableViewCell {
     var feed: String!
     var separator: UIView!
     
-    init(_ feed: String) {
+    init(feedText feed: String, _ activity: Int?) {
         super.init(style: .default, reuseIdentifier: .none)
         self.feed = feed
         
@@ -31,11 +31,17 @@ class FeedCell: UITableViewCell {
         feedBody.constrain(type: .horizontalFill, feedText, feedImage)
         feedBody.addConstraints(format: "V:|-0-[v0]-16-[v1(220)]-0-|", views: feedText, feedImage)
         
+        let activityCounter = activityBadge(activity)
+        if activity == nil {
+            activityCounter.isHidden = true
+        }
+        
         let ownerContainer = UIView()
-        ownerContainer.addSubviews(views: ownerName, feedTime)
+        ownerContainer.addSubviews(views: ownerName, feedTime, activityCounter)
         ownerContainer.addConstraints(format: "V:|-0-[v0]-0-|", views: ownerName)
         ownerContainer.addConstraints(format: "V:|-(>=0)-[v0]-2-|", views: feedTime)
-        ownerContainer.addConstraints(format: "H:|-0-[v0]-[v1(40@1)]-(>=0)-|", views: ownerName, feedTime)
+        ownerContainer.addConstraints(format: "V:|-0-[v0(22)]-(>=0)-|", views: activityCounter)
+        ownerContainer.addConstraints(format: "H:|-0-[v0]-[v1(40@1)]-(>=0)-[v2(>=22@1)]-0-|", views: ownerName, feedTime, activityCounter)
         
         let feedActivityCounter = makeFeedAcitivityCounter()
         let feedActivitySummary = UILabel("are talking about this", Color.darkBlue_white, UIFont.systemFont(ofSize: 12))
@@ -45,11 +51,33 @@ class FeedCell: UITableViewCell {
         feedActivityContainer.addConstraints(format: "H:|-0-[v0]-4-[v1(>=\(contentView.frame.width/2),<=\(contentView.frame.width))]-0-|", views: feedActivityCounter, feedActivitySummary)
         feedActivitySummary.centerYAnchor.constraint(equalTo: feedActivityContainer.centerYAnchor).isActive = true
         
+        let bottomContainer = UIView()
+        let leaveContainer = UIView();
+        let actionSeparator = makeSeparator()
+        bottomContainer.addSubviews(views: feedActivityContainer, actionSeparator, leaveContainer)
+        bottomContainer.addConstraints(format: "V:|-0-[v0]-(\(activity != nil ? 8 : 0))-[v1(1)]-(\(activity != nil ? 8 : 0))-[v2]-0-|", views: feedActivityContainer, actionSeparator, leaveContainer)
+        bottomContainer.constrain(type: .horizontalFill, feedActivityContainer, leaveContainer, actionSeparator)
+        actionSeparator.isHidden = true
+        if activity != nil {
+            actionSeparator.isHidden = false
+            let leaveButton = UIButton("Leave", font: UIFont.systemFont(ofSize: 12, weight: .bold), image: UIImage(named: "cancel")?.resize(CGSize(width: 8, height: 8)))
+            leaveButton.backgroundColor = Color.red
+            
+            let statusText = UILabel("Joined 2 mins ago", Color.darkBlue_white, UIFont.systemFont(ofSize: 12))
+            let mutable = NSMutableAttributedString()
+            mutable.normal("Joined ")
+            mutable.bold("2 mins", size: 12, weight: UIFont.Weight.heavy)
+            mutable.normal(" ago")
+            statusText.attributedText = mutable
+            leaveContainer.addSubviews(views: statusText, leaveButton)
+            leaveContainer.constrain(type: .verticalFill, statusText, leaveButton)
+            leaveContainer.addConstraints(format: "H:|-0-[v0]-(>=0)-[v1]-0-|", views: statusText, leaveButton)
+        }
         
         let bodyContainer = UIView()
-        bodyContainer.addSubviews(views: ownerContainer, ownerUsername, feedBody, feedActivityContainer)
-        bodyContainer.addConstraints(format: "V:|-16-[v0]-0-[v1]-4-[v2]-8-[v3]-8-|", views: ownerContainer, ownerUsername, feedBody, feedActivityContainer)
-        bodyContainer.constrain(type: .horizontalFill, ownerContainer, ownerUsername, feedBody, feedActivityContainer)
+        bodyContainer.addSubviews(views: ownerContainer, ownerUsername, feedBody, bottomContainer)
+        bodyContainer.addConstraints(format: "V:|-16-[v0]-0-[v1]-4-[v2]-8-[v3]-8-|", views: ownerContainer, ownerUsername, feedBody, bottomContainer)
+        bodyContainer.constrain(type: .horizontalFill, ownerContainer, ownerUsername, feedBody, bottomContainer)
         
         let feedContainer = UIView()
         feedContainer.addSubviews(views: ownerImage, bodyContainer)
@@ -64,6 +92,8 @@ class FeedCell: UITableViewCell {
         self.contentView.constrain(type: .horizontalFill, feedContainer, margin: 16)
         self.contentView.constrain(type: .horizontalFill, self.separator)
         self.contentView.addConstraints(format: "V:|-0-[v0]-2-[v1(1)]-0-|", views: feedContainer, self.separator)
+        
+        
         
         self.contentView.backgroundColor = UIColor.clear
         self.backgroundColor = Color.background
@@ -99,8 +129,33 @@ class FeedCell: UITableViewCell {
         return container
     }
     
+    func activityBadge(_ count: Int?) -> UIView {
+        let container = UIView()
+        container.backgroundColor = Color.darkBlue_white
+        container.layer.cornerRadius = 11
+        let label = UILabel()
+        label.font = UIFont.boldSystemFont(ofSize: 16)
+        label.textColor = Color.white_black
+        if count != nil {
+            label.text = "\(count!)"
+        } else {
+            label.text = "0"
+        }
+        
+        container.addSubview(label)
+        container.constrain(type: .horizontalFill, label, margin: 6)
+        container.constrain(type: .verticalFill, label, margin: 2)
+        return container
+    }
+    
     func hideSeparator() {
         self.separator.isHidden = true
+    }
+    
+    func makeSeparator() -> UIView {
+        let separator = UIView()
+        separator.backgroundColor = Color.separatorBackground
+        return separator
     }
     
     

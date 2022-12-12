@@ -69,6 +69,15 @@ extension UIView {
 			subview.scale(by: scale)
 		}
 	}
+    
+    func debugLines(color: UIColor?) {
+        self.layer.borderWidth = 1
+        self.layer.borderColor = color?.cgColor
+    }
+    func debugLines() {
+        self.layer.borderWidth = 1
+        self.layer.borderColor = UIColor.red.cgColor
+    }
 	
 	func getImage(scale: CGFloat? = nil) -> UIImage? {
 		let bounds = self.bounds
@@ -209,15 +218,13 @@ extension UIButton {
 		self.titleLabel?.font = font
 		if image != nil {
 			self.setImage(image, for: .normal)
+            self.contentEdgeInsets = UIEdgeInsets(top: 4, left: 12, bottom: 4, right: 8)
+            self.imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 16)
 		}
 		
 		self.backgroundColor = Color.purple
 		self.titleLabel?.textColor = UIColor.white
 		self.layer.cornerRadius = 12
-		self.layer.shadowColor = Color.buttonShadow.cgColor
-		self.layer.shadowOffset = CGSize(width: 0, height: 6)
-		self.layer.shadowRadius = 10
-		self.layer.shadowOpacity = 0.56
 	}
 	
 	func rightImage() {
@@ -226,6 +233,7 @@ extension UIButton {
 		self.imageView?.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
 		self.imageEdgeInsets = UIEdgeInsets(top: 0, left: -40, bottom: 0, right: 0)
 	}
+    
 }
 
 extension UITextField {
@@ -292,8 +300,8 @@ extension NSMutableData {
 }
 
 extension NSMutableAttributedString {
-	@discardableResult func bold(_ text:String, size: CGFloat) -> NSMutableAttributedString {
-		let attrs:[NSAttributedString.Key: Any] = [NSAttributedString.Key.font : UIFont.boldSystemFont(ofSize: size)]
+    @discardableResult func bold(_ text:String, size: CGFloat, weight: UIFont.Weight) -> NSMutableAttributedString {
+        let attrs:[NSAttributedString.Key: Any] = [NSAttributedString.Key.font : UIFont.systemFont(ofSize: size, weight: weight)]
 		let boldString = NSMutableAttributedString(string:"\(text)", attributes:attrs)
 		self.append(boldString)
 		return self
@@ -343,6 +351,10 @@ struct Color {
 	static let black_white = UIColor(dynamicProvider: { trait in
         return trait.userInterfaceStyle == .dark ? UIColor.white : UIColor.black
 	})
+    
+    static let white_black = UIColor(dynamicProvider: { trait in
+        return trait.userInterfaceStyle == .dark ? UIColor.black : UIColor.white
+    })
 	
 	static let background = UIColor(dynamicProvider: { trait in
 		return trait.userInterfaceStyle == .dark ? UIColor(hex: 0x141414) : UIColor.white
@@ -354,7 +366,7 @@ struct Color {
     })
     
     static let tabItem = UIColor(dynamicProvider: { trait in
-        return trait.userInterfaceStyle == .dark ? purple : cyan
+        return trait.userInterfaceStyle == .dark ? cyan : cyan
     })
     
     static let cyan_white = UIColor(dynamicProvider: { trait in

@@ -72,7 +72,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: FeedCell = FeedCell(feed[indexPath.row])
+        let cell: FeedCell = FeedCell(feedText: feed[indexPath.row], nil)
 		let background = UIView()
 		background.backgroundColor = Color.create(UIColor(hex: 0xf0f0f0), dark: UIColor(hex: 0x000000))
 		cell.selectedBackgroundView = background
@@ -94,7 +94,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		let label = UILabel()
 		label.font = UIFont.boldSystemFont(ofSize: 17)
 		label.textColor = UIColor.systemBackground
-		label.text = "23"
+		label.text = "3"
 		label.textAlignment = .center
 		container.addSubview(label)
 		container.addConstraints(format: "V:|-4-[v0(22)]-4-|", views: label)

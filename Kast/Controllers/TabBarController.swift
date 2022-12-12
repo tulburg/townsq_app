@@ -42,14 +42,6 @@ class TabBarController: UITabBarController {
 	@objc func presentEditor() {
 		let editVC = EditViewController()
         editVC.modalPresentationStyle = .popover
-//		DispatchQueue.main.async {
-//			if self.canResignFirstResponder {
-//				self.resignFirstResponder()
-//				let vc = self.viewControllers?[0] as? EditViewController
-//				vc?.textView.resignFirstResponder()
-//				vc?.textView.endEditing(true)
-//			}
-//		}
 		self.present(editVC, animated: true)
 	}
 	
