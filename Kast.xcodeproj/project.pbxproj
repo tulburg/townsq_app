@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -20,6 +20,10 @@
 		DF8EA28A24BC95E700C1A8DD /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8EA28924BC95E700C1A8DD /* SignupViewController.swift */; };
 		DF8EA28C24BE19BA00C1A8DD /* DisplayNameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8EA28B24BE19BA00C1A8DD /* DisplayNameViewController.swift */; };
 		DF951DDD24D4769C0091E138 /* OwnMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF951DDC24D4769C0091E138 /* OwnMessageCell.swift */; };
+		DF9A7ACD294377D900E8E2D3 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9A7ACC294377D900E8E2D3 /* SearchViewController.swift */; };
+		DF9A7ACF294378F500E8E2D3 /* ActiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9A7ACE294378F500E8E2D3 /* ActiveViewController.swift */; };
+		DF9A7AD32943818900E8E2D3 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9A7AD22943818900E8E2D3 /* FeedCell.swift */; };
+		DF9A7AD729438EEE00E8E2D3 /* Linker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9A7AD629438EEE00E8E2D3 /* Linker.swift */; };
 		DFA5398924B302D600316569 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA5398824B302D600316569 /* AppDelegate.swift */; };
 		DFA5398B24B302D600316569 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA5398A24B302D600316569 /* SceneDelegate.swift */; };
 		DFA5398D24B302D600316569 /* EditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA5398C24B302D600316569 /* EditViewController.swift */; };
@@ -50,7 +54,11 @@
 		DF8EA28924BC95E700C1A8DD /* SignupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupViewController.swift; sourceTree = "<group>"; };
 		DF8EA28B24BE19BA00C1A8DD /* DisplayNameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayNameViewController.swift; sourceTree = "<group>"; };
 		DF951DDC24D4769C0091E138 /* OwnMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnMessageCell.swift; sourceTree = "<group>"; };
-		DFA5398524B302D600316569 /* Kast.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kast.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF9A7ACC294377D900E8E2D3 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		DF9A7ACE294378F500E8E2D3 /* ActiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveViewController.swift; sourceTree = "<group>"; };
+		DF9A7AD22943818900E8E2D3 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
+		DF9A7AD629438EEE00E8E2D3 /* Linker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Linker.swift; sourceTree = "<group>"; };
+		DFA5398524B302D600316569 /* Town SQ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Town SQ.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFA5398824B302D600316569 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DFA5398A24B302D600316569 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		DFA5398C24B302D600316569 /* EditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewController.swift; sourceTree = "<group>"; };
@@ -116,6 +124,24 @@
 			path = Startup;
 			sourceTree = "<group>";
 		};
+		DF9A7AD12943812B00E8E2D3 /* TableCells */ = {
+			isa = PBXGroup;
+			children = (
+				DF0D4EF824CF3DB700543518 /* MessageCell.swift */,
+				DF951DDC24D4769C0091E138 /* OwnMessageCell.swift */,
+				DF9A7AD22943818900E8E2D3 /* FeedCell.swift */,
+			);
+			path = TableCells;
+			sourceTree = "<group>";
+		};
+		DF9A7AD529438EDF00E8E2D3 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				DF9A7AD629438EEE00E8E2D3 /* Linker.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		DFA5397C24B302D600316569 = {
 			isa = PBXGroup;
 			children = (
@@ -129,7 +155,7 @@
 		DFA5398624B302D600316569 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DFA5398524B302D600316569 /* Kast.app */,
+				DFA5398524B302D600316569 /* Town SQ.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -137,9 +163,11 @@
 		DFA5398724B302D600316569 /* Kast */ = {
 			isa = PBXGroup;
 			children = (
+				DF9A7AD529438EDF00E8E2D3 /* Utilities */,
 				DF0D4EFB24CF3E1400543518 /* Model */,
 				DF1F40AD24B8F7F300FDA4CD /* Startup */,
 				DFA539A424B3052500316569 /* Delegates */,
+				DF9A7AD12943812B00E8E2D3 /* TableCells */,
 				DFA539A124B3040300316569 /* Controllers */,
 				DFA5399024B302D600316569 /* Main.storyboard */,
 				DFA5399624B302D800316569 /* Assets.xcassets */,
@@ -148,8 +176,6 @@
 				DFA5399324B302D600316569 /* Kast.xcdatamodeld */,
 				DFA539A524B3054B00316569 /* Extensions.swift */,
 				DF8EA28824BC767C00C1A8DD /* Localizable.strings */,
-				DF0D4EF824CF3DB700543518 /* MessageCell.swift */,
-				DF951DDC24D4769C0091E138 /* OwnMessageCell.swift */,
 			);
 			path = Kast;
 			sourceTree = "<group>";
@@ -164,6 +190,8 @@
 				DFA539A924B3158700316569 /* ProfileViewController.swift */,
 				DF83688C24B32C34004A471B /* SettingsViewController.swift */,
 				DF83688E24B348CE004A471B /* MessagesViewController.swift */,
+				DF9A7ACC294377D900E8E2D3 /* SearchViewController.swift */,
+				DF9A7ACE294378F500E8E2D3 /* ActiveViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -188,7 +216,6 @@
 				DFA5398124B302D600316569 /* Sources */,
 				DFA5398224B302D600316569 /* Frameworks */,
 				DFA5398324B302D600316569 /* Resources */,
-				A9A621332670EF73B186BC05 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -196,7 +223,7 @@
 			);
 			name = Kast;
 			productName = Kast;
-			productReference = DFA5398524B302D600316569 /* Kast.app */;
+			productReference = DFA5398524B302D600316569 /* Town SQ.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -269,23 +296,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A9A621332670EF73B186BC05 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Kast/Pods-Kast-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Kast/Pods-Kast-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Kast/Pods-Kast-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -297,6 +307,7 @@
 				DFA5398F24B302D600316569 /* FeedViewController.swift in Sources */,
 				DF8EA28C24BE19BA00C1A8DD /* DisplayNameViewController.swift in Sources */,
 				DFA539A824B3107B00316569 /* TabBarController.swift in Sources */,
+				DF9A7AD729438EEE00E8E2D3 /* Linker.swift in Sources */,
 				DFA539A324B3044400316569 /* NavigationController.swift in Sources */,
 				DF83688D24B32C34004A471B /* SettingsViewController.swift in Sources */,
 				DFA5398D24B302D600316569 /* EditViewController.swift in Sources */,
@@ -308,8 +319,11 @@
 				DF8EA28A24BC95E700C1A8DD /* SignupViewController.swift in Sources */,
 				DF65D4E124C20DBF0031A068 /* ProfilePhotoViewController.swift in Sources */,
 				DFA5399524B302D600316569 /* Kast.xcdatamodeld in Sources */,
+				DF9A7ACD294377D900E8E2D3 /* SearchViewController.swift in Sources */,
+				DF9A7ACF294378F500E8E2D3 /* ActiveViewController.swift in Sources */,
 				DF1F40AF24B8F80800FDA4CD /* WelcomeViewController.swift in Sources */,
 				DF83688F24B348CE004A471B /* MessagesViewController.swift in Sources */,
+				DF9A7AD32943818900E8E2D3 /* FeedCell.swift in Sources */,
 				DF8EA28324BC1BE700C1A8DD /* LoginViewController.swift in Sources */,
 				DFA539A624B3054B00316569 /* Extensions.swift in Sources */,
 				DF0D4EF924CF3DB700543518 /* MessageCell.swift in Sources */,
@@ -470,12 +484,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5W669BK4JQ;
 				INFOPLIST_FILE = Kast/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Town SQ";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.Kast;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Town SQ";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -489,12 +505,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5W669BK4JQ;
 				INFOPLIST_FILE = Kast/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Town SQ";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.Kast;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Town SQ";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

@@ -72,7 +72,7 @@ extension UIView {
 	
 	func getImage(scale: CGFloat? = nil) -> UIImage? {
 		let bounds = self.bounds
-		UIGraphicsBeginImageContext(bounds.size)
+        UIGraphicsBeginImageContextWithOptions(bounds.size, false, 3.0)
 		if let context = UIGraphicsGetCurrentContext()  {
 			self.layer.render(in: context)
 			let image = UIGraphicsGetImageFromCurrentImageContext()
@@ -159,6 +159,18 @@ extension UIImage {
 		return self
 		
 	}
+	
+	convenience init?(color: UIColor, size: CGSize = CGSize(width: 1, height: 1)) {
+		let rect = CGRect(origin: .zero, size: size)
+		UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0)
+		color.setFill()
+		UIRectFill(rect)
+		let image = UIGraphicsGetImageFromCurrentImageContext()
+		UIGraphicsEndImageContext()
+		
+		guard let cgImage = image?.cgImage else { return nil }
+		self.init(cgImage: cgImage)
+	}
 }
 
 extension Encodable {
@@ -171,8 +183,10 @@ extension Encodable {
 }
 
 extension UIImageView {
-	func downloadedFrom(url: URL, contentMode mode: UIView.ContentMode = .scaleAspectFit) {
+	convenience init(link: String, contentMode mode: UIView.ContentMode = .scaleAspectFit) {
+        self.init()
 		contentMode = mode
+        guard let url = URL(string: link) else { return }
 		URLSession.shared.dataTask(with: url) { (data, response, error) in
 			guard
 				let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
@@ -185,10 +199,7 @@ extension UIImageView {
 			}
 		}.resume()
 	}
-	func downloadedFrom(link: String, contentMode mode: UIView.ContentMode = .scaleAspectFit) {
-		guard let url = URL(string: link) else { return }
-		downloadedFrom(url: url, contentMode: mode)
-	}
+
 }
 
 extension UIButton {
@@ -270,16 +281,6 @@ extension UINavigationController {
 		navigationController?.navigationBar.isTranslucent = true
 		navigationController?.navigationBar.overrideUserInterfaceStyle = smallTitleColorWhenScrolling
 	}
-	
-	func changeBackgroundColor(_ color: UIColor) {
-		let appearance = UINavigationBarAppearance()
-		appearance.configureWithOpaqueBackground()
-		appearance.backgroundColor = color
-		appearance.shadowImage = UIImage(named: "bar")?.resize(CGSize(width: self.view.frame.width, height: 3))
-		self.navigationBar.standardAppearance = appearance
-		self.navigationBar.compactAppearance = appearance
-		self.navigationBar.scrollEdgeAppearance = appearance
-	}
 }
 
 extension NSMutableData {
@@ -339,15 +340,37 @@ struct Color {
 		return trait.userInterfaceStyle == .dark ? UIColor(hex: 0x627F9D) : UIColor(hex: 0x465A6F)
 	})
 	
-	static let title = UIColor(dynamicProvider: { trait in
-		return trait.userInterfaceStyle == .dark ? UIColor.white : purple
+	static let black_white = UIColor(dynamicProvider: { trait in
+        return trait.userInterfaceStyle == .dark ? UIColor.white : UIColor.black
 	})
 	
 	static let background = UIColor(dynamicProvider: { trait in
 		return trait.userInterfaceStyle == .dark ? UIColor(hex: 0x141414) : UIColor.white
 	})
 	
-	/// Tab icons color
+	// Tab icons color
+    static let tabItemDisabled = UIColor(dynamicProvider: { trait in
+        return trait.userInterfaceStyle == .dark ? UIColor(hex: 0xBFBFBF) : UIColor(hex: 0xAFAFAF)
+    })
+    
+    static let tabItem = UIColor(dynamicProvider: { trait in
+        return trait.userInterfaceStyle == .dark ? purple : cyan
+    })
+    
+    static let cyan_white = UIColor(dynamicProvider: { trait in
+        return trait.userInterfaceStyle == .dark ? UIColor(hex: 0xBFBFBF) : UIColor(hex: 0x5CCCD0)
+    })
+    
+    static let darkBlue_white = UIColor(dynamicProvider: { trait in
+        return trait.userInterfaceStyle == .dark ? UIColor(hex: 0xBFBFBF) : UIColor(hex: 0x465A6F)
+    })
+    
+    static let lightText = UIColor(dynamicProvider: { trait in
+        return trait.userInterfaceStyle == .dark ? UIColor(hex: 0x808080) : UIColor(hex: 0x6c6c6c)
+    })
+    
+    
+    
 	static let editTabLight = UIColor(dynamicProvider: { trait in
 		return trait.userInterfaceStyle == .dark ? UIColor(hex: 0xCEF0F1) : UIColor(hex: 0x355758)
 	})
@@ -381,7 +404,7 @@ struct Color {
 	})
 	
 	static let separatorBackground = UIColor(dynamicProvider: { trait in
-		return trait.userInterfaceStyle == .dark ? UIColor(hex: 0x313131) : UIColor.white
+        return trait.userInterfaceStyle == .dark ? UIColor(hex: 0x313131) : UIColor(hex: 0xEBEBEB)
 	})
 	
 	static let blueLabel = UIColor(dynamicProvider: { trait in

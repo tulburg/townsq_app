@@ -21,6 +21,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
 	
 	init() {
 		super.init(nibName: nil, bundle: nil)
+        title = "Profile"
 		let tabImage = UIImage(named: "profile")
 		tabImage?.withRenderingMode(.alwaysTemplate)
 		self.tabBarItem = UITabBarItem(title: "", image: tabImage, tag: 2)
@@ -61,6 +62,11 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
 		self.view.addConstraints(format: "H:|-32-[v0(160)]-(>=0)-|", views: editButton)
 		
 	}
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.tabBarController?.title = "Profile"
+    }
 	
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

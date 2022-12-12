@@ -22,21 +22,26 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		tabImage?.withTintColor(Color.homeTabLight, renderingMode: .alwaysTemplate)
 		self.tabBarItem = UITabBarItem(title: "", image: tabImage, tag: 1)
 		self.tabBarItem.setBadgeTextAttributes([NSAttributedString.Key.backgroundColor: Color.red, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16)], for: .normal)
-		
-		let counter = self.makeFeedAcitivityCounter()
-		counter.isHidden = true;
+
 		
 		let feedTable = initFeedTableView()
-		self.view.addSubviews(views: feedTable, counter)
+		self.view.addSubviews(views: feedTable)
 		self.view.constrain(type: .horizontalFill, feedTable)
 		self.view.addConstraints(format: "V:|-0-[v0]-0-|", views: feedTable)
-		
-		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2, execute: {
-			counter.isHidden = false;
-			let image = counter.getImage()!.withRenderingMode(.alwaysOriginal)
-			self.tabBarItem.image = image
-			counter.isHidden = true
-		})
+        
+        Linker(path: "/posts") {
+            data, response, error in
+            if let json = data?.toJsonArray() {
+                for post in json {
+                    let value = (post as! Dictionary<String, Any>)["body"] as! String
+                    self.feed.append(value.replacingOccurrences(of: "\n", with: ""))
+                }
+            }
+            DispatchQueue.main.async {
+                feedTable.reloadData()
+            }
+            
+        }.execute()
 	}
 	
 	override func viewDidLoad() {
@@ -45,6 +50,11 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		self.view.backgroundColor = Color.background
 
 	}
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.tabBarController?.title = "Feed"
+    }
 	
 	func initFeedTableView() -> UITableView {
 		let tableView = UITableView()
@@ -53,7 +63,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		tableView.tableFooterView = UIView(frame: CGRect.zero)
 		tableView.estimatedRowHeight = UITableView.automaticDimension
 		tableView.backgroundColor = Color.background
-		tableView.separatorInset = UIEdgeInsets(top: 0, left: 64, bottom: 0, right: 16)
+        tableView.separatorColor = UIColor.clear
 		return tableView
 	}
 	
@@ -62,10 +72,13 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = FeedCell(feed[indexPath.row])
+        let cell: FeedCell = FeedCell(feed[indexPath.row])
 		let background = UIView()
 		background.backgroundColor = Color.create(UIColor(hex: 0xf0f0f0), dark: UIColor(hex: 0x000000))
 		cell.selectedBackgroundView = background
+        if indexPath.row == feed.count - 1 {
+            cell.hideSeparator()
+        }
 		return cell
 	}
 	
@@ -96,85 +109,4 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		messagesVC.modalPresentationStyle = .fullScreen
 		self.navigationController?.pushViewController(messagesVC, animated: true)
 	}
-}
-
-
-class FeedCell: UITableViewCell {
-	var feed: String!
-	
-	init(_ feed: String) {
-		super.init(style: .default, reuseIdentifier: .none)
-		self.feed = feed
-		
-		let ownerImage = makeOwnerImage()
-		let ownerName = UILabel("Simone biles", Color.darkBlue, UIFont.systemFont(ofSize: 17, weight: .bold))
-		let feedTime = UILabel("2d ago", Color.darkBlue, UIFont.italicSystemFont(ofSize: 12))
-		let feedBody = UILabel(feed, Color.textDark, UIFont.systemFont(ofSize: 16))
-		feedBody.numberOfLines = 6
-		
-		let ownerContainer = UIView()
-		ownerContainer.addSubviews(views: ownerName, feedTime)
-		ownerContainer.addConstraints(format: "V:|-2-[v0(24)]-2-|", views: ownerName)
-		ownerContainer.addConstraints(format: "V:|-2-[v0(24)]-2-|", views: feedTime)
-		ownerContainer.addConstraints(format: "H:|-0-[v0]-0-[v1(40@1)]-0-|", views: ownerName, feedTime)
-		
-		let feedActivityCounter = makeFeedAcitivityCounter()
-		let feedActivitySummary = UILabel("are talking about this", Color.purple, UIFont.systemFont(ofSize: 12))
-		let feedActivityContainer = UIView()
-		feedActivityContainer.addSubviews(views: feedActivityCounter, feedActivitySummary)
-		feedActivityContainer.addConstraints(format: "V:|-2-[v0]-2-|", views: feedActivityCounter)
-		feedActivityContainer.addConstraints(format: "H:|-0-[v0(>=12,<=35)]-4-[v1]-0-|", views: feedActivityCounter, feedActivitySummary)
-		feedActivitySummary.centerYAnchor.constraint(equalTo: feedActivityContainer.centerYAnchor).isActive = true
-		
-		
-		let bodyContainer = UIView()
-		bodyContainer.addSubviews(views: ownerContainer, feedBody, feedActivityContainer)
-		bodyContainer.addConstraints(format: "V:|-8-[v0]-0-[v1]-8-[v2]-8-|", views: ownerContainer, feedBody, feedActivityContainer)
-		bodyContainer.constrain(type: .horizontalFill, ownerContainer, feedBody, feedActivityContainer)
-		
-		let feedContainer = UIView()
-		feedContainer.addSubviews(views: ownerImage, bodyContainer)
-		feedContainer.addConstraints(format: "V:|-16-[v0(40)]-(>=0)-|", views: ownerImage)
-		feedContainer.addConstraints(format: "V:|-0-[v0]-8-|", views: bodyContainer)
-		feedContainer.addConstraints(format: "H:|-0-[v0(40)]-8-[v1]-0-|", views: ownerImage, bodyContainer)
-		
-		self.contentView.addSubview(feedContainer)
-		self.contentView.backgroundColor = UIColor.clear
-		self.contentView.constrain(type: .horizontalFill, feedContainer, margin: 16)
-		self.contentView.constrain(type: .verticalFill, feedContainer, margin: 2)
-		self.backgroundColor = Color.background
-		
-	}
-	
-	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-		super.init(style: style, reuseIdentifier: reuseIdentifier)
-	}
-	
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
-	
-	func makeOwnerImage() -> UIImageView {
-		let imageView = UIImageView()
-		imageView.layer.cornerRadius = 12
-		imageView.clipsToBounds = true
-		imageView.backgroundColor = Color.red
-		return imageView
-	}
-  
-	func makeFeedAcitivityCounter() -> UIView {
-		let container = UIView()
-		container.backgroundColor = Color.cyan
-		container.layer.cornerRadius = 8
-		let label = UILabel()
-		label.font = UIFont.boldSystemFont(ofSize: 10)
-		label.textColor = UIColor.systemBackground
-		label.text = "2.3k"
-		container.addSubview(label)
-		container.constrain(type: .horizontalFill, label, margin: 6)
-		container.constrain(type: .verticalFill, label, margin: 2)
-		return container
-	}
-	
-	
 }

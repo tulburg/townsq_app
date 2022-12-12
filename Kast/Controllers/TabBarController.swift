@@ -21,61 +21,36 @@ class TabBarController: UITabBarController {
 	override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
 		super.init(nibName: nil, bundle: nil)
 
-		let editViewController = EditViewController()
-		editViewController.modalPresentationStyle = .overCurrentContext
 		self.setViewControllers([
-			editViewController, FeedViewController(), ProfileViewController(), SettingsViewController()
+            FeedViewController(), SearchViewController(), ActiveViewController(), ProfileViewController()
 		], animated: false)
-		
-		self.selectedIndex = 1
+        
 		self.tabBar.barTintColor = Color.background
+        self.tabBar.backgroundColor = Color.background
+        self.tabBar.isTranslucent = false
 		self.tabBar.unselectedItemTintColor = UIColor.gray.withAlphaComponent(0.5)
-		self.tabBar.tintColor = Color.homeTab
-		self.title = "Home"
+		self.tabBar.tintColor = Color.tabItem
 
-		self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "message"), style: .plain, target: self, action: #selector(presentMessages))
-		self.navigationItem.rightBarButtonItem?.tintColor = Color.cyan
+		self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "edit"), style: .plain, target: self, action: #selector(presentEditor))
+        self.navigationItem.rightBarButtonItem?.tintColor = Color.darkBlue_white
 		self.navigationItem.backBarButtonItem?.tintColor = UIColor.clear
 		self.navigationItem.backBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.clear
 		], for: .normal)
 		
 	}
 	
-	override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
-		
-		let feedVC: UIViewController = (self.viewControllers?[1])!
-		
-		if item.tag == 0 {
-			self.title = "New Broadcast"
-		} else if item.tag == 1 {
-			self.title = "Home"
-			let tabImage = UIImage(named: "home")
-			tabImage?.withTintColor(Color.homeTabLight, renderingMode: .alwaysTemplate)
-			item.image = tabImage
-		}else if item.tag == 2 {
-			self.title = "Profile"
-		}else if item.tag == 3 {
-			self.title = "Settings"
-		}
-		
-		if item.tag != 1 {
-			feedVC.tabBarItem.badgeValue = self.homeBadge
-		}
-		
-	}
-	
-	@objc func presentMessages() {
-		let messagesVC = MessagesViewController()
-		messagesVC.modalPresentationStyle = .fullScreen
-		DispatchQueue.main.async {
-			if self.canResignFirstResponder {
-				self.resignFirstResponder()
-				let vc = self.viewControllers?[0] as? EditViewController
-				vc?.textView.resignFirstResponder()
-				vc?.textView.endEditing(true)
-			}
-		}
-		self.navigationController?.pushViewController(messagesVC, animated: true)
+	@objc func presentEditor() {
+		let editVC = EditViewController()
+        editVC.modalPresentationStyle = .popover
+//		DispatchQueue.main.async {
+//			if self.canResignFirstResponder {
+//				self.resignFirstResponder()
+//				let vc = self.viewControllers?[0] as? EditViewController
+//				vc?.textView.resignFirstResponder()
+//				vc?.textView.endEditing(true)
+//			}
+//		}
+		self.present(editVC, animated: true)
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {

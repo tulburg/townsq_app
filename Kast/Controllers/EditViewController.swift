@@ -64,6 +64,11 @@ class EditViewController: UIViewController {
 		self.view.constrain(type: .horizontalFill, buttonContainer, textView, margin: 16)
 		self.view.constrain(type: .horizontalFill, border)
 	}
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.tabBarController?.title = "New broadcast"
+    }
 
 
 }

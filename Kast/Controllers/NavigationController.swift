@@ -22,18 +22,17 @@ class NavigationController: UINavigationController {
 		
 		let appearance = UINavigationBarAppearance()
 		appearance.configureWithOpaqueBackground()
-		appearance.largeTitleTextAttributes = [.foregroundColor: Color.title]
+		appearance.largeTitleTextAttributes = [.foregroundColor: Color.black_white]
 		appearance.backgroundColor = Color.background
-		appearance.shadowImage = UIImage(named: "bar")?.resize(CGSize(width: self.view.frame.width, height: 3))
 		appearance.titleTextAttributes = [
 			NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 17),
-			NSAttributedString.Key.foregroundColor: Color.title
+			NSAttributedString.Key.foregroundColor: Color.black_white
 		]
 		self.navigationBar.standardAppearance = appearance
 		self.navigationBar.compactAppearance = appearance
 		self.navigationBar.scrollEdgeAppearance = appearance
 		self.navigationBar.prefersLargeTitles = false
-		self.navigationBar.tintColor = Color.title
+		self.navigationBar.tintColor = Color.black_white
 		self.navigationBar.isTranslucent = false
 
 	}
