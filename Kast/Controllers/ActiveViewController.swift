@@ -22,7 +22,6 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
         let tabImage = UIImage(named: "active")
         tabImage?.withTintColor(Color.tabItemDisabled, renderingMode: .alwaysTemplate)
         self.tabBarItem = UITabBarItem(title: "", image: tabImage, tag: 1)
-        self.tabBarItem.setBadgeTextAttributes([NSAttributedString.Key.backgroundColor: Color.red, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16)], for: .normal)
         
         let table = initTableView()
         self.view.addSubviews(views: table)
@@ -51,6 +50,12 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.tabBarController?.title = "Active"
+        (self.tabBarController as! TabBarController).activeBadge.isHidden = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        (self.tabBarController as! TabBarController).activeBadge.isHidden = false
     }
     
     func initTableView() -> UITableView {

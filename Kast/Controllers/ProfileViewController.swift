@@ -22,8 +22,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
 	init() {
 		super.init(nibName: nil, bundle: nil)
         title = "Profile"
-		let tabImage = UIImage(named: "profile")
-		tabImage?.withRenderingMode(.alwaysTemplate)
+        let tabImage = UIImage()
 		self.tabBarItem = UITabBarItem(title: "", image: tabImage, tag: 2)
 		
 		details = ["Date of birth", "Email address"]
@@ -60,12 +59,18 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
 		self.view.addConstraints(format: "H:|-16-[v0]-16-|", views: displayName)
 		self.view.constrain(type: .horizontalFill, detailsTable)
 		self.view.addConstraints(format: "H:|-32-[v0(160)]-(>=0)-|", views: editButton)
+        
+        
 		
 	}
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.tabBarController?.title = "Profile"
+        
+        
+        self.tabBarItem.badgeColor = UIColor.red
+        self.tabBarItem.badgeValue = "3"
     }
 	
 	
