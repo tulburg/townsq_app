@@ -381,6 +381,10 @@ struct Color {
         return trait.userInterfaceStyle == .dark ? UIColor(hex: 0x808080) : UIColor(hex: 0x6c6c6c)
     })
     
+    static let grayDark = UIColor(hex: 0x343434)
+    static let grayMid = UIColor(hex: 0x858585)
+    static let gray = UIColor(hex: 0xB6B6B6)
+    
     
     
 	static let editTabLight = UIColor(dynamicProvider: { trait in

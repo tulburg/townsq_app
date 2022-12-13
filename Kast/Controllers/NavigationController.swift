@@ -9,10 +9,8 @@
 import UIKit
 
 class NavigationController: UINavigationController {
-	
-	required init?(coder aDecoder: NSCoder) {
-		super.init(coder: aDecoder)
-	}
+    
+    var appearance: UINavigationBarAppearance!
 	
 	override init(rootViewController: UIViewController) {
 		super.init(rootViewController: rootViewController)
@@ -20,7 +18,7 @@ class NavigationController: UINavigationController {
 		
 		self.navigationItem.backBarButtonItem?.tintColor = Color.navigationItem
 		
-		let appearance = UINavigationBarAppearance()
+		appearance = UINavigationBarAppearance()
 		appearance.configureWithOpaqueBackground()
 		appearance.largeTitleTextAttributes = [.foregroundColor: Color.black_white]
 		appearance.backgroundColor = Color.background
@@ -36,9 +34,28 @@ class NavigationController: UINavigationController {
 		self.navigationBar.isTranslucent = false
 
 	}
-	
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 	}
 	
+    func hideTopBar() {
+        appearance.shadowImage = UIImage(color: UIColor.clear)
+        
+        self.navigationBar.standardAppearance = appearance
+        self.navigationBar.compactAppearance = appearance
+        self.navigationBar.scrollEdgeAppearance = appearance
+    }
+    
+    func showTopBar() {
+        appearance.shadowImage = UINavigationBar.appearance().shadowImage
+        
+        self.navigationBar.standardAppearance = appearance
+        self.navigationBar.compactAppearance = appearance
+        self.navigationBar.scrollEdgeAppearance = appearance
+    }
 }

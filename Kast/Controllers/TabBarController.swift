@@ -27,6 +27,8 @@ class TabBarController: UITabBarController {
             FeedViewController(), SearchViewController(), ActiveViewController(), ProfileViewController()
 		], animated: false)
         
+        selectedIndex = 3
+        
 		self.tabBar.barTintColor = Color.background
         self.tabBar.backgroundColor = Color.background
         self.tabBar.isTranslucent = false
@@ -43,9 +45,14 @@ class TabBarController: UITabBarController {
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         if tabBar.items?.firstIndex(of: item) == 3 {
             profileRing.backgroundColor = Color.tabItem
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "settings"), style: .done, target: self, action: #selector(openSettings))
+            (self.navigationController as! NavigationController).hideTopBar()
         }else {
             profileRing.backgroundColor = Color.homeTabLight
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "edit"), style: .plain, target: self, action: #selector(presentEditor))
+            (self.navigationController as! NavigationController).showTopBar()
         }
+        
     }
 	
 	@objc func presentEditor() {
@@ -95,6 +102,11 @@ class TabBarController: UITabBarController {
     @objc func selectProfile() {
         selectedIndex = 3
         profileRing.backgroundColor = Color.tabItem
+        tabBar(self.tabBar, didSelect: tabBar.items![3])
+    }
+    
+    @objc func openSettings() {
+        self.navigationController?.pushViewController(SettingsViewController(), animated: true)
     }
 	
 }
