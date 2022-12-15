@@ -8,50 +8,78 @@
 
 import UIKit
 
-class DOBViewController: UIViewController, UITextFieldDelegate {
+class DOBViewController: ViewController, UITextFieldDelegate {
+    
+    var rootView: UIView!
+    var datePicker: UIDatePicker!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		self.view.backgroundColor = Color.background
-		self.navigationItem.title = "Date of birth"
-		let backButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: nil)
-		backButtonItem.tintColor = Color.navigationItem
-		self.navigationItem.backBarButtonItem = backButtonItem
-		
-		
-		let title = UILabel("Choose your date of birth", Color.formTitle, UIFont.systemFont(ofSize: 18, weight: .bold))
-		let description = UILabel("Please choose your date of birth to confirm you are older than 13", Color.formDescription, UIFont.systemFont(ofSize: 16))
-		description.numberOfLines = 2
-		
-		let datePicker = UIDatePicker()
-		datePicker.datePickerMode = .date
-		datePicker.preferredDatePickerStyle = .automatic
-		datePicker.alpha = 1
-		datePicker.backgroundColor = Color.formInput
-		datePicker.locale = Locale(identifier: "FR")
-		datePicker.addTarget(self, action: #selector(setDate), for: .valueChanged)
-		datePicker.layer.cornerRadius = 12
-		datePicker.clipsToBounds = true
-		datePicker.inputView?.tintColor = Color.purple
-		let formatter = DateFormatter()
-		formatter.dateFormat = "DD-MM-YYYY"
-		datePicker.minimumDate = formatter.date(from: "01-01-1920")
-		datePicker.maximumDate = Date(timeIntervalSinceNow: -(14 * 365 * 86400))
-			
-		let button = UIButton("Next", font: UIFont.systemFont(ofSize: 16), image: UIImage(named: "arrow_right"))
-		button.rightImage()
-		button.addTarget(self, action: #selector(openPhoto), for: .touchUpInside)
-		self.view.addSubviews(views: title, description, datePicker, button)
-		self.view.constrain(type: .horizontalFill, title, description, datePicker, margin: 24)
-		self.view.addConstraints(format: "H:|-(>=0)-[v0(120)]-24-|", views: button)
-		self.view.addConstraints(format: "V:|-120-[v0(24)]-8-[v1(48)]-24-[v2(40)]-32-[v3(40)]-(>=0)-|", views: title, description, datePicker, button)
-		
-	}
-	
-	override func viewDidAppear(_ animated: Bool) {
-		super.viewDidAppear(animated)
-	}
+        self.view.backgroundColor = Color.background
+        self.navigationItem.title = "Display name"
+        
+        rootView = UIView()
+        
+        let descriptionLabel = UILabel("You must be older than 18 years old to use this app", Color.lightText, UIFont.systemFont(ofSize: 14))
+        descriptionLabel.numberOfLines = 2
+        let verifyButton = ButtonXL("Next", action: #selector(verify))
+        
+        datePicker = UIDatePicker()
+        datePicker.datePickerMode = .date
+        datePicker.preferredDatePickerStyle = .automatic
+        datePicker.alpha = 1
+        datePicker.backgroundColor = Color.formInput
+        datePicker.locale = Locale(identifier: "EN")
+        datePicker.addTarget(self, action: #selector(setDate), for: .valueChanged)
+        datePicker.layer.cornerRadius = 12
+        datePicker.clipsToBounds = true
+        datePicker.inputView?.tintColor = Color.purple
+        let formatter = DateFormatter()
+        formatter.dateFormat = "DD-MM-YYYY"
+        datePicker.minimumDate = formatter.date(from: "01-01-1920")
+        datePicker.maximumDate = Date(timeIntervalSinceNow: -(14 * 365 * 86400))
+        
+        rootView.add().vertical(0.14 * view.frame.height).view(datePicker, 44).gap(8).view(descriptionLabel).gap(50).view(verifyButton, 44).end(">=0")
+        rootView.constrain(type: .horizontalFill, datePicker, margin: 32)
+        rootView.add().horizontal(32).view(descriptionLabel).end(56)
+        rootView.constrain(type: .horizontalCenter, verifyButton)
+        
+        view.add().vertical(0).view(rootView).end(">=0")
+        view.constrain(type: .horizontalFill, rootView)
+        
+        let title = UILabel("Choose your date of birth", Color.formTitle, UIFont.systemFont(ofSize: 18, weight: .bold))
+        
+        
+        
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        rootView.hideIndicator()
+    }
+    
+    @objc func verify() {
+        rootView.showIndicator(size: 56, color: Color.darkBlue_white)
+        let controller = DOBViewController()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+            self.navigationController?.pushViewController(controller, animated: true)
+        })
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if datePicker.isFirstResponder {
+            datePicker.resignFirstResponder()
+        }
+    }
+    
+    @objc func dismissNav() {
+        dismiss(animated: true)
+    }
 	
 	@objc func pop() {
 		self.navigationController?.popViewController(animated: true)

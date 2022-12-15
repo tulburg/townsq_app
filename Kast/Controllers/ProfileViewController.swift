@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ProfileViewController: UIViewController {
+class ProfileViewController: ViewController {
 	
 	var details: [String]!
 	var values: [String]!
@@ -41,16 +41,24 @@ class ProfileViewController: UIViewController {
         let username = UILabel("@simone_biles", Color.grayMid, UIFont.systemFont(ofSize: 14))
         username.textAlignment = .center
 		
-        let followButton = UIButton("Follow")
-        let messageButton = UIButton("", font: UIFont.systemFont(ofSize: 12), image: UIImage(named: "message"))
-        let moreButton = UIButton("", font: UIFont.systemFont(ofSize: 12), image: UIImage(named: "more"))
+        let followButton = UIButton("Follow", font: UIFont.systemFont(ofSize: 14, weight: .semibold))
+        followButton.layer.cornerRadius = 15
+        followButton.backgroundColor = Color.darkBlue_white
+        let messageButton = UIImageView(image: UIImage(named: "message"))
+        messageButton.asButton()
+        let moreButton = UIImageView(image: UIImage(named: "more"))
+        moreButton.asButton()
         let separator = UIView()
         separator.backgroundColor = Color.separator
         let bio = UILabel("Hi, welcome to my profile. I’m a father, son & a cheerful spirit person. If you like what you see, please give me a follow & I will quickly follow back", Color.lightText, UIFont.systemFont(ofSize: 16))
+        bio.textAlignment = .center
+        bio.numberOfLines = 6
         let buttonContainer = UIView()
         buttonContainer.addSubviews(views: followButton, messageButton, moreButton)
-        buttonContainer.addConstraints(format: "H:|-(>=0)-[v0]-8-[v1]-8-[v2]-(>=0)-|", views: followButton, messageButton, moreButton)
-        buttonContainer.constrain(type: .verticalFill, followButton, messageButton, moreButton)
+        buttonContainer.addConstraints(format: "H:|-(>=0)-[v0]-8-[v1(30)]-8-[v2(30)]-(>=0)-|", views: followButton, messageButton, moreButton)
+        buttonContainer.addConstraints(format: "V:|-0-[v0(30)]-0-|", views: followButton)
+        buttonContainer.addConstraints(format: "V:|-0-[v0(30)]-0-|", views: messageButton)
+        buttonContainer.addConstraints(format: "V:|-0-[v0(30)]-0-|", views: moreButton)
 		
         let followers = makeCounter(245, "Followers")
         let following = makeCounter(198, "Following")
@@ -64,16 +72,31 @@ class ProfileViewController: UIViewController {
         counterContainer.addConstraints(format: "H:|-0-[v0(72)]-16-[v1(1)]-16-[v2(72)]-16-[v3(1)]-16-[v4(72)]-0-|", views: followers, separator1, following, separator2, broadcasts)
         counterContainer.constrain(type: .verticalFill, separator1, separator2, margin: 8)
         
-        view.addSubviews(views: profilePhoto, displayName, username, buttonContainer, counterContainer, separator)
-        view.addConstraints(format: "V:|-8-[v0(80)]-4-[v1]-0-[v2]-16-[v3]-24-[v4(44)]-16-[v5(1)]-(>=0)-|", views: profilePhoto, displayName, username, buttonContainer, counterContainer, separator)
+        let statGroup = UIView()
+        let joined = TagButton(UIImage(systemName: "calendar")!, "Joined Sept 2021", color: Color.darkBlue_white)
+        joined.layer.borderWidth = 0
+        let location = TagButton(UIImage(systemName: "pin")!, "West Virginia, CA", color: Color.darkBlue_white)
+        location.layer.borderWidth = 0
+        statGroup.addSubviews(views: joined, location)
+        statGroup.addConstraints(format: "H:|-0-[v0]-8-[v1]-0-|", views: joined, location)
+        statGroup.constrain(type: .verticalFill, joined, location)
+        
+        
+        view.addSubviews(views: profilePhoto, displayName, username, buttonContainer, counterContainer, separator, bio, statGroup)
+        view.addConstraints(
+            format: "V:|-8-[v0(80)]-4-[v1]-0-[v2]-16-[v3]-24-[v4(44)]-16-[v5(1)]-16-[v6]-16-[v7]-(>=0)-|",
+            views: profilePhoto, displayName, username, buttonContainer, counterContainer, separator, bio, statGroup
+        )
+        view.constrain(type: .horizontalFill, bio, margin: 32)
         view.addConstraints(format: "H:|-(>=0)-[v0(80)]-(>=0)-|", views: profilePhoto)
         profilePhoto.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
         view.constrain(type: .horizontalFill, displayName, username, separator)
         view.addConstraints(format: "H:|-(>=0)-[v0]-(>=0)-|", views: buttonContainer)
         view.addConstraints(format: "H:|-(>=0)-[v0]-(>=0)-|", views: counterContainer)
+        view.addConstraints(format: "H:|-(>=0)-[v0]-(>=0)-|", views: statGroup)
         buttonContainer.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
         counterContainer.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-		
+        statGroup.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
 	}
     
     override func viewDidAppear(_ animated: Bool) {

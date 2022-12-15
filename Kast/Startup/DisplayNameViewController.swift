@@ -8,52 +8,57 @@
 
 import UIKit
 
-class DisplayNameViewController: UIViewController, UITextFieldDelegate {
+class DisplayNameViewController: ViewController, UITextFieldDelegate {
 	
 	var nameField: UITextField!
+    var rootView: UIView!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		self.view.backgroundColor = Color.background
-		self.navigationItem.title = "Display name"
-		
-		let backButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: nil)
-		backButtonItem.tintColor = Color.navigationItem
-		self.navigationItem.backBarButtonItem = backButtonItem
-		
-		self.navigationItem.leftBarButtonItem?.tintColor = Color.navigationItem
-		
-		let title = UILabel("Choose your account name", Color.formTitle, UIFont.systemFont(ofSize: 18, weight: .bold))
-		let description = UILabel("Please choose a name that will be displayed on your account", Color.formDescription, UIFont.systemFont(ofSize: 16))
-		description.numberOfLines = 2
-		nameField = UITextField("Display name")
-		nameField.delegate = self
-		nameField.textContentType = .name
-		let button = UIButton("Next", font: UIFont.systemFont(ofSize: 16), image: UIImage(named: "arrow_right"))
-		button.rightImage()
-		button.addTarget(self, action: #selector(submit), for: .touchUpInside)
-		self.view.addSubviews(views: title, description, nameField, button)
-		self.view.constrain(type: .horizontalFill, title, description, nameField, margin: 24)
-		self.view.addConstraints(format: "H:|-(>=0)-[v0(120)]-24-|", views: button)
-		self.view.addConstraints(format: "V:|-120-[v0(24)]-8-[v1(48)]-24-[v2(40)]-32-[v3(40)]-(>=0)-|", views: title, description, nameField, button)
-	
-	}
-	
-	override func viewDidAppear(_ animated: Bool) {
-		super.viewDidAppear(animated)
-	}
-	
-	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-		if nameField.isFirstResponder { nameField.resignFirstResponder() }
-		return true
-	}
-	
-	@objc func pop() {
-		self.navigationController?.popViewController(animated: true)
-	}
-	
-	@objc func submit() {
-		self.navigationController?.pushViewController(DOBViewController(), animated: true)
-	}
+        self.view.backgroundColor = Color.background
+        self.navigationItem.title = "Display name"
+        
+        rootView = UIView()
+        
+        nameField = UITextField("Display name")
+        let descriptionLabel = UILabel("Choose a name that will be displayed on your account", Color.lightText, UIFont.systemFont(ofSize: 14))
+        descriptionLabel.numberOfLines = 2
+        let verifyButton = ButtonXL("Next", action: #selector(verify))
+        
+        rootView.add().vertical(0.14 * view.frame.height).view(nameField, 44).gap(8).view(descriptionLabel).gap(50).view(verifyButton, 44).end(">=0")
+        rootView.constrain(type: .horizontalFill, nameField, margin: 32)
+        rootView.add().horizontal(32).view(descriptionLabel).end(56)
+        rootView.constrain(type: .horizontalCenter, verifyButton)
+        
+        view.add().vertical(0).view(rootView).end(">=0")
+        view.constrain(type: .horizontalFill, rootView)
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        rootView.hideIndicator()
+    }
+    
+    @objc func verify() {
+        rootView.showIndicator(size: 56, color: Color.darkBlue_white)
+        let controller = DOBViewController()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+            self.navigationController?.pushViewController(controller, animated: true)
+        })
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if nameField.isFirstResponder {
+            nameField.resignFirstResponder()
+        }
+    }
+    
+    @objc func dismissNav() {
+        dismiss(animated: true)
+    }
 }

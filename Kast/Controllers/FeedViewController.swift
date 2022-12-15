@@ -74,7 +74,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: FeedCell = FeedCell(feedText: feed[indexPath.row], nil)
 		let background = UIView()
-		background.backgroundColor = Color.create(UIColor(hex: 0xf0f0f0), dark: UIColor(hex: 0x000000))
+        background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
 		cell.selectedBackgroundView = background
         if indexPath.row == feed.count - 1 {
             cell.hideSeparator()

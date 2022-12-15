@@ -8,50 +8,145 @@
 
 import UIKit
 
+class ConstrainChain {
+    var chain: String = ""
+    var host: UIView!
+    var viewIndex: Int = 0
+    var subviews: [UIView] = []
+    init(_ host: UIView) {
+        self.host = host
+    }
+    
+    func vertical(_ startMargin: CGFloat) -> ConstrainChain {
+        chain += "V:|-\(startMargin)-"
+        return self
+    }
+    
+    func vertical(_ startMargin: String) -> ConstrainChain {
+        chain += "V:|-(\(startMargin))-"
+        return self
+    }
+    func horizontal(_ startMargin: CGFloat) -> ConstrainChain {
+        chain += "H:|-\(startMargin)-"
+        return self
+    }
+    
+    func horizontal(_ startMargin: String) -> ConstrainChain {
+        chain += "H:|-(\(startMargin))-"
+        return self
+    }
+    
+    func view(_ subView: UIView) -> ConstrainChain {
+        host.addSubview(subView)
+        subviews.append(subView)
+        chain += "[v\(viewIndex)]-"
+        viewIndex += 1
+        return self
+    }
+    func view(_ subView: UIView, _ size: CGFloat) -> ConstrainChain {
+        host.addSubview(subView)
+        subviews.append(subView)
+        chain += "[v\(viewIndex)(\(size))]-"
+        viewIndex += 1
+        return self
+    }
+    func view(_ subView: UIView, _ size: String) -> ConstrainChain {
+        host.addSubview(subView)
+        subviews.append(subView)
+        chain += "[v\(viewIndex)(\(size))]-"
+        viewIndex += 1
+        return self
+    }
+    func gap(_ margin: CGFloat) -> ConstrainChain {
+        chain += "\(margin)-"
+        return self
+    }
+    func gap(_ margin: String) -> ConstrainChain {
+        chain += "\(margin)-"
+        return self
+    }
+    
+    func end(_ margin: CGFloat) {
+        chain += "\(margin)-|"
+        host.addConstraints(format: chain, views: subviews)
+    }
+    func end(_ margin: String) {
+        chain += "\(margin)-|"
+        host.addConstraints(format: chain, views: subviews)
+    }
+}
+
 extension UIView {
 	
 	func addConstraints(format: String, views: UIView...) {
-		var viewDict = [String: Any]()
-		for(index, view) in views.enumerated() {
-			view.translatesAutoresizingMaskIntoConstraints = false
-			let key = "v\(index)"
-			viewDict[key] = view
-		}
-		addConstraints(NSLayoutConstraint.constraints(withVisualFormat: format, options: NSLayoutConstraint.FormatOptions(), metrics: nil, views: viewDict))
+		addConstraints(format: format, views: views)
 	}
+    
+    func addConstraints(format: String, views: [UIView]) {
+        var viewDict = [String: Any]()
+        for(index, view) in views.enumerated() {
+            view.translatesAutoresizingMaskIntoConstraints = false
+            let key = "v\(index)"
+            viewDict[key] = view
+        }
+        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: format, options: NSLayoutConstraint.FormatOptions(), metrics: nil, views: viewDict))
+    }
 	
 	func constrain(type: ConstraintType, _ views: UIView..., margin: Float = 0) {
-		if type == .horizontalFill {
-			for view in views {
-				addConstraints(format: "H:|-\(margin)-[v0]-\(margin)-|", views: view)
-			}
-		}else if type == .verticalFill {
-			for view in views {
-				addConstraints(format: "V:|-\(margin)-[v0]-\(margin)-|", views: view)
-			}
-		}
+        switch type {
+        case .horizontalFill:
+            for view in views {
+                addConstraints(format: "H:|-\(margin)-[v0]-\(margin)-|", views: view)
+            }
+        case .verticalFill:
+            for view in views {
+                addConstraints(format: "V:|-\(margin)-[v0]-\(margin)-|", views: view)
+            }
+        case .verticalCenter:
+            for view in views {
+                addConstraints(format: "V:|-(>=\(margin))-[v0]-(>=\(margin))-|", views: view)
+                view.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+            }
+        case .horizontalCenter:
+            for view in views {
+                addConstraints(format: "H:|-(>=\(margin))-[v0]-(>=\(margin))-|", views: view)
+                view.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+            }
+        }
 	}
+    
+    func add() -> ConstrainChain {
+        return ConstrainChain(self)
+    }
 	
-	func showIndicator(size: Int, color: UIColor) {
-		let loadIndicator = UIActivityIndicatorView()
-		loadIndicator.style = .large
-		loadIndicator.color = color
+    func showIndicator(size: Int, color: UIColor, background: UIColor) {
+        let loadIndicator = UIActivityIndicatorView()
+        loadIndicator.style = .large
+        loadIndicator.color = color
+        
+        let wrapper = UIView()
+        wrapper.tag = 0x77234
+        wrapper.backgroundColor = background
+        wrapper.addSubview(loadIndicator)
+        wrapper.constrain(type: .verticalCenter, loadIndicator)
+        wrapper.constrain(type: .horizontalCenter, loadIndicator)
+        wrapper.isUserInteractionEnabled = true
+        wrapper.addGestureRecognizer(UITapGestureRecognizer())
+        wrapper.layer.cornerRadius = layer.cornerRadius
+        
+        addSubview(wrapper)
+        add().vertical(0).view(wrapper).end(0)
+        add().horizontal(0).view(wrapper).end(0)
 		loadIndicator.startAnimating()
-		var dimen = 20
-		if size == 2 { dimen = 40 }
-		if size == 3 { dimen = 60 }
-		if size == 4 { dimen = 80 }
-		if size == 5 { dimen = 100 }
-		addSubview(loadIndicator)
-		addConstraints(format: "V:|-(>=0)-[v0(\(dimen))]-(>=0)-|", views: loadIndicator)
-		addConstraints(format: "H:|-(>=0)-[v0(\(dimen))]-(>=0)-|", views: loadIndicator)
-		loadIndicator.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-		loadIndicator.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
 	}
+    
+    func showIndicator(size: Int, color: UIColor) {
+        showIndicator(size: size, color: color, background: Color.create(0xFFFFFF, dark: 0x000000).withAlphaComponent(0.6))
+    }
 	
 	func hideIndicator() {
 		for v: UIView in subviews {
-			if v is UIActivityIndicatorView {
+            if v.tag == 0x77234 {
 				v.removeFromSuperview()
 			}
 		}
@@ -134,6 +229,8 @@ extension Data {
 enum ConstraintType {
 	case horizontalFill
 	case verticalFill
+    case horizontalCenter
+    case verticalCenter
 }
 
 extension UIImage {
@@ -208,6 +305,13 @@ extension UIImageView {
 			}
 		}.resume()
 	}
+    
+    func asButton() {
+        contentMode = .center
+        layer.borderWidth = 1
+        layer.borderColor = Color.separator.cgColor
+        layer.cornerRadius = 15
+    }
 
 }
 
@@ -241,9 +345,9 @@ extension UITextField {
 		self.init()
 		self.placeholder = hint;
 		self.backgroundColor = Color.formInput
-		self.textColor = UIColor.secondaryLabel
+        self.textColor = Color.black_white
 		self.clipsToBounds = true
-		self.layer.cornerRadius = 12
+		self.layer.cornerRadius = 22
 		self.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 20))
 		self.leftViewRect(forBounds: CGRect(x: 0, y: 0, width: 16, height: 20))
 		self.leftViewMode = .always
@@ -332,9 +436,9 @@ struct Color {
 	static let darkBlue = UIColor(hex: 0x465A6F)
 	static let lightBlue = UIColor(hex: 0x627F9D)
 	
-	static func create(_ light: UIColor, dark: UIColor) -> UIColor {
+	static func create(_ light: Int, dark: Int) -> UIColor {
 		return UIColor(dynamicProvider: { trait in
-			return trait.userInterfaceStyle == .dark ? dark : light
+            return trait.userInterfaceStyle == .dark ? UIColor(hex: dark) : UIColor(hex: light)
 		})
 	}
 	
@@ -381,9 +485,9 @@ struct Color {
         return trait.userInterfaceStyle == .dark ? UIColor(hex: 0x808080) : UIColor(hex: 0x6c6c6c)
     })
     
-    static let grayDark = UIColor(hex: 0x343434)
-    static let grayMid = UIColor(hex: 0x858585)
-    static let gray = UIColor(hex: 0xB6B6B6)
+    static let grayDark = Color.create(0x343434, dark: 0xFFFFFF)
+    static let grayMid = Color.create(0x858585, dark: 0xc9c9c9)
+    static let gray = Color.create(0xB6B6B6, dark: 0x9f9f9f)
     
     
     

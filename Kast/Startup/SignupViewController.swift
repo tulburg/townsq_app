@@ -9,60 +9,97 @@
 import UIKit
 
 
-class SignupViewController: UIViewController, UITextFieldDelegate {
+class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDelegate {
 	
-	var emailField: UITextField!
-	var passwordField: UITextField!
+    var countryCode: UILabel!
+    var country: UIView!
+    var phone: UITextField!
+    var phoneValue = "1"
+    var rootView: UIView!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
 		self.view.backgroundColor = Color.background
 		
-		self.navigationItem.title = "Sign up"
 		self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: #selector(dismissNav))
 		self.navigationItem.leftBarButtonItem?.image = UIImage(named: "back")
 		self.navigationItem.leftBarButtonItem?.tintColor = Color.navigationItem
+        
+        rootView = UIView()
 		
-		let backButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: nil)
-		backButtonItem.tintColor = Color.navigationItem
-		self.navigationItem.backBarButtonItem = backButtonItem
-		
-		let signupTitle = UILabel("Create your account", Color.formTitle, UIFont.systemFont(ofSize: 18, weight: .bold))
-		let signupDesc = UILabel("Please choose your email and password for your account ", Color.formDescription, UIFont.systemFont(ofSize: 16))
-		signupDesc.numberOfLines = 2
-		emailField = UITextField("Email address")
-		emailField.delegate = self
-		emailField.textContentType = .emailAddress
-		passwordField = UITextField("Password")
-		passwordField.delegate = self
-		passwordField.textContentType = .password
-		passwordField.isSecureTextEntry = true
-		let signupButton = UIButton("Sign up", font: UIFont.systemFont(ofSize: 16), image: UIImage(named: "arrow_right"))
-		signupButton.rightImage()
-		signupButton.addTarget(self, action: #selector(submit), for: .touchUpInside)
-		
-		self.view.addSubviews(views: signupTitle, signupDesc, emailField, passwordField, signupButton)
-		self.view.constrain(type: .horizontalFill, signupTitle, signupDesc, emailField, passwordField, margin: 24)
-		self.view.addConstraints(format: "H:|-(>=0)-[v0(140)]-24-|", views: signupButton)
-		self.view.addConstraints(format: "V:|-120-[v0(24)]-8-[v1(48)]-24-[v2(40)]-24-[v3(40)]-32-[v4(40)]-(>=0)-|", views: signupTitle, signupDesc, emailField, passwordField, signupButton)
+		country = UIView()
+        country.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(chooseCountry)))
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.down")?.withTintColor(Color.lightText).resize(CGSize(width: 16, height: 8)))
+        chevron.contentMode = .center
+        countryCode = UILabel("🇺🇸 +1", Color.textDark, UIFont.systemFont(ofSize: 20))
+        phone = UITextField("Phone number")
+        phone.keyboardType = .numberPad
+        phone.font = UIFont.systemFont(ofSize: 20)
+        country.add().horizontal(8).view(countryCode).gap(2).view(chevron, 16).end(8)
+        country.constrain(type: .verticalFill, countryCode, chevron)
+        phone.leftView = country
+        let disclaimerLabel = UILabel("By entering your number, you're agreeing to your Terms of Service and Privacy Policy.", Color.lightText, UIFont.systemFont(ofSize: 12))
+        disclaimerLabel.numberOfLines = 3
+        let continueButton = ButtonXL("Continue", action: #selector(verifyPhone))
+        
+        rootView.add().vertical(0.15 * view.frame.height).view(phone, 44).gap(8).view(disclaimerLabel).gap(50).view(continueButton, 44).end(">=0")
+        rootView.constrain(type: .horizontalFill, phone, disclaimerLabel, margin: 32)
+        rootView.constrain(type: .horizontalCenter, continueButton)
+        
+        view.add().vertical(0).view(rootView).end(">=0")
+        view.constrain(type: .horizontalFill, rootView)
 	}
-	
-	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-		if emailField.isFirstResponder { emailField.resignFirstResponder() }
-		if passwordField.isFirstResponder { emailField.resignFirstResponder() }
-	  
-		return true
-	}
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        title = "Sign Up"
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        title = "Edit"
+        rootView.hideIndicator()
+    }
+    
+    @objc func chooseCountry() {
+        let countryPicker = CountryPickerViewController()
+        countryPicker.selectedCountry = "US"
+        countryPicker.delegate = self
+        self.present(countryPicker, animated: true)
+    }
+    
+    func countryPicker(didSelect country: Country) {
+        countryCode.text = country.isoCode.getFlag() + " +" + country.phoneCode
+        phoneValue = "+" + country.phoneCode
+        DispatchQueue.main.async {
+            self.phone.layoutSubviews()
+            self.phone.becomeFirstResponder()
+        }
+    }
+    
+    
+    @objc func verifyPhone() {
+        rootView.showIndicator(size: 56, color: Color.darkBlue_white)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+            let controller = VerifyPhoneController();
+            if let text = self.phone.text {
+                controller.phoneNumber = self.phoneValue + text
+                self.navigationController?.pushViewController(controller, animated: true)
+            }
+        })
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if phone.isFirstResponder {
+            phone.resignFirstResponder()
+        }
+    }
 	
 	@objc func dismissNav() {
 		self.navigationController?.dismiss(animated: true, completion: nil)
 	}
-	
-	@objc func submit() {
-		
-		self.navigationController?.pushViewController(DisplayNameViewController(), animated: true)
-	}
+
 	
 	
 }
