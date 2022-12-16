@@ -14,6 +14,13 @@ class ViewController: UIViewController {
         super.viewDidLoad()
     }
     
+    var safeAreaInset: UIEdgeInsets? {
+        get {
+            let delegate = UIApplication.shared.connectedScenes.first!.delegate as! SceneDelegate
+            return delegate.window?.safeAreaInsets
+        }
+    }
+    
     func TagButton(_ image: UIImage, _ title: String, color: UIColor?) -> UIView {
         let container = UIView()
         container.layer.cornerRadius = 15

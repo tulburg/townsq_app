@@ -47,7 +47,7 @@ class DOBViewController: ViewController, UITextFieldDelegate {
         view.add().vertical(0).view(rootView).end(">=0")
         view.constrain(type: .horizontalFill, rootView)
         
-        let title = UILabel("Choose your date of birth", Color.formTitle, UIFont.systemFont(ofSize: 18, weight: .bold))
+//        let title = UILabel("Choose your date of birth", Color.formTitle, UIFont.systemFont(ofSize: 18, weight: .bold))
         
     }
     

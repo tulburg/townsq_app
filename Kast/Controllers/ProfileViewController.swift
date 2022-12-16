@@ -117,7 +117,6 @@ class ProfileViewController: ViewController {
         super.viewDidAppear(animated)
         self.tabBarController?.title = ""
         (self.navigationController as! NavigationController).hideTopBar()
-        print(self.navigationController)
     }
     
     override func viewWillAppear(_ animated: Bool) {

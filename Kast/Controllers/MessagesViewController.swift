@@ -9,13 +9,15 @@
 import UIKit
 import NotificationCenter
 
-class MessagesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
+class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
 	
 	var tableView: UITableView!
 	var messageField: UITextView!
 	var messages: [Message] = []
+    var messageContainer: UIView!
+    var sendButton: UIImageView!
 	
-	var messageContainerTopConstraint: NSLayoutConstraint!
+	var messageContainerBottomConstraint: NSLayoutConstraint!
 	var titleContainerHeightConstraint: NSLayoutConstraint!
 	var messageFieldHeightConstraint: NSLayoutConstraint!
 	
@@ -25,7 +27,7 @@ class MessagesViewController: UIViewController, UITableViewDelegate, UITableView
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		let text = "[{\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been going around about a guy that claims to have found big foot in his backyard.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Kim\", \"body\": \"There’s this story that has been. For some, somethings will never change\"}]"
+		let text = "[{\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been going around about a guy that claims to have found big foot in his backyard.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Kim\", \"body\": \"There’s this story that has been. For some, somethings will never change\"},{\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been going around about a guy that claims to have found big foot in his backyard.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Kim\", \"body\": \"There’s this story that has been. For some, somethings will never change\"},{\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been going around about a guy that claims to have found big foot in his backyard.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Kim\", \"body\": \"There’s this story that has been. For some, somethings will never change\"},{\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been going around about a guy that claims to have found big foot in his backyard.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Kim\", \"body\": \"There’s this story that has been. For some, somethings will never change\"}]"
 		if let dicts = text.data(using: .utf8)?.toJsonArray() as? [NSDictionary] {
 			dicts.forEach({ dict in
 				messages.append(Message(dict))
@@ -59,47 +61,47 @@ class MessagesViewController: UIViewController, UITableViewDelegate, UITableView
 		
 		messageField = UITextView()
 		messageField.text = "Message here"
-//		messageField.translatesAutoresizingMaskIntoConstraints = true
-//		messageField.sizeToFit()
-		messageField.isScrollEnabled = true
-		messageField.contentInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
-		messageField.layer.borderWidth = 2
-		messageField.layer.cornerRadius = 12
-		messageField.layer.borderColor = Color.purple.cgColor
-		messageField.textColor = Color.textDark
-		messageField.font = UIFont.systemFont(ofSize: 18)
+        messageField.backgroundColor = UIColor.clear
+		messageField.contentInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -2)
+        messageField.textColor = Color.lightText
+        messageField.font = UIFont.systemFont(ofSize: 18)
 		messageField.delegate = self
+        messageField.showsVerticalScrollIndicator = false
 		
 		tableContainer.addSubview(tableView)
 		tableContainer.constrain(type: .horizontalFill, tableView)
 		tableContainer.addConstraints(format: "V:|-0-[v0]-0-|", views: tableView)
-			
-		self.view.addSubviews(views: tableContainer)
-		self.view.constrain(type: .horizontalFill, tableContainer)
-		self.view.addConstraints(format: "V:|-0-[v0]-0-|", views: tableContainer)
-		
 
-		let messageContainer = UIView()
-		messageContainer.backgroundColor = Color.background
+		messageContainer = UIView()
 		let borderBottom = UIView()
 		borderBottom.backgroundColor = UIColor.clear // Color.separator
-		messageContainer.addSubviews(views: messageField, borderBottom)
-		messageContainer.addConstraints(format: "V:|-0-[v0(40)]-8-[v1(1)]-(>=0)-|", views: messageField, borderBottom)
-		messageContainer.constrain(type: .horizontalFill, messageField, margin: 16)
-		messageContainer.constrain(type: .horizontalFill, borderBottom)
+        let buttonImage = UIImage(systemName: "arrow.up.circle.fill")?.withTintColor(Color.darkBlue_white, renderingMode: .alwaysOriginal)
+        sendButton = UIImageView(image: buttonImage)
+        
+        let messageWrap = UIView()
+        messageWrap.layer.cornerRadius = 20
+        messageWrap.backgroundColor = Color.backgroundDark
+        messageWrap.add().horizontal(8).view(messageField).gap(0).view(sendButton, 36).end(4)
+        messageWrap.add().vertical(0).view(messageField, ">=35").end(0)
+        messageWrap.add().vertical(">=0").view(sendButton, 35).end(2)
+        let borderTop = UIView()
+        borderTop.backgroundColor = Color.separator
+        messageContainer.add().vertical(">=0").view(borderTop, 1).gap(6).view(messageWrap, ">=40").end(4)
+		messageContainer.constrain(type: .horizontalFill, messageWrap, margin: 16)
+        messageContainer.constrain(type: .horizontalFill, borderTop)
 		messageContainer.backgroundColor = Color.background
-		self.view.addSubview(messageContainer)
-		self.view.constrain(type: .horizontalFill, messageContainer)
-		self.view.addConstraints(format: "V:|-(>=0)-[v0(>=50)]-44-|", views: messageContainer)
-//		messageContainer.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -40).isActive = true
+        
+        view.add().vertical(0).view(tableContainer).gap(0).view(messageContainer, 52).end(safeAreaInset!.bottom)
+		view.constrain(type: .horizontalFill, tableContainer, messageContainer)
 		
 		for c in self.view.constraints where c.firstAttribute == .bottom && c.secondItem as? UIView == messageContainer {
-			messageContainerTopConstraint = c
+			messageContainerBottomConstraint = c
 		}
 
-		for c in messageContainer.constraints where c.firstAttribute == .height && c.firstItem as? UIView == messageField {
+		for c in messageWrap.constraints where c.firstAttribute == .height && c.firstItem as? UIView == messageField {
 			messageFieldHeightConstraint = c
 		}
+        
 		
 	}
 	
@@ -130,21 +132,22 @@ class MessagesViewController: UIViewController, UITableViewDelegate, UITableView
 	
 	@objc func keyboardWillShow(notification: NSNotification) {
 		if let kFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-			if messageContainerTopConstraint != nil {
-				messageContainerTopConstraint.constant = (kFrame.height)
+			if messageContainerBottomConstraint != nil {
+				messageContainerBottomConstraint.constant = (kFrame.height + 4)
 			}
 			UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
 				self.view.layoutIfNeeded()
+                self.tableView.scrollToRow(at: IndexPath(row: self.messages.count - 1, section: 0), at: .bottom, animated: true)
 			}, completion: { _ in
-				self.tableView.scrollToRow(at: IndexPath(row: self.messages.count - 1, section: 0), at: .bottom, animated: true)
+				
 			})
 		}
 		
 	}
 	
 	@objc func keyboardWillHide(notification: NSNotification) {
-		if messageContainerTopConstraint != nil {
-			messageContainerTopConstraint.constant = 44
+		if messageContainerBottomConstraint != nil {
+			messageContainerBottomConstraint.constant = 44
 		}
 		UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
 			self.view.layoutIfNeeded()
@@ -154,6 +157,7 @@ class MessagesViewController: UIViewController, UITableViewDelegate, UITableView
 	func textViewDidBeginEditing(_ textView: UITextView) {
 		if textView.text == "Message here" {
 			textView.text = ""
+            textView.textColor = Color.black_white
 		}
 	}
 	
@@ -164,12 +168,20 @@ class MessagesViewController: UIViewController, UITableViewDelegate, UITableView
 	}
 	
 	func textViewDidChange(_ textView: UITextView) {
-		if messageFieldHeightConstraint.constant < 124 {
-			let fixedWidth = textView.frame.size.width
-			textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
-			let newSize = textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
-			messageFieldHeightConstraint.constant = newSize.height
-			self.messageField.superview?.layoutIfNeeded()
-		}
+        
+        let size = CGSize(width: textView.frame.size.width, height: .infinity)
+        let estimatedSize = textView.sizeThatFits(size)
+        guard textView.contentSize.height < 116 else { textView.isScrollEnabled = true; return }
+        textView.isScrollEnabled = false
+        if estimatedSize.height < 48 {
+            return
+        }
+        self.view.constraints.forEach({ constraint in
+            if constraint.firstAttribute == .height && (constraint.firstItem as? UIView) == messageContainer {
+                constraint.constant = estimatedSize.height + 12
+            }
+        })
+        messageFieldHeightConstraint.constant = estimatedSize.height
+        self.messageField.superview?.layoutIfNeeded()
 	}
 }

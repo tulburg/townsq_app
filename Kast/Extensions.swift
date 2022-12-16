@@ -469,6 +469,8 @@ struct Color {
 	static let background = UIColor(dynamicProvider: { trait in
 		return trait.userInterfaceStyle == .dark ? UIColor(hex: 0x141414) : UIColor.white
 	})
+    
+    static let backgroundDark = Color.create(0xECECEC, dark: 0x000000)
 	
 	// Tab icons color
     static let tabItemDisabled = UIColor(dynamicProvider: { trait in

@@ -192,7 +192,7 @@ import UIKit
     private func updateLabels() {
         let item = VerificationCodeItem(text: text, placeholder: placeholderText, isSecure: isSecureTextEntry)
         for label in labels {
-            let index         = labels.index(of: label) ?? 0
+            let index         = labels.firstIndex(of: label) ?? 0
             let currentItem   = item.character(atIndex: index)
             label.text        = currentItem.map { String($0) }
             label.font        = font
@@ -203,7 +203,7 @@ import UIKit
     
     private func updateUnderlines() {
         for label in labels {
-            let index = labels.index(of: label) ?? 0
+            let index = labels.firstIndex(of: label) ?? 0
             if isPlaceholder(index) {
                 underlines[index].backgroundColor = underlineColor
             }
