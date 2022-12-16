@@ -17,7 +17,7 @@ class DOBViewController: ViewController, UITextFieldDelegate {
 		super.viewDidLoad()
 		
         self.view.backgroundColor = Color.background
-        self.navigationItem.title = "Display name"
+        self.navigationItem.title = "Date of birth"
         
         rootView = UIView()
         
@@ -27,10 +27,9 @@ class DOBViewController: ViewController, UITextFieldDelegate {
         
         datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
-        datePicker.preferredDatePickerStyle = .automatic
+        datePicker.preferredDatePickerStyle = .inline
         datePicker.alpha = 1
         datePicker.backgroundColor = Color.formInput
-        datePicker.locale = Locale(identifier: "EN")
         datePicker.addTarget(self, action: #selector(setDate), for: .valueChanged)
         datePicker.layer.cornerRadius = 12
         datePicker.clipsToBounds = true
@@ -40,7 +39,7 @@ class DOBViewController: ViewController, UITextFieldDelegate {
         datePicker.minimumDate = formatter.date(from: "01-01-1920")
         datePicker.maximumDate = Date(timeIntervalSinceNow: -(14 * 365 * 86400))
         
-        rootView.add().vertical(0.14 * view.frame.height).view(datePicker, 44).gap(8).view(descriptionLabel).gap(50).view(verifyButton, 44).end(">=0")
+        rootView.add().vertical(32).view(datePicker).gap(8).view(descriptionLabel).gap(50).view(verifyButton, 44).end(">=0")
         rootView.constrain(type: .horizontalFill, datePicker, margin: 32)
         rootView.add().horizontal(32).view(descriptionLabel).end(56)
         rootView.constrain(type: .horizontalCenter, verifyButton)
@@ -50,22 +49,25 @@ class DOBViewController: ViewController, UITextFieldDelegate {
         
         let title = UILabel("Choose your date of birth", Color.formTitle, UIFont.systemFont(ofSize: 18, weight: .bold))
         
-        
-        
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        title = "Date of birth"
+    }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         rootView.hideIndicator()
+        title = ""
     }
     
     @objc func verify() {
         rootView.showIndicator(size: 56, color: Color.darkBlue_white)
-        let controller = DOBViewController()
+        let controller = ProfilePhotoViewController()
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
             self.navigationController?.pushViewController(controller, animated: true)
         })
@@ -87,10 +89,6 @@ class DOBViewController: ViewController, UITextFieldDelegate {
 	
 	@objc func setDate(_ sender: UIDatePicker, value: Any) {
 		print(sender.date)
-	}
-	
-	@objc func openPhoto() {
-		self.navigationController?.pushViewController(ProfilePhotoViewController(), animated: true)
 	}
 }
 

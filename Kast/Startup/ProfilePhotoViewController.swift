@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ProfilePhotoViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class ProfilePhotoViewController: ViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 	
 	var button: UIButton!
 	var imagePicker: UIImagePickerController!
@@ -20,7 +20,7 @@ class ProfilePhotoViewController: UIViewController, UIImagePickerControllerDeleg
 		super.viewDidLoad()
 		
 		self.view.backgroundColor = Color.background
-		self.navigationItem.title = "Profile photo"
+		self.navigationItem.title = "Profile picture"
 		let backButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: nil)
 		backButtonItem.tintColor = Color.navigationItem
 		self.navigationItem.backBarButtonItem = backButtonItem
@@ -28,7 +28,8 @@ class ProfilePhotoViewController: UIViewController, UIImagePickerControllerDeleg
 		delegate = UIApplication.shared.delegate as? UISceneDelegate
 		
 		
-		let title = UILabel("Choose your profile photo", Color.formTitle, UIFont.systemFont(ofSize: 18, weight: .bold))
+		let title = UILabel("Choose your profile picture", Color.formTitle, UIFont.systemFont(ofSize: 22, weight: .bold))
+        title.textAlignment = .center
 		let description = UILabel("Please select the photo to be displayed on your profile", Color.formDescription, UIFont.systemFont(ofSize: 16))
 		description.numberOfLines = 2
 		
@@ -46,17 +47,13 @@ class ProfilePhotoViewController: UIViewController, UIImagePickerControllerDeleg
 		chooseButton.addTarget(self, action: #selector(showImagePicker), for: .touchUpInside)
 		chooseButton.layer.shadowOpacity = 0
 		
-		button = UIButton("Next", font: UIFont.systemFont(ofSize: 16), image: UIImage(named: "arrow_right"))
-		button.rightImage()
+		button = ButtonXL("Next", action: #selector(complete))
 		button.isHidden = true
-		button.addTarget(self, action: #selector(complete), for: .touchUpInside)
-		
-		self.view.addSubviews(views: title, description, photo, chooseButton, button)
-		self.view.constrain(type: .horizontalFill, title, description, photo, margin: 24)
-		self.view.addConstraints(format: "H:|-(>=0)-[v0(120)]-24-|", views: button)
-		self.view.addConstraints(format: "H:|-(>=0)-[v0(120)]-(>=0)-|", views: chooseButton)
-		self.view.addConstraints(format: "V:|-120-[v0(24)]-8-[v1(48)]-24-[v2(\(self.view.frame.width - 48))]-(-56)-[v3(40)]-40-[v4(40)]-(>=0)-|", views: title, description, photo, chooseButton, button)
-		chooseButton.centerXAnchor.constraint(equalTo: photo.centerXAnchor).isActive = true
+        view.add().horizontal(">=0").view(photo, 180).end(">=0")
+        view.add().vertical(0.08 * view.frame.height).view(title, 24).gap(48).view(photo, 180).gap(-56).view(chooseButton, 40).gap(48).view(button, 44).end(">=0")
+        photo.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+		view.constrain(type: .horizontalFill, title, margin: 24)
+        view.constrain(type: .horizontalCenter, button, chooseButton)
 		
 		imagePicker = UIImagePickerController()
 		imagePicker.delegate = self

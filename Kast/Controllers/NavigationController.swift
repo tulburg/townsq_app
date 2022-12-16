@@ -45,17 +45,25 @@ class NavigationController: UINavigationController {
 	
     func hideTopBar() {
         appearance.shadowImage = UIImage(color: UIColor.clear)
+        appearance.backgroundColor = UIColor.clear
+        appearance.backgroundImage = UIImage()
+        appearance.configureWithTransparentBackground()
         
         self.navigationBar.standardAppearance = appearance
         self.navigationBar.compactAppearance = appearance
         self.navigationBar.scrollEdgeAppearance = appearance
+        self.navigationBar.isTranslucent = true
     }
     
     func showTopBar() {
-        appearance.shadowImage = UINavigationBar.appearance().shadowImage
+        appearance.configureWithOpaqueBackground()
+//        appearance.shadowImage = UINavigationBar.appearance().shadowImage
+        appearance.backgroundColor = Color.background
+//        appearance.backgroundImage = UINavigationBar.appearance().backgroundImage(for: .default)
         
         self.navigationBar.standardAppearance = appearance
         self.navigationBar.compactAppearance = appearance
         self.navigationBar.scrollEdgeAppearance = appearance
+        self.navigationBar.isTranslucent = false
     }
 }

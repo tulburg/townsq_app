@@ -50,12 +50,12 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.tabBarController?.title = "Active"
-        (self.tabBarController as! TabBarController).activeBadge.isHidden = true
+        (self.tabBarController as! TabBarController).activeBadge?.isHidden = true
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        (self.tabBarController as! TabBarController).activeBadge.isHidden = false
+        (self.tabBarController as! TabBarController).activeBadge?.isHidden = false
     }
     
     func initTableView() -> UITableView {

@@ -22,6 +22,8 @@ class DisplayNameViewController: ViewController, UITextFieldDelegate {
         rootView = UIView()
         
         nameField = UITextField("Display name")
+        nameField.textContentType = .givenName
+        nameField.font = UIFont.systemFont(ofSize: 20)
         let descriptionLabel = UILabel("Choose a name that will be displayed on your account", Color.lightText, UIFont.systemFont(ofSize: 14))
         descriptionLabel.numberOfLines = 2
         let verifyButton = ButtonXL("Next", action: #selector(verify))
@@ -38,15 +40,24 @@ class DisplayNameViewController: ViewController, UITextFieldDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        DispatchQueue.main.async {
+            self.nameField.becomeFirstResponder()
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        title = "Display name"
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         rootView.hideIndicator()
+        title = ""
     }
     
     @objc func verify() {
         rootView.showIndicator(size: 56, color: Color.darkBlue_white)
-        let controller = DOBViewController()
+        let controller = UsernameViewController()
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
             self.navigationController?.pushViewController(controller, animated: true)
         })

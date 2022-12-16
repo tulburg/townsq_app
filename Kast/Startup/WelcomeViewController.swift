@@ -56,7 +56,9 @@ class WelcomeViewController: ViewController {
 	}
 	
 	@objc func openSignup() {
-		let navigationController = NavigationController(rootViewController: SignupViewController())
+//        let controller = SignupViewController()
+        let controller = ProfilePhotoViewController()
+		let navigationController = NavigationController(rootViewController: controller)
 		navigationController.modalPresentationStyle = .overCurrentContext
 		self.present(navigationController, animated: true, completion: nil)
 	}

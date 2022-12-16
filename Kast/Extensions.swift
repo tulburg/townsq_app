@@ -18,7 +18,7 @@ class ConstrainChain {
     }
     
     func vertical(_ startMargin: CGFloat) -> ConstrainChain {
-        chain += "V:|-\(startMargin)-"
+        chain += "V:|-(\(startMargin))-"
         return self
     }
     
@@ -27,7 +27,7 @@ class ConstrainChain {
         return self
     }
     func horizontal(_ startMargin: CGFloat) -> ConstrainChain {
-        chain += "H:|-\(startMargin)-"
+        chain += "H:|-(\(startMargin))-"
         return self
     }
     
@@ -37,41 +37,47 @@ class ConstrainChain {
     }
     
     func view(_ subView: UIView) -> ConstrainChain {
-        host.addSubview(subView)
-        subviews.append(subView)
+        if subviews.firstIndex(of: subView) == nil {
+            host.addSubview(subView)
+            subviews.append(subView)
+        }
         chain += "[v\(viewIndex)]-"
         viewIndex += 1
         return self
     }
     func view(_ subView: UIView, _ size: CGFloat) -> ConstrainChain {
-        host.addSubview(subView)
-        subviews.append(subView)
+        if subviews.firstIndex(of: subView) == nil {
+            host.addSubview(subView)
+            subviews.append(subView)
+        }
         chain += "[v\(viewIndex)(\(size))]-"
         viewIndex += 1
         return self
     }
     func view(_ subView: UIView, _ size: String) -> ConstrainChain {
-        host.addSubview(subView)
-        subviews.append(subView)
+        if subviews.firstIndex(of: subView) == nil {
+            host.addSubview(subView)
+            subviews.append(subView)
+        }
         chain += "[v\(viewIndex)(\(size))]-"
         viewIndex += 1
         return self
     }
     func gap(_ margin: CGFloat) -> ConstrainChain {
-        chain += "\(margin)-"
+        chain += "(\(margin))-"
         return self
     }
     func gap(_ margin: String) -> ConstrainChain {
-        chain += "\(margin)-"
+        chain += "(\(margin))-"
         return self
     }
     
     func end(_ margin: CGFloat) {
-        chain += "\(margin)-|"
+        chain += "(\(margin))-|"
         host.addConstraints(format: chain, views: subviews)
     }
     func end(_ margin: String) {
-        chain += "\(margin)-|"
+        chain += "(\(margin))-|"
         host.addConstraints(format: chain, views: subviews)
     }
 }
@@ -508,7 +514,7 @@ struct Color {
 	})
 	static let settingsTab = darkBlue
 	
-	static let separator = UIColor(hex: 0xE1E1E1)
+    static let separator = Color.create(0xE1E1E1, dark: 0x303030)
 	
 	static let formTitle = UIColor(dynamicProvider: { trait in
 		return trait.userInterfaceStyle == .dark ? UIColor.white : UIColor(hex: 0x686868)
