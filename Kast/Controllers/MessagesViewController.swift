@@ -66,6 +66,7 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
         messageField.textColor = Color.lightText
         messageField.font = UIFont.systemFont(ofSize: 18)
 		messageField.delegate = self
+        messageField.textAlignment = .natural
         messageField.showsVerticalScrollIndicator = false
 		
 		tableContainer.addSubview(tableView)
@@ -164,24 +165,33 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
 	func textViewDidEndEditing(_ textView: UITextView) {
 		if textView.text.count == 0 {
 			textView.text = "Message here"
+            textView.textColor = Color.lightText
 		}
 	}
 	
 	func textViewDidChange(_ textView: UITextView) {
+        if textView.text == "" {
+            self.view.constraints.forEach({ constraint in
+                if constraint.firstAttribute == .height && (constraint.firstItem as? UIView) == messageContainer {
+                    constraint.constant = 40 + 12
+                }
+            })
+            messageFieldHeightConstraint.constant = 40
+            self.messageField.superview?.layoutIfNeeded()
+            return
+        }
         
         let size = CGSize(width: textView.frame.size.width, height: .infinity)
         let estimatedSize = textView.sizeThatFits(size)
-        guard textView.contentSize.height < 116 else { textView.isScrollEnabled = true; return }
-        textView.isScrollEnabled = false
-        if estimatedSize.height < 48 {
-            return
-        }
+        if textView.contentSize.height > 116 { textView.isScrollEnabled = true; }
+        else { textView.isScrollEnabled = false }
+        if estimatedSize.height < 52 { return }
         self.view.constraints.forEach({ constraint in
             if constraint.firstAttribute == .height && (constraint.firstItem as? UIView) == messageContainer {
-                constraint.constant = estimatedSize.height + 12
+                constraint.constant = min(estimatedSize.height, 116) + 12
             }
         })
-        messageFieldHeightConstraint.constant = estimatedSize.height
+        messageFieldHeightConstraint.constant = min(estimatedSize.height, 116)
         self.messageField.superview?.layoutIfNeeded()
 	}
 }

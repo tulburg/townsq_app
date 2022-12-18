@@ -17,29 +17,28 @@ class OwnMessageCell: UITableViewCell {
 		self.message = message
 		
 		let ownerImage = makeOwnerImage()
-		let feedBody = UILabel(message.body!, UIColor.white, UIFont.systemFont(ofSize: 16))
+        let feedBody = UILabel(message.body!, Color.black_white, UIFont.systemFont(ofSize: 16))
 		feedBody.numberOfLines = 6
 		
 		let time = UILabel("2d ago", Color.lightBlue, UIFont.systemFont(ofSize: 12))
 		
 		let bodyContainer = UIView()
-		bodyContainer.backgroundColor = Color.purple
-		bodyContainer.layer.cornerRadius = 12
+		bodyContainer.backgroundColor = Color.backgroundDark
+		bodyContainer.layer.cornerRadius = 8
 		bodyContainer.clipsToBounds = true
 		bodyContainer.addSubviews(views: feedBody)
 		bodyContainer.addConstraints(format: "V:|-8-[v0]-8-|", views: feedBody)
 		bodyContainer.constrain(type: .horizontalFill, feedBody, margin: 8)
 		
 		let container = UIView()
-		container.addSubviews(views: ownerImage, bodyContainer, time)
-		container.addConstraints(format: "V:|-16-[v0(40)]-(>=0)-|", views: ownerImage)
-		container.addConstraints(format: "V:|-16-[v0]-8-[v1]-8-|", views: bodyContainer, time)
-		container.addConstraints(format: "H:|-0-[v0(40)]-8-[v1]-(>=0)-|", views: ownerImage, bodyContainer)
-		container.addConstraints(format: "H:|-48-[v0(>=40)]-48-|", views: time)
+        container.add().vertical(8).view(ownerImage, 40).end(">=0")
+        container.add().vertical(8).view(bodyContainer).gap(8).view(time).end(8)
+        container.add().horizontal(48).view(bodyContainer).gap(8).view(ownerImage, 40).end(">=0")
+        container.add().horizontal(">=0").view(time).end(50)
 		
 		self.contentView.addSubview(container)
 		self.contentView.backgroundColor = Color.background
-		self.contentView.constrain(type: .horizontalFill, container, margin: 48)
+		self.contentView.constrain(type: .horizontalFill, container, margin: 16)
 		self.contentView.constrain(type: .verticalFill, container)
 	}
 	
@@ -47,13 +46,12 @@ class OwnMessageCell: UITableViewCell {
 		super.init(coder: coder)
 	}
 	
-	func makeOwnerImage() -> UIImageView {
-		let imageView = UIImageView()
-		imageView.layer.cornerRadius = 12
-		imageView.clipsToBounds = true
-		imageView.backgroundColor = Color.cyan
-		return imageView
-	}
+    func makeOwnerImage() -> UIImageView {
+        let imageView = UIImageView(link: "https://images.ctfassets.net/sc7uy4u0eewy/LPEpShMYorRpDnv0TU720/e279146d5feac47133ff1c1b0818752b/emil-pakarklis.jpg", contentMode: .scaleAspectFill)
+        imageView.layer.cornerRadius = 8
+        imageView.clipsToBounds = true
+        return imageView
+    }
 	
 	
 }

@@ -17,22 +17,22 @@ class MessageCell: UITableViewCell {
 		self.message = message
 		
 		let ownerImage = makeOwnerImage()
-		let ownerName = UILabel("Simone biles", Color.darkBlue, UIFont.systemFont(ofSize: 17, weight: .bold))
+        let ownerName = UILabel("Simone biles", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
+        let ownerUsername = UILabel("@simone_biles", Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
 		let feedTime = UILabel("2d ago", Color.darkBlue, UIFont.italicSystemFont(ofSize: 12))
-		let feedBody = UILabel(message.body!, Color.textDark, UIFont.systemFont(ofSize: 16))
+		let feedBody = UILabel(message.body!, Color.black_white, UIFont.systemFont(ofSize: 16))
 		feedBody.numberOfLines = 6
 		
 		let ownerContainer = UIView()
 		ownerContainer.addSubviews(views: ownerName, feedTime)
-		ownerContainer.addConstraints(format: "V:|-2-[v0(24)]-2-|", views: ownerName)
-		ownerContainer.addConstraints(format: "V:|-2-[v0(24)]-2-|", views: feedTime)
-		ownerContainer.addConstraints(format: "H:|-0-[v0]-8-[v1(40)]-(>=0)-|", views: ownerName, feedTime)
-		
+		ownerContainer.addConstraints(format: "V:|-2-[v0]-2-|", views: ownerName)
+		ownerContainer.addConstraints(format: "V:|-2-[v0]-2-|", views: feedTime)
+		ownerContainer.addConstraints(format: "H:|-0-[v0]-8-[v1]-(>=0)-|", views: ownerName, feedTime)
 		
 		let bodyContainer = UIView()
-		bodyContainer.addSubviews(views: ownerContainer, feedBody)
-		bodyContainer.addConstraints(format: "V:|-8-[v0]-0-[v1]-8-|", views: ownerContainer, feedBody)
-		bodyContainer.constrain(type: .horizontalFill, ownerContainer, feedBody)
+		bodyContainer.addSubviews(views: ownerContainer, feedBody, ownerUsername)
+		bodyContainer.addConstraints(format: "V:|-8-[v0]-(-2)-[v1]-6-[v2]-8-|", views: ownerContainer, ownerUsername, feedBody)
+		bodyContainer.constrain(type: .horizontalFill, ownerUsername, ownerContainer, feedBody)
 		
 		let container = UIView()
 		container.addSubviews(views: ownerImage, bodyContainer)
@@ -52,10 +52,9 @@ class MessageCell: UITableViewCell {
 	}
 	
 	func makeOwnerImage() -> UIImageView {
-		let imageView = UIImageView()
-		imageView.layer.cornerRadius = 12
+        let imageView = UIImageView(link: "https://dvyvvujm9h0uq.cloudfront.net/com/articles/1525891879-886386-sam-burriss-457746-unsplashjpg.jpg", contentMode: .scaleAspectFill)
+		imageView.layer.cornerRadius = 8
 		imageView.clipsToBounds = true
-		imageView.backgroundColor = Color.red
 		return imageView
 	}
 	
