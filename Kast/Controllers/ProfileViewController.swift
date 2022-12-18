@@ -46,7 +46,7 @@ class ProfileViewController: ViewController {
 		
         let followButton = UIButton("Follow", font: UIFont.systemFont(ofSize: 14, weight: .semibold))
         followButton.layer.cornerRadius = 15
-        followButton.backgroundColor = Color.darkBlue_white
+        followButton.backgroundColor = Color.darkBlue
         let message = UIImage(named: "message")?.withTintColor(Color.darkBlue_white)
         let messageButton = UIImageView(image: message)
         messageButton.asButton()

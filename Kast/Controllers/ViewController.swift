@@ -47,7 +47,7 @@ class ViewController: UIViewController {
     
     func ButtonXL(_ text: String, action: Selector) -> UIButton {
         let button = UIButton(text, font: UIFont.systemFont(ofSize: 18, weight: .bold))
-        button.backgroundColor = Color.darkBlue_white
+        button.backgroundColor = Color.darkBlue
         button.layer.cornerRadius = 22
         button.contentEdgeInsets = UIEdgeInsets(top: 14, left: 24, bottom: 14, right: 24)
         button.addTarget(self, action: action, for: .touchUpInside)

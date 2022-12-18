@@ -33,7 +33,7 @@ class OwnMessageCell: UITableViewCell {
 		let container = UIView()
         container.add().vertical(8).view(ownerImage, 40).end(">=0")
         container.add().vertical(8).view(bodyContainer).gap(8).view(time).end(8)
-        container.add().horizontal(48).view(bodyContainer).gap(8).view(ownerImage, 40).end(">=0")
+        container.add().horizontal(48).view(bodyContainer).gap(8).view(ownerImage, 40).end(0)
         container.add().horizontal(">=0").view(time).end(50)
 		
 		self.contentView.addSubview(container)
