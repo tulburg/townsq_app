@@ -14,7 +14,7 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
     
 	var editField: UITextView!
     var counter: UILabel!
-    var button: UIButton!
+    var button: UIBarButtonItem!
     var imagePicker: UIImagePickerController!
     var photo: UIImageView!
     var messageWrap: UIView!
@@ -81,26 +81,31 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
         messageWrap.constrain(type: .horizontalFill, editField, controlView)
         messageWrap.constrain(type: .horizontalFill, photo, margin: 16)
         
-        let buttonContainer = UIView()
-        button = ButtonXL("Publish", action: #selector(publish))
+        button = UIBarButtonItem(customView: ButtonXL("Publish", action: #selector(publish)))
         button.isEnabled = false
-        button.alpha = 0.3
         
-        buttonContainer.add().horizontal(">=0").view(button).end(0)
-        buttonContainer.add().vertical(0).view(button, 44).end(0)
-        
-        rootView.add().vertical(16).view(messageWrap).gap(24).view(buttonContainer).end(">=48")
+        rootView.add().vertical(16).view(messageWrap).end(">=48")
         rootView.add().horizontal(16).view(messageWrap).end(16)
-        rootView.add().horizontal(">=0").view(buttonContainer).end(16)
         
         scrollView = UIScrollView()
         scrollView.add().horizontal(0).view(rootView, view.frame.width).end(0)
         scrollView.constrain(type: .verticalFill, rootView)
         scrollView.delegate = self
         
-        view.addSubview(scrollView)
-        view.constrain(type: .horizontalFill, scrollView)
-        view.constrain(type: .verticalFill, scrollView)
+        let toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 44))
+        toolbar.barTintColor = UIColor.clear
+        toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
+        
+        let cancelButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancel))
+        cancelButton.tintColor = Color.red
+        toolbar.setItems([
+            cancelButton,
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            button
+        ], animated: false)
+        
+        view.add().vertical(16).view(toolbar, 44).gap(0).view(scrollView).end(0)
+        view.constrain(type: .horizontalFill, scrollView, toolbar)
         
         imagePicker = UIImagePickerController()
         imagePicker.delegate = self
@@ -139,14 +144,27 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         imagePicker.dismiss(animated: true, completion: nil)
-        photo.image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
-        photo.isHidden = false
-        messageWrap.constraints.forEach({ constraint in
-            if (constraint.firstItem as! UIView) == photo && constraint.firstAttribute == .height {
-                constraint.constant = 240
-            }
-        })
-        messageWrap.layoutIfNeeded()
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            let w = image.size.width
+            let h = image.size.height
+            let adjRatio = (w > h ? 720 / w : 720 / h)
+            let newImage = image.resizeWithImageIO(to: CGSize(width: adjRatio * w, height: adjRatio * h))
+            let imageData = newImage!.jpegData(compressionQuality: 9)
+            let name = UUID()
+            S3.shared().uploadImage(data: imageData!, name: "\(name.uuidString).jpg", completion: { path in
+                ImageCache.shared().set(data: imageData!, path: path, completion: nil)
+            })
+
+            photo.image = image
+            photo.isHidden = false
+            messageWrap.constraints.forEach({ constraint in
+                if (constraint.firstItem as! UIView) == photo && constraint.firstAttribute == .height {
+                    constraint.constant = 240
+                }
+            })
+            messageWrap.layoutIfNeeded()
+        }
+        
     }
     
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
@@ -194,11 +212,9 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
             if count < 0 {
                 counter.textColor = Color.red
                 button.isEnabled = false
-                button.alpha = 0.3
             } else {
                 counter.textColor = Color.black_white
                 button.isEnabled = true
-                button.alpha = 1
             }
         }
     }
@@ -234,6 +250,10 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
         if editField.isFirstResponder {
             editField.resignFirstResponder()
         }
+    }
+    
+    @objc func cancel() {
+        dismiss(animated: true)
     }
 
 }
@@ -274,4 +294,24 @@ extension FileManager {
 //            NSLog("Error -> \(error.localizedDescription)")
 //        }
 //    }
+}
+
+extension UIImage {
+    func resizeWithImageIO(to newSize: CGSize) -> UIImage? {
+        var resultImage = self
+        
+        guard let data = jpegData(compressionQuality: 1.0) else { return resultImage }
+        let imageCFData = NSData(data: data) as CFData
+        let options = [
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceThumbnailMaxPixelSize: max(newSize.width, newSize.height)
+        ] as CFDictionary
+        guard   let source = CGImageSourceCreateWithData(imageCFData, nil),
+                let imageReference = CGImageSourceCreateThumbnailAtIndex(source, 0, options) else { return resultImage }
+        resultImage = UIImage(cgImage: imageReference)
+        
+        return resultImage
+    }
+
 }

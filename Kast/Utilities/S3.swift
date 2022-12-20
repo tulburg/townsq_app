@@ -21,7 +21,6 @@ class S3 {
         let configuration = AWSServiceConfiguration(region: .USEast1, credentialsProvider: provider)
         
         AWSServiceManager.default().defaultServiceConfiguration = configuration
-        AWSDDLog.sharedInstance.logLevel = .verbose
     }
     
     private let bucketName = "tq-imagecache-sn"
