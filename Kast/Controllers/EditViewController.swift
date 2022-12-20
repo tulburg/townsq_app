@@ -8,9 +8,10 @@
 
 import UIKit
 import NotificationCenter
+import PhotosUI
 
-class EditViewController: ViewController, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-	
+class EditViewController: ViewController, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
+    
 	var editField: UITextView!
     var counter: UILabel!
     var button: UIButton!
@@ -18,6 +19,7 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
     var photo: UIImageView!
     var messageWrap: UIView!
     var scrollView: UIScrollView!
+    var phPicker: PHPickerViewController!
 	
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
@@ -62,8 +64,10 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
         counter = UILabel("200", Color.black_white, UIFont.boldSystemFont(ofSize: 12))
         
         let controlView = UIView()
-        controlView.add().horizontal(16).view(cameraButton, 24).gap(16).view(photoButton, 24).gap(">=0").view(counter).end("16")
-        controlView.constrain(type: .verticalCenter, cameraButton, photoButton, counter)
+        controlView.add().horizontal(16).view(cameraButton, 32).gap(8).view(photoButton, 32).gap(">=0").view(counter).end("16")
+        controlView.add().vertical(0).view(cameraButton, 32).end(0)
+        controlView.add().vertical(0).view(photoButton, 32).end(0)
+        controlView.constrain(type: .verticalCenter, counter)
         
         photo = UIImageView()
         photo.contentMode = .scaleAspectFill
@@ -73,7 +77,7 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
         photo.isUserInteractionEnabled = true
         photo.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showImagePicker)))
         
-        messageWrap.add().vertical(0).view(editField, 140).gap(8).view(photo, 0).gap(8).view(controlView, 24).end(16)
+        messageWrap.add().vertical(0).view(editField, 140).gap(8).view(photo, 0).gap(8).view(controlView, 32).end(16)
         messageWrap.constrain(type: .horizontalFill, editField, controlView)
         messageWrap.constrain(type: .horizontalFill, photo, margin: 16)
         
@@ -92,6 +96,7 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
         scrollView = UIScrollView()
         scrollView.add().horizontal(0).view(rootView, view.frame.width).end(0)
         scrollView.constrain(type: .verticalFill, rootView)
+        scrollView.delegate = self
         
         view.addSubview(scrollView)
         view.constrain(type: .horizontalFill, scrollView)
@@ -117,8 +122,12 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
     }
     
     @objc func showImagePicker() {
-        imagePicker.modalPresentationStyle = .overCurrentContext
-        present(imagePicker, animated: true)
+        var phPickerConfig = PHPickerConfiguration(photoLibrary: .shared())
+        phPickerConfig.selectionLimit = 1
+        phPickerConfig.filter = PHPickerFilter.any(of: [.images, .livePhotos])
+        phPicker = PHPickerViewController(configuration: phPickerConfig)
+        phPicker.delegate = self
+        present(phPicker, animated: true)
     }
     
     @objc func showCamera() {
@@ -138,6 +147,40 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
             }
         })
         messageWrap.layoutIfNeeded()
+    }
+    
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        phPicker.dismiss(animated: true)
+
+        if let provider = results.first?.itemProvider {
+            if provider.canLoadObject(ofClass: UIImage.self) {
+                provider.loadObject(ofClass: UIImage.self) { uiImage, _ in
+                    if let image = uiImage as? UIImage {
+                        DispatchQueue.main.async {
+                            let w = image.size.width
+                            let h = image.size.height
+                            let adjRatio = (w > h ? 720 / w : 720 / h)
+                            let newImage = image.resize(CGSize(width: adjRatio * w, height: adjRatio * h))
+                            let imageData = newImage.jpegData(compressionQuality: 9)
+                            let name = UUID()
+                            S3.shared().uploadImage(data: imageData!, name: "\(name.uuidString).jpg", completion: { path in
+                                ImageCache.shared().set(data: imageData!, path: path, completion: nil)
+                            })
+
+                            self.photo.image = image
+                            self.photo.isHidden = false
+                            self.messageWrap.constraints.forEach({ constraint in
+                                if (constraint.firstItem as! UIView) == self.photo && constraint.firstAttribute == .height {
+                                    constraint.constant = 240
+                                }
+                            })
+                            self.messageWrap.layoutIfNeeded()
+                        }
+
+                    }
+                }
+            }
+        }
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -186,5 +229,49 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
             editField.resignFirstResponder()
         }
     }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if editField.isFirstResponder {
+            editField.resignFirstResponder()
+        }
+    }
 
+}
+
+extension FileManager {
+    func writeToTmp(data: Data, name: String) -> URL? {
+        let tmp = temporaryDirectory
+        let path = tmp.appendingPathExtension("\(name).jpg")
+        if createFile(atPath: path.absoluteString, contents: data) {
+            return path
+        }else { return nil }
+    }
+    
+//    func someting() {
+//        do {
+//            let documentFolderURL = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+//            let fileURL = documentFolderURL.appendingPathComponent((URL(string: (live?.media)!)?.lastPathComponent)!)
+//            if live.type == "photo" {
+//                eventPhoto.image = UIImage(contentsOfFile: fileURL.path)
+//            }else if live.type == "video" {
+//                player = AVPlayer(url: fileURL)
+//                let playerController = AVPlayerViewController()
+//                playerController.videoGravity = AVLayerVideoGravityResizeAspectFill
+//                playerController.player = player
+//                let videoView = playerController.view
+//                videoView?.contentMode = .scaleAspectFill
+//                videoView?.frame = view.bounds
+//                if let p = playerController.player {
+//                    p.play()
+//                }
+//                view.addSubview(videoView!)
+//                view.constrain(type: .verticalFill, videoView!)
+//                view.constrain(type: .horizontalFill, videoView!)
+//                eventPhoto.isHidden = true
+//                NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd(notification:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.player.currentItem)
+//            }
+//        }catch let error {
+//            NSLog("Error -> \(error.localizedDescription)")
+//        }
+//    }
 }

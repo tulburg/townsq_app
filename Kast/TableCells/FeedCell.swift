@@ -109,7 +109,8 @@ class FeedCell: UITableViewCell {
     }
     
     func makeOwnerImage() -> UIImageView {
-        let imageView = UIImageView(link: "https://imgc.artprintimages.com/img/print/young-girl-trying-to-determine-which-lipstick-color-will-look-right-with-her-complextion_u-l-p75yfe0.jpg", contentMode: .scaleAspectFill)
+        let n = arc4random_uniform(80) + 1        
+        let imageView = UIImageView(link: "https://randomuser.me/api/portraits/med/men/\(n).jpg", contentMode: .scaleAspectFill)
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
         return imageView

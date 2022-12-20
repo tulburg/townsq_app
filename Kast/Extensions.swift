@@ -299,17 +299,23 @@ extension UIImageView {
         self.init()
 		contentMode = mode
         guard let url = URL(string: link) else { return }
-		URLSession.shared.dataTask(with: url) { (data, response, error) in
-			guard
-				let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
-				let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
-				let data = data, error == nil,
-				let image = UIImage(data: data)
-				else { return }
-			DispatchQueue.main.async() { () -> Void in
-				self.image = image
-			}
-		}.resume()
+        if let path = ImageCache.shared().fetch(url: url) {
+            let image = UIImage(contentsOfFile: path)
+            self.image = image
+        }else {
+            URLSession.shared.dataTask(with: url) { (data, response, error) in
+                guard
+                    let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
+                    let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
+                    let data = data, error == nil,
+                    let image = UIImage(data: data)
+                else { return }
+                ImageCache.shared().set(data: image.jpegData(compressionQuality: 1)!, url: url, completion: nil)
+                DispatchQueue.main.async() { () -> Void in
+                    self.image = image
+                }
+            }.resume()
+        }
 	}
     
     func asButton() {

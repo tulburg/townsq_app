@@ -52,10 +52,11 @@ class MessageCell: UITableViewCell {
 	}
 	
 	func makeOwnerImage() -> UIImageView {
-        let imageView = UIImageView(link: "https://dvyvvujm9h0uq.cloudfront.net/com/articles/1525891879-886386-sam-burriss-457746-unsplashjpg.jpg", contentMode: .scaleAspectFill)
-		imageView.layer.cornerRadius = 8
-		imageView.clipsToBounds = true
-		return imageView
+        let n = arc4random_uniform(80) + 1
+        let imageView = UIImageView(link: "https://randomuser.me/api/portraits/med/men/\(n).jpg", contentMode: .scaleAspectFill)
+        imageView.layer.cornerRadius = 8
+        imageView.clipsToBounds = true
+        return imageView
 	}
 	
 	

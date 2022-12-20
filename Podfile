@@ -6,5 +6,6 @@ target 'Kast' do
   use_frameworks!
   
   # Pods for Kast
+  pod 'AWSS3'
 
 end

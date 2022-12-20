@@ -1,2 +1,3 @@
 ${PODS_ROOT}/Target Support Files/Pods-Kast/Pods-Kast-frameworks.sh
-${BUILT_PRODUCTS_DIR}/MFVerificationCode/MFVerificationCode.framework
+${BUILT_PRODUCTS_DIR}/AWSCore/AWSCore.framework
+${BUILT_PRODUCTS_DIR}/AWSS3/AWSS3.framework
