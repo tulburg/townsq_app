@@ -48,5 +48,6 @@ class SuccessViewController: ViewController {
     
     @objc func close() {
         dismiss(animated: true)
+        parent?.dismiss(animated: true)
     }
 }

@@ -59,7 +59,7 @@ class UsernameViewController: ViewController, UITextFieldDelegate {
     }
     
     @objc func verify() {
-        rootView.showIndicator(size: 56, color: Color.darkBlue_white)
+        rootView.showIndicator(size: .large, color: Color.darkBlue_white)
         let controller = DOBViewController()
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
             self.navigationController?.pushViewController(controller, animated: true)

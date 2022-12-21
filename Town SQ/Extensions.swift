@@ -125,16 +125,15 @@ extension UIView {
         return ConstrainChain(self)
     }
 	
-    func showIndicator(size: CGFloat, color: UIColor, background: UIColor) {
+    func showIndicator(size: UIActivityIndicatorView.Style, color: UIColor, background: UIColor) {
         let loadIndicator = UIActivityIndicatorView()
-        loadIndicator.style = .medium
+        loadIndicator.style = size
         loadIndicator.color = color
         
         let wrapper = UIView()
         wrapper.tag = 0x77234
         wrapper.backgroundColor = background
-        wrapper.add().vertical(">=0").view(loadIndicator, size).end(">=0")
-        wrapper.add().horizontal(">=0").view(loadIndicator, size).end(">=0")
+        wrapper.addSubview(loadIndicator)
         wrapper.constrain(type: .verticalCenter, loadIndicator)
         wrapper.constrain(type: .horizontalCenter, loadIndicator)
         wrapper.isUserInteractionEnabled = true
@@ -147,8 +146,8 @@ extension UIView {
 		loadIndicator.startAnimating()
 	}
     
-    func showIndicator(size: CGFloat, color: UIColor) {
-        showIndicator(size: size, color: color, background: Color.create(0xFFFFFF, dark: 0x000000).withAlphaComponent(0.6))
+    func showIndicator(size: UIActivityIndicatorView.Style, color: UIColor) {
+        showIndicator(size: size, color: color, background: Color.create(0xFFFFFF, dark: 0x000000).withAlphaComponent(size == .large ? 0.6 : 0.9))
     }
 	
 	func hideIndicator() {
@@ -215,12 +214,12 @@ extension UILabel {
 }
 
 extension Data {
-	func toDictionary() -> [Dictionary<String, Any>] {
+	func toDictionary() -> Dictionary<String, Any> {
 		do {
-			return try JSONSerialization.jsonObject(with: self, options: []) as! [Dictionary<String, Any>]
+			return try JSONSerialization.jsonObject(with: self, options: []) as! Dictionary<String, Any>
 		} catch {
 			print(error.localizedDescription)
-			return [[:]]
+			return [:]
 		}
 	}
 	func toJsonArray() -> [Any]? {

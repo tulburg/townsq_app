@@ -18,9 +18,9 @@ class ClaimUsernameController: ViewController, UITextFieldDelegate {
         super.viewDidLoad()
         
         self.view.backgroundColor = Color.background
-        self.navigationItem.title = "Claim your username"
         
         rootView = UIView()
+        self.navigationItem.hidesBackButton = false
         
         usernameField = UITextField("Username")
         usernameField.keyboardType = .alphabet
@@ -55,17 +55,20 @@ class ClaimUsernameController: ViewController, UITextFieldDelegate {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        button.hideIndicator()
+        view.hideIndicator()
     }
     
     @objc func verify() {
-        button.showIndicator(size: 16, color: Color.darkBlue_white)
+        view.showIndicator(size: .large, color: Color.darkBlue_white)
         let controller = SuccessViewController(
             title: "Your username (@tulburg) is reserved!",
             subtitle: "We will notify you when you can login to your account"
         )
+        controller.modalPresentationStyle = .overFullScreen
+        controller.modalTransitionStyle = .coverVertical
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-            self.present(controller, animated: true)
+            self.navigationController?.present(controller, animated: true)
+            self.navigationController?.popToRootViewController(animated: true)
         })
     }
     

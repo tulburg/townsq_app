@@ -10,7 +10,7 @@ import UIKit
 
 class DemoWelcomeController: ViewController {
     
-    var nav: UINavigationController!
+    var nav: NavigationController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,16 +50,19 @@ class DemoWelcomeController: ViewController {
     }
     
     @objc func useInviteCode() {
-        self.nav = NavigationController(rootViewController: LoginViewController())
-        self.nav.modalPresentationStyle = .overCurrentContext
-        self.present(self.nav, animated: true, completion: nil)
+        dismiss(animated: true)
+        let controller = VerifyPhoneController()
+        controller.fromDemo = true
+        title = ""
+        self.navigationController?.pushViewController(controller, animated: true)
     }
     
     @objc func claimUsername() {
-        let controller = ClaimUsernameController()
-        controller.modalPresentationStyle = .fullScreen
-        controller.modalTransitionStyle = .coverVertical
-        self.present(controller, animated: true)
+        dismiss(animated: true)
+        let controller = SignupViewController()
+        controller.fromDemo = true
+        title = ""
+        self.navigationController?.pushViewController(controller, animated: true)
     }
     
     @objc func dismissNav() {

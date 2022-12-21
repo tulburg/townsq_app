@@ -16,15 +16,17 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
     var phone: UITextField!
     var phoneValue = "1"
     var rootView: UIView!
+    
+    var fromDemo: Bool?
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
 		self.view.backgroundColor = Color.background
-		
-		self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: #selector(dismissNav))
-		self.navigationItem.leftBarButtonItem?.image = UIImage(named: "back")
-		self.navigationItem.leftBarButtonItem?.tintColor = Color.navigationItem
+        self.navigationItem.hidesBackButton = false
+//		self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: #selector(dismissNav))
+//		self.navigationItem.leftBarButtonItem?.image = UIImage(named: "back")
+//		self.navigationItem.leftBarButtonItem?.tintColor = Color.navigationItem
         
         rootView = UIView()
 		
@@ -32,6 +34,7 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
         country.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(chooseCountry)))
         let chevron = UIImageView(image: UIImage(systemName: "chevron.down")?.withTintColor(Color.lightText).resize(CGSize(width: 16, height: 8)))
         chevron.contentMode = .center
+        let title = Title(text: "Enter your phone number")
         countryCode = UILabel("🇺🇸 +1", Color.textDark, UIFont.systemFont(ofSize: 20))
         phone = UITextField("Phone number")
         phone.keyboardType = .numberPad
@@ -43,8 +46,8 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
         disclaimerLabel.numberOfLines = 3
         let continueButton = ButtonXL("Continue", action: #selector(verifyPhone))
         
-        rootView.add().vertical(0.15 * view.frame.height).view(phone, 44).gap(8).view(disclaimerLabel).gap(50).view(continueButton, 44).end(">=0")
-        rootView.constrain(type: .horizontalFill, phone, disclaimerLabel, margin: 32)
+        rootView.add().vertical(0.15 * view.frame.height).view(title).gap(64).view(phone, 44).gap(8).view(disclaimerLabel).gap(50).view(continueButton, 44).end(">=0")
+        rootView.constrain(type: .horizontalFill, phone, disclaimerLabel, title, margin: 32)
         rootView.constrain(type: .horizontalCenter, continueButton)
         
         view.add().vertical(0).view(rootView).end(">=0")
@@ -53,12 +56,11 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        title = "Sign Up"
+        title = fromDemo != nil ? "Sign Up" : ""
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        title = "Edit"
         rootView.hideIndicator()
     }
     
@@ -80,14 +82,26 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
     
     
     @objc func verifyPhone() {
-        rootView.showIndicator(size: 56, color: Color.darkBlue_white)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-            let controller = VerifyPhoneController();
+        view.showIndicator(size: .large, color: Color.darkBlue_white)
+        if fromDemo != nil {
+            let controller = VerifyPhoneController()
+            controller.fromDemo = true
             if let text = self.phone.text {
                 controller.phoneNumber = self.phoneValue + text
-                self.navigationController?.pushViewController(controller, animated: true)
+                title = ""
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+                    self.navigationController?.pushViewController(controller, animated: true)
+                })
             }
-        })
+        }else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+                let controller = VerifyPhoneController();
+                if let text = self.phone.text {
+                    controller.phoneNumber = self.phoneValue + text
+                    self.navigationController?.pushViewController(controller, animated: true)
+                }
+            })
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
