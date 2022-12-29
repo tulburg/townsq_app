@@ -11,6 +11,7 @@ struct Response<T> {
     var code: Int?
     var status: Int?
     var message: String?
+    var error: String?
     var data: T?
     
     init(_ dict: NSDictionary) {
@@ -18,6 +19,7 @@ struct Response<T> {
         if let status = dict["status"] as? Int { self.status = status }
         if let message = dict["message"] as? String { self.message = message }
         if let data = dict["data"] as? T { self.data = data }
+        if let error = dict["error"] as? Int { self.error = Constants.ErrorMessages[error] }
     }
     
 //    func export() -> [String: String] {
@@ -36,5 +38,7 @@ struct Response<T> {
 //        self.size = Int(vv[1].description)
 //    }
 }
+
+
 
 

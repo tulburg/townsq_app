@@ -20,6 +20,7 @@
 		DF38F4DC29508BFF00C3C473 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF38F4DB29508BFF00C3C473 /* Alert.swift */; };
 		DF38F4DE2950A59400C3C473 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF38F4DD2950A59400C3C473 /* ImageCache.swift */; };
 		DF65D4E124C20DBF0031A068 /* ProfilePhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF65D4E024C20DBF0031A068 /* ProfilePhotoViewController.swift */; };
+		DF676FB1295C86ED0006A90E /* Progress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF676FB0295C86ED0006A90E /* Progress.swift */; };
 		DF818BD0294A2BF00005F080 /* CountryPickerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF818BC3294A2BF00005F080 /* CountryPickerCell.swift */; };
 		DF818BD1294A2BF00005F080 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF818BC5294A2BF00005F080 /* Assets.xcassets */; };
 		DF818BD2294A2BF00005F080 /* countries.json in Resources */ = {isa = PBXBuildFile; fileRef = DF818BC6294A2BF00005F080 /* countries.json */; };
@@ -31,7 +32,7 @@
 		DF818BD8294A2BF00005F080 /* Country.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF818BCD294A2BF00005F080 /* Country.swift */; };
 		DF818BD9294A2BF00005F080 /* CountryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF818BCE294A2BF00005F080 /* CountryManager.swift */; };
 		DF818BDA294A2BF00005F080 /* CountryPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF818BCF294A2BF00005F080 /* CountryPickerViewController.swift */; };
-		DF818BDC294A313B0005F080 /* VerifyPhoneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF818BDB294A313B0005F080 /* VerifyPhoneController.swift */; };
+		DF818BDC294A313B0005F080 /* CodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF818BDB294A313B0005F080 /* CodeViewController.swift */; };
 		DF83688D24B32C34004A471B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF83688C24B32C34004A471B /* SettingsViewController.swift */; };
 		DF83688F24B348CE004A471B /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF83688E24B348CE004A471B /* MessagesViewController.swift */; };
 		DF8EA28324BC1BE700C1A8DD /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8EA28224BC1BE700C1A8DD /* LoginViewController.swift */; };
@@ -80,6 +81,7 @@
 		DF38F4DB29508BFF00C3C473 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		DF38F4DD2950A59400C3C473 /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		DF65D4E024C20DBF0031A068 /* ProfilePhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePhotoViewController.swift; sourceTree = "<group>"; };
+		DF676FB0295C86ED0006A90E /* Progress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
 		DF818BC3294A2BF00005F080 /* CountryPickerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountryPickerCell.swift; sourceTree = "<group>"; };
 		DF818BC5294A2BF00005F080 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DF818BC6294A2BF00005F080 /* countries.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = countries.json; sourceTree = "<group>"; };
@@ -91,7 +93,7 @@
 		DF818BCD294A2BF00005F080 /* Country.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Country.swift; sourceTree = "<group>"; };
 		DF818BCE294A2BF00005F080 /* CountryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountryManager.swift; sourceTree = "<group>"; };
 		DF818BCF294A2BF00005F080 /* CountryPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountryPickerViewController.swift; sourceTree = "<group>"; };
-		DF818BDB294A313B0005F080 /* VerifyPhoneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyPhoneController.swift; sourceTree = "<group>"; };
+		DF818BDB294A313B0005F080 /* CodeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeViewController.swift; sourceTree = "<group>"; };
 		DF83688C24B32C34004A471B /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		DF83688E24B348CE004A471B /* MessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewController.swift; sourceTree = "<group>"; };
 		DF8EA28224BC1BE700C1A8DD /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -182,7 +184,7 @@
 				DF8EA28B24BE19BA00C1A8DD /* DisplayNameViewController.swift */,
 				DF2C953F24BE25AB0066EF99 /* DOBViewController.swift */,
 				DF65D4E024C20DBF0031A068 /* ProfilePhotoViewController.swift */,
-				DF818BDB294A313B0005F080 /* VerifyPhoneController.swift */,
+				DF818BDB294A313B0005F080 /* CodeViewController.swift */,
 				DF01A20D294B475000A8EC7E /* UsernameViewController.swift */,
 				DFBC9ED3295302BE00377DE8 /* ClaimUsernameController.swift */,
 				DFBC9ED5295311F700377DE8 /* DemoWelcomeController.swift */,
@@ -244,6 +246,7 @@
 				DFBC9ED92953624300377DE8 /* Api.swift */,
 				DFBC9EDB2953A6DD00377DE8 /* Objects.swift */,
 				DFBC9EDD2953B4BD00377DE8 /* Constants.swift */,
+				DF676FB0295C86ED0006A90E /* Progress.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -438,7 +441,7 @@
 				DF951DDD24D4769C0091E138 /* OwnMessageCell.swift in Sources */,
 				DF818BD3294A2BF00005F080 /* Config.swift in Sources */,
 				DFA5398F24B302D600316569 /* FeedViewController.swift in Sources */,
-				DF818BDC294A313B0005F080 /* VerifyPhoneController.swift in Sources */,
+				DF818BDC294A313B0005F080 /* CodeViewController.swift in Sources */,
 				DF8EA28C24BE19BA00C1A8DD /* DisplayNameViewController.swift in Sources */,
 				DFA539A824B3107B00316569 /* TabBarController.swift in Sources */,
 				DF01A20E294B475000A8EC7E /* UsernameViewController.swift in Sources */,
@@ -450,6 +453,7 @@
 				DF818BD0294A2BF00005F080 /* CountryPickerCell.swift in Sources */,
 				DFA5398D24B302D600316569 /* EditViewController.swift in Sources */,
 				DF818BD9294A2BF00005F080 /* CountryManager.swift in Sources */,
+				DF676FB1295C86ED0006A90E /* Progress.swift in Sources */,
 				DF01A20B294B37C200A8EC7E /* VerificationCodeProtocol.swift in Sources */,
 				DF2C954024BE25AB0066EF99 /* DOBViewController.swift in Sources */,
 				DF0D4EFD24CF3E2D00543518 /* Message.swift in Sources */,

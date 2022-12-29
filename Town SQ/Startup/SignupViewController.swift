@@ -36,9 +36,15 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
         chevron.contentMode = .center
         let title = Title(text: "Enter your phone number")
         countryCode = UILabel("🇺🇸 +1", Color.textDark, UIFont.systemFont(ofSize: 20))
+        if let countryNumber = UserDefaults.standard.string(forKey: Constants.verificationCountry) {
+            countryCode.text = countryNumber
+        }
         phone = UITextField("Phone number")
         phone.keyboardType = .numberPad
         phone.font = UIFont.systemFont(ofSize: 20)
+        if let phoneNumber = UserDefaults.standard.string(forKey: Constants.verificationPhone) {
+            phone.text = phoneNumber
+        }
         country.add().horizontal(8).view(countryCode).gap(2).view(chevron, 16).end(8)
         country.constrain(type: .verticalFill, countryCode, chevron)
         phone.leftView = country
@@ -46,8 +52,8 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
         disclaimerLabel.numberOfLines = 3
         let continueButton = ButtonXL("Continue", action: #selector(verifyPhone))
         
-        rootView.add().vertical(0.15 * view.frame.height).view(title).gap(64).view(phone, 44).gap(8).view(disclaimerLabel).gap(50).view(continueButton, 44).end(">=0")
-        rootView.constrain(type: .horizontalFill, phone, disclaimerLabel, title, margin: 32)
+        rootView.add().vertical(0.15 * view.frame.height).view(title).gap(8).view(message).gap(64).view(phone, 44).gap(8).view(disclaimerLabel).gap(50).view(continueButton, 44).end(">=0")
+        rootView.constrain(type: .horizontalFill, phone, disclaimerLabel, title, message, margin: 32)
         rootView.constrain(type: .horizontalCenter, continueButton)
         
         view.add().vertical(0).view(rootView).end(">=0")
@@ -69,6 +75,9 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
         countryPicker.selectedCountry = "US"
         countryPicker.delegate = self
         self.present(countryPicker, animated: true)
+        DispatchQueue.main.async {
+            countryPicker.searchTextField.becomeFirstResponder()
+        }
     }
     
     func countryPicker(didSelect country: Country) {
@@ -83,24 +92,67 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
     
     @objc func verifyPhone() {
         view.showIndicator(size: .large, color: Color.darkBlue_white)
-        if fromDemo != nil {
-            let controller = VerifyPhoneController()
+        if path == .ClaimUsername {
+            let controller = CodeViewController()
             controller.fromDemo = true
+            controller.path = .ClaimUsername
             if let text = self.phone.text {
                 controller.phoneNumber = self.phoneValue + text
                 title = ""
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-                    self.navigationController?.pushViewController(controller, animated: true)
-                })
+                Api.main.verifyPhone(controller.phoneNumber!) { data, error in
+                    DispatchQueue.main.async {
+                        self.view.hideIndicator()
+                    }
+                    if error == nil {
+                        let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                        if response.code == 200 {
+                            DispatchQueue.main.async {
+                                self.navigationController?.pushViewController(controller, animated: true)
+                            }
+                        }else {
+                            DispatchQueue.main.async { [self] in
+                                if let errorMessage = response.error {
+                                    showError(errorMessage, delay: Constants.defaultMessageDelay)
+                                }
+                                
+                            }
+                        }
+                    } else {
+                        print(error.debugDescription)
+                    }
+                }
             }
         }else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-                let controller = VerifyPhoneController();
-                if let text = self.phone.text {
-                    controller.phoneNumber = self.phoneValue + text
-                    self.navigationController?.pushViewController(controller, animated: true)
-                }
-            })
+            // Actuall sign up path
+            if let text = self.phone.text {
+                let phone = self.phoneValue + text
+                Api.main.verifyPhone(phone, completion: { data, error in
+                    DispatchQueue.main.async { self.view.hideIndicator() }
+                    if error == nil {
+                        let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                        if response.code == 200 {
+                            Progress.state = .PhoneCodeSent
+                            DispatchQueue.main.async {
+                                let controller = CodeViewController();
+                                if let text = self.phone.text {
+                                    controller.phoneNumber = self.phoneValue + text
+                                    UserDefaults.standard.set(text, forKey: Constants.verificationPhone)
+                                    UserDefaults.standard.set(self.phoneValue, forKey: Constants.verificationCountry)
+                                    self.navigationController?.pushViewController(controller, animated: true)
+                                }
+                            }
+                        }else {
+                            DispatchQueue.main.async { [self] in
+                                if let errorMessage = response.error {
+                                    showError(errorMessage, delay: Constants.defaultMessageDelay)
+                                }
+                            }
+                        }
+                    } else {
+                        print(error.debugDescription)
+                    }
+                })
+            }
         }
     }
     
@@ -113,7 +165,6 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
 	@objc func dismissNav() {
 		self.navigationController?.dismiss(animated: true, completion: nil)
 	}
-
 	
 	
 }

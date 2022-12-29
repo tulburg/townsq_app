@@ -51,8 +51,9 @@ class DemoWelcomeController: ViewController {
     
     @objc func useInviteCode() {
         dismiss(animated: true)
-        let controller = VerifyPhoneController()
+        let controller = CodeViewController()
         controller.fromDemo = true
+        controller.path = .InviteCode
         title = ""
         self.navigationController?.pushViewController(controller, animated: true)
     }
@@ -61,6 +62,7 @@ class DemoWelcomeController: ViewController {
         dismiss(animated: true)
         let controller = SignupViewController()
         controller.fromDemo = true
+        controller.path = .ClaimUsername
         title = ""
         self.navigationController?.pushViewController(controller, animated: true)
     }

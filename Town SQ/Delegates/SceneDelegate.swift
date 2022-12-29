@@ -16,15 +16,46 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 		// Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`
-		
-		let welcomeVC = DemoWelcomeController() // WelcomeViewController()
-//		window?.rootViewController = welcomeVC
-        let navigationController = NavigationController(rootViewController: welcomeVC)
-        navigationController.hideTopBar()
+        window?.backgroundColor = Color.background
+        switch Progress.state {
+        case .InviteCodeVerified:
+            showNav([SignupViewController()])
+        case .PhoneCodeSent:
+            let codeVC = CodeViewController()
+            if let phone = UserDefaults.standard.string(forKey: Constants.verificationPhone) {
+                if let country = UserDefaults.standard.string(forKey: Constants.verificationCountry) {
+                    codeVC.phoneNumber = country + phone
+                    showNav([DemoWelcomeController(), SignupViewController(), codeVC])
+                }else {
+                    showNav([DemoWelcomeController()])
+                }
+            }else {
+                showNav([DemoWelcomeController()])
+            }
+            
+        case .PhoneVerified:
+            showNav([DisplayNameViewController()], false)
+        case .DisplayNameSet:
+            showNav([DisplayNameViewController(), UsernameViewController()], false)
+        case .None, .DOBSet, .ProfilePhotoSet, .UsernameSet:
+            showNav([DemoWelcomeController()])
+        case .none:
+            showNav([SignupViewController()])
+        }
         
-//		let navigationController = NavigationController(rootViewController: TabBarController())
-		window?.rootViewController = navigationController
-		window?.becomeKey()
+        func showNav(_ controllers: [UIViewController], _ hideTopBar: Bool = true) {
+            let navigationController = NavigationController(rootViewController: controllers[0])
+            controllers.dropFirst(1).forEach({ controller in
+                navigationController.pushViewController(controller, animated: false)
+            })
+            if hideTopBar {
+                navigationController.hideTopBar()
+            }
+            //        let navigationController = NavigationController(rootViewController: TabBarController())
+            window?.rootViewController = navigationController
+            window?.becomeKey()
+        }
+        
 		// If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
 		// This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 		guard let _ = (scene as? UIWindowScene) else { return }

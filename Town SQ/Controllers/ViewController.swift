@@ -10,8 +10,14 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    var message: UILabel!
+    var root: UIViewController!
+    var path: FlowPath!
     override func viewDidLoad() {
         super.viewDidLoad()
+        message = UILabel("", Color.darkBlue_white, UIFont.systemFont(ofSize: 14))
+        message.numberOfLines = 2
+        message.isHidden = true
     }
     
     var safeAreaInset: UIEdgeInsets? {
@@ -66,5 +72,36 @@ class ViewController: UIViewController {
         button.setTitleColor(Color.darkBlue_white, for: .normal)
         button.addTarget(self, action: action, for: .touchUpInside)
         return button
+    }
+    
+    func showError(_ text: String, delay: CGFloat) {
+        message.isHidden = false
+        message.text = text
+        message.textColor = Color.red
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: {
+            UIView.animate(withDuration: 0.3, delay: 0, animations: { [self] in
+                message.isHidden = true
+            }, completion: { _ in
+                self.message.text = ""
+                self.message.textColor = Color.darkBlue_white
+            })
+        })
+    }
+    
+    func showMessage(_ text: String, delay: CGFloat) {
+        message.isHidden = false
+        message.text = text
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: {
+            UIView.animate(withDuration: 0.3, delay: 0, animations: { [self] in
+                message.isHidden = true
+            }, completion: { _ in
+                self.message.text = ""
+            })
+        })
+    }
+    
+    enum FlowPath {
+        case ClaimUsername
+        case InviteCode
     }
 }

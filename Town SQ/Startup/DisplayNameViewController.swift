@@ -22,11 +22,11 @@ class DisplayNameViewController: ViewController, UITextFieldDelegate {
         rootView = UIView()
         
         nameField = UITextField("Display name")
-        nameField.textContentType = .givenName
+        nameField.textContentType = .name
         nameField.font = UIFont.systemFont(ofSize: 20)
         let descriptionLabel = UILabel("Choose a name that will be displayed on your account", Color.lightText, UIFont.systemFont(ofSize: 14))
         descriptionLabel.numberOfLines = 2
-        let verifyButton = ButtonXL("Next", action: #selector(verify))
+        let verifyButton = ButtonXL("Next", action: #selector(save))
         
         rootView.add().vertical(0.14 * view.frame.height).view(nameField, 44).gap(8).view(descriptionLabel).gap(50).view(verifyButton, 44).end(">=0")
         rootView.constrain(type: .horizontalFill, nameField, margin: 32)
@@ -55,12 +55,32 @@ class DisplayNameViewController: ViewController, UITextFieldDelegate {
         title = ""
     }
     
-    @objc func verify() {
+    @objc func save() {
         rootView.showIndicator(size: .large, color: Color.darkBlue_white)
-        let controller = UsernameViewController()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-            self.navigationController?.pushViewController(controller, animated: true)
-        })
+        if let name = nameField.text {
+            Api.main.setProfile("name", name) { data, error in
+                DispatchQueue.main.async { self.rootView.hideIndicator() }
+                if error == nil {
+                    let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                    if response.code == 200 {
+                        Progress.state = .DisplayNameSet
+                        DispatchQueue.main.async {
+                            let controller = UsernameViewController()
+                            self.navigationController?.pushViewController(controller, animated: true)
+                        }
+                    }else {
+                        DispatchQueue.main.async { [self] in
+                            if let errorMessage = response.error {
+                                showError(errorMessage, delay: Constants.defaultMessageDelay)
+                            }
+                        }
+                    }
+                } else {
+                    print(error.debugDescription)
+                }
+            }
+        }
+        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

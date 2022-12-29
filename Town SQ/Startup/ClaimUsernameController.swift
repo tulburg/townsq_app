@@ -66,6 +66,8 @@ class ClaimUsernameController: ViewController, UITextFieldDelegate {
         )
         controller.modalPresentationStyle = .overFullScreen
         controller.modalTransitionStyle = .coverVertical
+        controller.path = .ClaimUsername
+        controller.root = self
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
             self.navigationController?.present(controller, animated: true)
             self.navigationController?.popToRootViewController(animated: true)
@@ -80,6 +82,14 @@ class ClaimUsernameController: ViewController, UITextFieldDelegate {
     
     @objc func dismissNav() {
         dismiss(animated: true)
+        if path == .ClaimUsername {
+            self.navigationController?.dismiss(animated: true)
+            if let vc = root as? CodeViewController {
+                vc.dismissNav()
+            }
+        }
+        
+        self.root?.dismiss(animated: true)
     }
 }
 

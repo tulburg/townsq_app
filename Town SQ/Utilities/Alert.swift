@@ -45,7 +45,7 @@ class Alert {
         viewHolder.layer.cornerRadius = 6
         if !(type == .custom || type == .confirm) {
             let title = UILabel()
-            title.font = UIFont.boldSystemFont(ofSize: 20)
+            title.font = UIFont.boldSystemFont(ofSize: 16)
             title.textColor = colors[type.rawValue]
             title.text = message
             title.numberOfLines = 4
@@ -59,7 +59,7 @@ class Alert {
             viewHolder.addSubviews(title, cancelButton)
             viewHolder.addConstraints(format: "H:|-16-[v0]-8-[v1(30)]-16-|", views: title, cancelButton)
             viewHolder.addConstraints(format: "V:|-(>=0)-[v0(30)]-(>=0)-|", views: cancelButton)
-            viewHolder.constrain(type: .verticalFill, title, margin: 16)
+            viewHolder.constrain(type: .verticalFill, title, margin: 8)
             cancelButton.centerYAnchor.constraint(equalTo: viewHolder.centerYAnchor).isActive = true
         }
         
@@ -94,10 +94,10 @@ class Alert {
             controller = parent
         }
         controller?.present(viewController, animated: false, completion: {
-            UIView.animate(withDuration: 0.25, animations: {
+            UIView.animate(withDuration: 0.25, animations: { [self] in
                 self.backgroundOverlay.alpha = 0.42
                 self.mainView.removeConstraint(self.viewHolderTopConstraint)
-                self.viewHolderTopConstraint = NSLayoutConstraint(item: self.viewHolder, attribute: .bottom, relatedBy: .equal, toItem: self.mainView, attribute: .bottom, multiplier: 1, constant: -16)
+                self.viewHolderTopConstraint = NSLayoutConstraint(item: self.viewHolder, attribute: .bottom, relatedBy: .equal, toItem: self.mainView, attribute: .bottom, multiplier: 1, constant: -(16 + (window?.safeAreaInsets.bottom)!))
                 self.viewHolderTopConstraint.isActive = true
                 self.mainView.addConstraint(self.viewHolderTopConstraint)
                 self.mainView.layoutIfNeeded()

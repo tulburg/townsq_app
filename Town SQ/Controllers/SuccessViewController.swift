@@ -47,7 +47,18 @@ class SuccessViewController: ViewController {
     }
     
     @objc func close() {
+        switch (path) {
+        case .ClaimUsername:
+            dismiss(animated: true)
+            if let vc: ClaimUsernameController = root as? ClaimUsernameController {
+                vc.dismissNav()
+            }
+        case .InviteCode:
+            dismiss(animated: true)
+        case .none:
+            dismiss(animated: true)
+        }
         dismiss(animated: true)
-        parent?.dismiss(animated: true)
+        root?.dismiss(animated: true)
     }
 }
