@@ -36,9 +36,14 @@ class ProfileViewController: ViewController {
         
         rootView = UIView()
 		
-        let profilePhoto = UIImageView(link: "https://t4.ftcdn.net/jpg/04/86/11/69/360_F_486116937_WzL9xLnHyQWlsnGTCwyLyWF8DAcEMIT5.jpg", contentMode: .scaleAspectFill)
+        var profilePhoto = UIImageView(link: "https://t4.ftcdn.net/jpg/04/86/11/69/360_F_486116937_WzL9xLnHyQWlsnGTCwyLyWF8DAcEMIT5.jpg", contentMode: .scaleAspectFill)
+        if let photo = user?.profile_photo {
+            profilePhoto = UIImageView(link: photo, contentMode: .scaleAspectFill)
+        }
 		profilePhoto.clipsToBounds = true
 		profilePhoto.layer.cornerRadius = 12
+        profilePhoto.isUserInteractionEnabled = true
+        profilePhoto.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openPhotoPicker)))
 		let displayName = UILabel("Simone biles", Color.grayDark, UIFont.boldSystemFont(ofSize: 24))
 		displayName.textAlignment = .center
         let username = UILabel("@simone_biles", Color.grayMid, UIFont.systemFont(ofSize: 14))
@@ -146,6 +151,9 @@ class ProfileViewController: ViewController {
         return container
     }
 	
+    @objc func openPhotoPicker() {
+        present(ProfilePhotoViewController(), animated: true)
+    }
 	
 }
 

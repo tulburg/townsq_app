@@ -30,4 +30,5 @@ struct Constants {
     static let startupProgress = "startup-progress"
     static let verificationPhone = "verification-phone"
     static let verificationCountry = "verification-country"
+    static let S3Addr = "https://tq-imagecache-sn.s3.amazonaws.com/"
 }

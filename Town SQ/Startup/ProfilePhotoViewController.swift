@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import PhotosUI
 
-class ProfilePhotoViewController: ViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class ProfilePhotoViewController: ViewController, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
 	
 	var button: UIButton!
-	var imagePicker: UIImagePickerController!
 	var photo: UIImageView!
+    var phPicker: PHPickerViewController!
 	
 	var delegate: UISceneDelegate!
 	
@@ -53,10 +54,12 @@ class ProfilePhotoViewController: ViewController, UIImagePickerControllerDelegat
         photo.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
 		view.constrain(type: .horizontalFill, title, message, margin: 32)
         view.constrain(type: .horizontalCenter, button, chooseButton)
-		
-		imagePicker = UIImagePickerController()
-		imagePicker.delegate = self
-		
+    
+        var phPickerConfig = PHPickerConfiguration(photoLibrary: .shared())
+        phPickerConfig.selectionLimit = 1
+        phPickerConfig.filter = PHPickerFilter.any(of: [.images, .livePhotos])
+        phPicker = PHPickerViewController(configuration: phPickerConfig)
+        phPicker.delegate = self
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {
@@ -67,20 +70,49 @@ class ProfilePhotoViewController: ViewController, UIImagePickerControllerDelegat
 		self.navigationController?.popViewController(animated: true)
 	}
 	
-	@objc func showImagePicker() {
-		self.navigationController?.present(imagePicker, animated: true, completion: nil)
-	}
-	
-	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-		print(info)
-		imagePicker.dismiss(animated: true, completion: nil)
-		photo.image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
-		button.isHidden = false
-	}
-	
-	func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-		imagePicker.dismiss(animated: true, completion: nil)
-	}
+    @objc func showImagePicker() {
+        present(phPicker, animated: true)
+    }
+    
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        phPicker.dismiss(animated: true)
+        view.showIndicator(size: .large, color: Color.darkBlue_white)
+        if let provider = results.first?.itemProvider {
+            if provider.canLoadObject(ofClass: UIImage.self) {
+                provider.loadObject(ofClass: UIImage.self) { uiImage, _ in
+                    if let image = uiImage as? UIImage {
+                        DispatchQueue.main.async {
+                            self.photo.image = image
+                            
+                            let w = image.size.width
+                            let h = image.size.height
+                            let adjRatio = (w > h ? 240 / w : 240 / h)
+                            let newImage = image.resize(CGSize(width: adjRatio * w, height: adjRatio * h))
+                            let imageData = newImage.jpegData(compressionQuality: 9)
+                            let name = UUID()
+                            let fileAddr = Constants.S3Addr + "\(name.uuidString).jpg"
+                            Api.main.setProfile("profile_photo", fileAddr) { data, error in
+                                DispatchQueue.main.async { self.view.hideIndicator() }
+                                let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                                if response.code == 200 {
+                                    Progress.state = .ProfilePhotoSet
+                                    DispatchQueue.main.async {
+                                        S3.shared().uploadImage(data: imageData!, name: "\(name.uuidString).jpg", completion: { path in
+                                            ImageCache.shared().set(data: imageData!, path: path, completion: nil)
+                                        })
+                                        
+                                        DB.shared.update(.User, predicate: NSPredicate(format: "primary = %@", NSNumber(booleanLiteral:  true)), keyValue: ["profile_photo": fileAddr])
+                                        self.button.isHidden = false
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
+    }
 	
 	@objc func complete() {
 		let vc = NavigationController(rootViewController: TabBarController())

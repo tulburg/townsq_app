@@ -47,9 +47,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             let tbVC = TabBarController()
             showNav([tbVC])
         case .none:
-            showNav([SignupViewController()])
+            showNav([DemoWelcomeController()])
         case .some(.None):
-            showNav([SignupViewController()])
+            showNav([DemoWelcomeController()])
         }
         
         func showNav(_ controllers: [UIViewController]) {
@@ -57,7 +57,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             controllers.dropFirst(1).forEach({ controller in
                 navigationController.pushViewController(controller, animated: false)
             })
-            navigationController.hideTopBar()
+            if !(controllers[0] is UITabBarController) {
+                navigationController.hideTopBar()
+            }
             //        let navigationController = NavigationController(rootViewController: TabBarController())
             window?.rootViewController = navigationController
             window?.becomeKey()
