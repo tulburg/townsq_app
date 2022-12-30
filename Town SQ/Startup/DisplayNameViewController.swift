@@ -17,19 +17,22 @@ class DisplayNameViewController: ViewController, UITextFieldDelegate {
 		super.viewDidLoad()
 		
         self.view.backgroundColor = Color.background
-        self.navigationItem.title = "Display name"
         
         rootView = UIView()
+        
+        let title = Title(text: "Display name")
         
         nameField = UITextField("Display name")
         nameField.textContentType = .name
         nameField.font = UIFont.systemFont(ofSize: 20)
+        nameField.text = user?.name
+        
         let descriptionLabel = UILabel("Choose a name that will be displayed on your account", Color.lightText, UIFont.systemFont(ofSize: 14))
         descriptionLabel.numberOfLines = 2
         let verifyButton = ButtonXL("Next", action: #selector(save))
         
-        rootView.add().vertical(0.14 * view.frame.height).view(nameField, 44).gap(8).view(descriptionLabel).gap(50).view(verifyButton, 44).end(">=0")
-        rootView.constrain(type: .horizontalFill, nameField, margin: 32)
+        rootView.add().vertical(0.15 * view.frame.height).view(title).gap(8).view(message).gap(64).view(nameField, 44).gap(8).view(descriptionLabel).gap(50).view(verifyButton, 44).end(">=0")
+        rootView.constrain(type: .horizontalFill, nameField, title, message, margin: 32)
         rootView.add().horizontal(32).view(descriptionLabel).end(56)
         rootView.constrain(type: .horizontalCenter, verifyButton)
         
@@ -47,7 +50,6 @@ class DisplayNameViewController: ViewController, UITextFieldDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        title = "Display name"
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -65,6 +67,7 @@ class DisplayNameViewController: ViewController, UITextFieldDelegate {
                     if response.code == 200 {
                         Progress.state = .DisplayNameSet
                         DispatchQueue.main.async {
+                            DB.shared.update(.User, predicate: NSPredicate(format: "primary = %@", NSNumber(booleanLiteral: true)), keyValue: ["name": name])
                             let controller = UsernameViewController()
                             self.navigationController?.pushViewController(controller, animated: true)
                         }

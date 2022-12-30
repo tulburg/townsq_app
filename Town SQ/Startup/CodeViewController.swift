@@ -48,6 +48,8 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
         view.add().vertical(0).view(rootView).end(">=0")
         view.constrain(type: .horizontalFill, rootView)
         
+        print(DB.shared.find(.User, predicate: nil))
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -116,6 +118,7 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
                             Progress.state = .InviteCodeVerified
                             DispatchQueue.main.async {
                                 let controller = SignupViewController()
+                                controller.path = .InviteCode
                                 let navigationController = NavigationController(rootViewController: controller)
                                 navigationController.modalPresentationStyle = .overCurrentContext
                                 navigationController.hideTopBar()
@@ -176,19 +179,23 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
                         let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
                         if response.code == 200 {
                             Progress.state = .PhoneVerified
+                            DB.shared.insert(.User, keyValue: ["phone": self.phoneNumber as Any, "primary": true])
                             UserDefaults.standard.set(response.data as! String, forKey: Constants.authToken)
                             DispatchQueue.main.async {
                                 let controller = DisplayNameViewController()
                                 let navigationController = NavigationController(rootViewController: controller)
                                 navigationController.modalPresentationStyle = .overCurrentContext
+                                navigationController.hideTopBar()
                                 self.present(navigationController, animated: true)
                             }
                         }else {
                             if response.code == 403 {
-                                if let errorMessage = response.error {
-                                    self.showError(errorMessage, delay: Constants.defaultMessageDelay)
-                                }else {
-                                    print(response)
+                                DispatchQueue.main.async {
+                                    if let errorMessage = response.error {
+                                        self.showError(errorMessage, delay: Constants.defaultMessageDelay)
+                                    }else {
+                                        print(response)
+                                    }
                                 }
                             }
                         }

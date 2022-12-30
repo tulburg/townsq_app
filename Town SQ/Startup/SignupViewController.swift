@@ -14,7 +14,7 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
     var countryCode: UILabel!
     var country: UIView!
     var phone: UITextField!
-    var phoneValue = "1"
+    var phoneValue = "+1"
     var rootView: UIView!
     
     var fromDemo: Bool?
@@ -38,6 +38,7 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
         countryCode = UILabel("🇺🇸 +1", Color.textDark, UIFont.systemFont(ofSize: 20))
         if let countryNumber = UserDefaults.standard.string(forKey: Constants.verificationCountry) {
             countryCode.text = countryNumber
+            phoneValue = countryNumber
         }
         phone = UITextField("Phone number")
         phone.keyboardType = .numberPad
@@ -122,7 +123,7 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
                     }
                 }
             }
-        }else {
+        }else if path == .InviteCode {
             // Actuall sign up path
             if let text = self.phone.text {
                 let phone = self.phoneValue + text

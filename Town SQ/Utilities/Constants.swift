@@ -14,7 +14,9 @@ struct Constants {
         1002: "Server error, unable to send verification code",
         1003: "Verfification code is invalid, please try again",
         1004: "Phone number is not registered",
-        1005: "Invite code is invalid, please try again"
+        1005: "Invite code is invalid, please try again",
+        1006: "Unauthorized",
+        1008: "Username is already taken"
     ]
     static let Messages = [
         1001: "Verification code sent!",

@@ -19,7 +19,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.backgroundColor = Color.background
         switch Progress.state {
         case .InviteCodeVerified:
-            showNav([SignupViewController()])
+            let vc = SignupViewController()
+            vc.path = .InviteCode
+            showNav([vc])
         case .PhoneCodeSent:
             let codeVC = CodeViewController()
             if let phone = UserDefaults.standard.string(forKey: Constants.verificationPhone) {
@@ -34,23 +36,28 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
             
         case .PhoneVerified:
-            showNav([DisplayNameViewController()], false)
+            showNav([DisplayNameViewController()])
         case .DisplayNameSet:
-            showNav([DisplayNameViewController(), UsernameViewController()], false)
-        case .None, .DOBSet, .ProfilePhotoSet, .UsernameSet:
-            showNav([DemoWelcomeController()])
+            showNav([DisplayNameViewController(), UsernameViewController()])
+        case .UsernameSet:
+            showNav([DisplayNameViewController(), UsernameViewController(), DOBViewController()])
+        case .DOBSet:
+            showNav([DisplayNameViewController(), UsernameViewController(), DOBViewController(), ProfilePhotoViewController()])
+        case .ProfilePhotoSet:
+            let tbVC = TabBarController()
+            showNav([tbVC])
         case .none:
+            showNav([SignupViewController()])
+        case .some(.None):
             showNav([SignupViewController()])
         }
         
-        func showNav(_ controllers: [UIViewController], _ hideTopBar: Bool = true) {
+        func showNav(_ controllers: [UIViewController]) {
             let navigationController = NavigationController(rootViewController: controllers[0])
             controllers.dropFirst(1).forEach({ controller in
                 navigationController.pushViewController(controller, animated: false)
             })
-            if hideTopBar {
-                navigationController.hideTopBar()
-            }
+            navigationController.hideTopBar()
             //        let navigationController = NavigationController(rootViewController: TabBarController())
             window?.rootViewController = navigationController
             window?.becomeKey()

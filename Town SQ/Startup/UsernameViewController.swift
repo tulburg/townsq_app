@@ -17,9 +17,10 @@ class UsernameViewController: ViewController, UITextFieldDelegate {
         super.viewDidLoad()
         
         self.view.backgroundColor = Color.background
-        self.navigationItem.title = "Username"
         
         rootView = UIView()
+        
+        let title = Title(text: "Username")
         
         usernameField = UITextField("Username")
         usernameField.keyboardType = .alphabet
@@ -27,12 +28,13 @@ class UsernameViewController: ViewController, UITextFieldDelegate {
         usernameField.autocorrectionType = .no
         usernameField.textContentType = .username
         usernameField.font = UIFont.systemFont(ofSize: 20)
+        usernameField.text = user?.username
         let descriptionLabel = UILabel("Choose your username", Color.lightText, UIFont.systemFont(ofSize: 14))
         descriptionLabel.numberOfLines = 2
         let button = ButtonXL("Next", action: #selector(save))
         
-        rootView.add().vertical(0.14 * view.frame.height).view(usernameField, 44).gap(8).view(descriptionLabel).gap(50).view(button, 44).end(">=0")
-        rootView.constrain(type: .horizontalFill, usernameField, margin: 32)
+        rootView.add().vertical(0.15 * view.frame.height).view(title).gap(8).view(message).gap(64).view(usernameField, 44).gap(8).view(descriptionLabel).gap(50).view(button, 44).end(">=0")
+        rootView.constrain(type: .horizontalFill, usernameField, title, message, margin: 32)
         rootView.add().horizontal(32).view(descriptionLabel).end(56)
         rootView.constrain(type: .horizontalCenter, button)
         
@@ -50,12 +52,10 @@ class UsernameViewController: ViewController, UITextFieldDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        title = "Username"
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         rootView.hideIndicator()
-        title = ""
     }
     
     @objc func save() {
@@ -64,34 +64,25 @@ class UsernameViewController: ViewController, UITextFieldDelegate {
             Api.main.verifyUsername(username) { data, error in
                 DispatchQueue.main.async { self.rootView.hideIndicator() }
                 let verifyResponse = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
-                print(verifyResponse)
-//                if verifyResponse.code == 200 {
-//
-//                }
-                
+                if verifyResponse.code == 200 {
+                    Progress.state = .UsernameSet
+                    DispatchQueue.main.async {
+                        DB.shared.update(.User, predicate: NSPredicate(format: "primary = %@", NSNumber(booleanLiteral:  true)), keyValue: ["username": username])
+                        let controller = DOBViewController()
+                        self.navigationController?.pushViewController(controller, animated: true)
+                    }
+                } else if verifyResponse.code == 400 {
+                    DispatchQueue.main.async { [self] in
+                        showError("Username is invalid, please try again", delay: Constants.defaultMessageDelay)
+                    }
+                } else {
+                    DispatchQueue.main.async { [self] in
+                        if let errorMessage = verifyResponse.error {
+                            showError(errorMessage, delay: Constants.defaultMessageDelay)
+                        }
+                    }
+                }
             }
-            
-//            Api.main.setProfile("username", username) { data, error in
-//                DispatchQueue.main.async { self.rootView.hideIndicator() }
-//                if error == nil {
-//                    let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
-//                    if response.code == 200 {
-//                        Progress.state = .UsernameSet
-//                        DispatchQueue.main.async {
-//                            let controller = DOBViewController()
-//                            self.navigationController?.pushViewController(controller, animated: true)
-//                        }
-//                    }else {
-//                        DispatchQueue.main.async { [self] in
-//                            if let errorMessage = response.error {
-//                                showError(errorMessage, delay: Constants.defaultMessageDelay)
-//                            }
-//                        }
-//                    }
-//                } else {
-//                    print(error.debugDescription)
-//                }
-//            }
         }
     }
     

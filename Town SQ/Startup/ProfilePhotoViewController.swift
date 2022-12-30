@@ -20,16 +20,15 @@ class ProfilePhotoViewController: ViewController, UIImagePickerControllerDelegat
 		super.viewDidLoad()
 		
 		self.view.backgroundColor = Color.background
-		self.navigationItem.title = "Profile picture"
 		let backButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: nil)
 		backButtonItem.tintColor = Color.navigationItem
 		self.navigationItem.backBarButtonItem = backButtonItem
 		
 		delegate = UIApplication.shared.delegate as? UISceneDelegate
 		
-		
-		let title = UILabel("Choose your profile picture", Color.formTitle, UIFont.systemFont(ofSize: 22, weight: .bold))
+		let title = Title(text: "Choose your profile picture")
         title.textAlignment = .center
+        message.textAlignment = .center
 		let description = UILabel("Please select the photo to be displayed on your profile", Color.formDescription, UIFont.systemFont(ofSize: 16))
 		description.numberOfLines = 2
 		
@@ -50,9 +49,9 @@ class ProfilePhotoViewController: ViewController, UIImagePickerControllerDelegat
 		button = ButtonXL("Next", action: #selector(complete))
 		button.isHidden = true
         view.add().horizontal(">=0").view(photo, 180).end(">=0")
-        view.add().vertical(0.08 * view.frame.height).view(title, 24).gap(48).view(photo, 180).gap(-56).view(chooseButton, 40).gap(48).view(button, 44).end(">=0")
+        view.add().vertical(0.14 * view.frame.height).view(title).gap(8).view(message).gap(64).view(photo, 180).gap(-56).view(chooseButton, 40).gap(48).view(button, 44).end(">=0")
         photo.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-		view.constrain(type: .horizontalFill, title, margin: 24)
+		view.constrain(type: .horizontalFill, title, message, margin: 32)
         view.constrain(type: .horizontalCenter, button, chooseButton)
 		
 		imagePicker = UIImagePickerController()

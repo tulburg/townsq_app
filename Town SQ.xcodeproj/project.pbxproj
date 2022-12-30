@@ -56,6 +56,7 @@
 		DFA539A624B3054B00316569 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA539A524B3054B00316569 /* Extensions.swift */; };
 		DFA539A824B3107B00316569 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA539A724B3107B00316569 /* TabBarController.swift */; };
 		DFA539AA24B3158700316569 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA539A924B3158700316569 /* ProfileViewController.swift */; };
+		DFA97539295E0CE3001DAAA2 /* DB.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFA97538295E0CE3001DAAA2 /* DB.swift */; };
 		DFBC9ED4295302BE00377DE8 /* ClaimUsernameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC9ED3295302BE00377DE8 /* ClaimUsernameController.swift */; };
 		DFBC9ED6295311F700377DE8 /* DemoWelcomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC9ED5295311F700377DE8 /* DemoWelcomeController.swift */; };
 		DFBC9ED829533DC400377DE8 /* SuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC9ED729533DC400377DE8 /* SuccessViewController.swift */; };
@@ -119,6 +120,7 @@
 		DFA539A524B3054B00316569 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		DFA539A724B3107B00316569 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		DFA539A924B3158700316569 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		DFA97538295E0CE3001DAAA2 /* DB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DB.swift; sourceTree = "<group>"; };
 		DFBC9ED3295302BE00377DE8 /* ClaimUsernameController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimUsernameController.swift; sourceTree = "<group>"; };
 		DFBC9ED5295311F700377DE8 /* DemoWelcomeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoWelcomeController.swift; sourceTree = "<group>"; };
 		DFBC9ED729533DC400377DE8 /* SuccessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessViewController.swift; sourceTree = "<group>"; };
@@ -247,6 +249,7 @@
 				DFBC9EDB2953A6DD00377DE8 /* Objects.swift */,
 				DFBC9EDD2953B4BD00377DE8 /* Constants.swift */,
 				DF676FB0295C86ED0006A90E /* Progress.swift */,
+				DFA97538295E0CE3001DAAA2 /* DB.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -439,6 +442,7 @@
 				DFC658342948C581003E678C /* ViewController.swift in Sources */,
 				DF38F4DE2950A59400C3C473 /* ImageCache.swift in Sources */,
 				DF951DDD24D4769C0091E138 /* OwnMessageCell.swift in Sources */,
+				DFA97539295E0CE3001DAAA2 /* DB.swift in Sources */,
 				DF818BD3294A2BF00005F080 /* Config.swift in Sources */,
 				DFA5398F24B302D600316569 /* FeedViewController.swift in Sources */,
 				DF818BDC294A313B0005F080 /* CodeViewController.swift in Sources */,

@@ -13,11 +13,14 @@ class ViewController: UIViewController {
     var message: UILabel!
     var root: UIViewController!
     var path: FlowPath!
+    var user: User?
     override func viewDidLoad() {
         super.viewDidLoad()
         message = UILabel("", Color.darkBlue_white, UIFont.systemFont(ofSize: 14))
         message.numberOfLines = 2
         message.isHidden = true
+        
+        user = DB.UserRecord()
     }
     
     var safeAreaInset: UIEdgeInsets? {
