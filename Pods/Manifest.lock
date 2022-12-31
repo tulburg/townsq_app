@@ -2,19 +2,27 @@ PODS:
   - AWSCore (2.23.0)
   - AWSS3 (2.23.0):
     - AWSCore (= 2.23.0)
+  - Socket.IO-Client-Swift (16.0.1):
+    - Starscream (~> 4.0)
+  - Starscream (4.0.4)
 
 DEPENDENCIES:
   - AWSS3
+  - Socket.IO-Client-Swift (~> 16.0.1)
 
 SPEC REPOS:
   trunk:
     - AWSCore
     - AWSS3
+    - Socket.IO-Client-Swift
+    - Starscream
 
 SPEC CHECKSUMS:
   AWSCore: 589ad0bd5b72e9a95ce33834f12339b50cfc9f14
   AWSS3: 7f89c85b958d0979a39069003a2fe06facf78373
+  Socket.IO-Client-Swift: c116d6dc9fd6be9c259bacfe143f8725bce7d79e
+  Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
 
-PODFILE CHECKSUM: c12c8bebf076a4b774f780afd29d8a1dd2a6b54b
+PODFILE CHECKSUM: d29b8e65a459c8f0488d30e91b3da131ac49da2b
 
 COCOAPODS: 1.10.2

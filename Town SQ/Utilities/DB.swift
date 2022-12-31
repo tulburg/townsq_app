@@ -18,11 +18,11 @@ class DB: NSObject {
     }()
     
     enum Model: String {
-        case User
+        case User, Broadcast, Comment
     }
     
     let ModelClass: Dictionary<Model, AnyClass> = [
-        .User: User.self,
+        .User: User.self, .Broadcast: Broadcast.self, .Comment: Comment.self
     ]
     
     let context : NSManagedObjectContext!
@@ -37,6 +37,15 @@ class DB: NSObject {
             return records[0] as? User
         }
         return nil
+    }
+    
+    enum BroadcastType: Int16 {
+        case Active, Normal
+    }
+    
+    static func activeBroadcasts() -> [Broadcast]? {
+        let activeBroadcast = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "active = %@", BroadcastType.Active.rawValue))
+        return activeBroadcast as? [Broadcast]
     }
     
     // Base func
@@ -105,4 +114,22 @@ class DB: NSObject {
         return []
     }
 
+}
+
+extension NSManagedObject {
+    func object() -> [String: Any] {
+        func parseValue(_ value: Any) -> Any {
+            if value is Date {
+                return (value as! Date).milliseconds
+            }else {
+                return value
+            }
+        }
+        let keys = Array(self.entity.attributesByName.keys)
+        var result: [String: Any] = [:]
+        self.dictionaryWithValues(forKeys: keys).forEach{ key, value in
+            result[key] = parseValue(value)
+        }
+        return result
+    }
 }

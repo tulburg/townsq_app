@@ -350,6 +350,15 @@ extension UIButton {
 		self.imageEdgeInsets = UIEdgeInsets(top: 0, left: -40, bottom: 0, right: 0)
 	}
     
+    func disable(_ disable: Bool) {
+        self.isEnabled = !disable
+        if disable {
+            self.alpha = 0.4
+        }else {
+            self.alpha = 1
+        }
+    }
+    
 }
 
 extension UITextField {
@@ -556,4 +565,10 @@ struct Color {
 
 func Localize(_ string: String) -> String {
 	return NSLocalizedString(string, comment: "")
+}
+
+extension Date {
+    var milliseconds: Int64 {
+        Int64((self.timeIntervalSince1970 * 1000.0).rounded())
+    }
 }

@@ -48,6 +48,8 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		super.viewDidLoad()
 		// Do any additional setup after loading the view.
 		self.view.backgroundColor = Color.background
+        
+        Socket.shared.start()
 
 	}
     

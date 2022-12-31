@@ -24,11 +24,15 @@ struct Constants {
         1003: "Invite code successful"
     ]
     
+    static let Base = "http://192.168.18.3:5400"
+    
     static let authToken = "auth-token"
     static let defaultMessageDelay: CGFloat = 8
     static let progress = "progress"
+    static let inviteCode = "invite-code"
     static let startupProgress = "startup-progress"
     static let verificationPhone = "verification-phone"
     static let verificationCountry = "verification-country"
     static let S3Addr = "https://tq-imagecache-sn.s3.amazonaws.com/"
+    static let lastFeedCheck = "last-feed-check"
 }

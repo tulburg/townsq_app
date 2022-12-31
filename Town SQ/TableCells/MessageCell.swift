@@ -19,7 +19,7 @@ class MessageCell: UITableViewCell {
 		let ownerImage = makeOwnerImage()
         let ownerName = UILabel("Simone biles", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
         let ownerUsername = UILabel("@simone_biles", Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
-		let feedTime = UILabel("2d ago", Color.darkBlue, UIFont.italicSystemFont(ofSize: 12))
+		let feedTime = UILabel("2d ago", Color.darkBlue, UIFont.systemFont(ofSize: 12))
 		let feedBody = UILabel(message.body!, Color.black_white, UIFont.systemFont(ofSize: 16))
 		feedBody.numberOfLines = 6
 		

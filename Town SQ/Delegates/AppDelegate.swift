@@ -8,16 +8,32 @@
 
 import UIKit
 import CoreData
+import SocketIO
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
-
-
+    var manager: SocketManager?
+    var socket: SocketIOClient?
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
+        
+        makeSocket()
+        
 		return true
 	}
+    
+    func makeSocket() {
+        if socket != nil {
+            return
+        }
+        if let token = UserDefaults.standard.string(forKey: Constants.authToken) {
+            manager = SocketManager(socketURL: URL(string: Constants.Base)!, config: [.log(false), .compress, .extraHeaders([
+                "authorization": "Bearer \(token)"
+            ])])
+        }
+        socket = self.manager?.defaultSocket
+    }
 
 	// MARK: - Core Data stack
 

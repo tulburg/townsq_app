@@ -11,7 +11,7 @@ import UIKit
 class Api {
     
     static let main = {
-        return Api(base: "http://192.168.18.3:5400")
+        return Api(base: Constants.Base)
     }()
     
     private var parameters: [String: Any]?
@@ -26,10 +26,10 @@ class Api {
         parameters = nil
     }
     
-    func verifyCode(_ code: String, _ phone: String, completion: ((_ data: Data?, _ error: Error?) -> Void)?) {
+    func verifyCode(_ code: String, _ phone: String, _ inviteCode: String?, completion: ((_ data: Data?, _ error: Error?) -> Void)?) {
         path = "/verify-code"
         self.completion = completion
-        parameters = ["code": "\(code)", "phone": "\(phone)"]
+        parameters = ["code": "\(code)", "phone": "\(phone)", "invite": "\(inviteCode as Any)"]
         execute(.POST)
     }
     

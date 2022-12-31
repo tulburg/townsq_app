@@ -14,12 +14,14 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
     
 	var editField: UITextView!
     var counter: UILabel!
-    var button: UIBarButtonItem!
+    var publishButton: UIBarButtonItem!
     var imagePicker: UIImagePickerController!
     var photo: UIImageView!
     var messageWrap: UIView!
     var scrollView: UIScrollView!
     var phPicker: PHPickerViewController!
+    
+    var mediaPhoto: UIImage?
 	
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
@@ -27,7 +29,11 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
 	
 	init() {
 		super.init(nibName: nil, bundle: nil)
-        
+	}
+
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		// Do any additional setup after loading the view.
         self.view.backgroundColor = Color.background
         
         let rootView = UIView()
@@ -37,7 +43,7 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
         messageWrap.layer.cornerRadius = 8
         
         editField = UITextView()
-        editField.text = "Message here"
+        editField.text = "What about?"
         editField.backgroundColor = UIColor.clear
         editField.contentInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -2)
         editField.textColor = Color.black_white
@@ -81,8 +87,9 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
         messageWrap.constrain(type: .horizontalFill, editField, controlView)
         messageWrap.constrain(type: .horizontalFill, photo, margin: 16)
         
-        button = UIBarButtonItem(customView: ButtonXL("Publish", action: #selector(publish)))
-        button.isEnabled = false
+        let button = ButtonXL("Publish", action: #selector(publish))
+        button.disable(true)
+        button.contentEdgeInsets = UIEdgeInsets(top: 14, left: 16, bottom: 14, right: 16)
         
         rootView.add().vertical(16).view(messageWrap).end(">=48")
         rootView.add().horizontal(16).view(messageWrap).end(16)
@@ -95,38 +102,53 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
         scrollView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(resign)))
         
         let toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 44))
-        toolbar.barTintColor = UIColor.clear
+        toolbar.barTintColor = Color.create(0xFFFFFF, dark: 0x00000000)
         toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
-        
+        publishButton = UIBarButtonItem(customView: button)
         let cancelButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancel))
         cancelButton.tintColor = Color.red
         toolbar.setItems([
             cancelButton,
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            button
+            publishButton
         ], animated: false)
         
         view.add().vertical(safeAreaInset!.top + 16).view(toolbar, 44).gap(0).view(scrollView).end(0)
         view.constrain(type: .horizontalFill, scrollView, toolbar)
         
-        imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        
-	}
-
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		// Do any additional setup after loading the view.
 	}
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.tabBarController?.title = "New broadcast"
+        imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
     }
     
     @objc func publish() {
+        if let image = mediaPhoto {
+            let w = image.size.width
+            let h = image.size.height
+            let adjRatio = (w > h ? 720 / w : 720 / h)
+            let newImage = image.resizeWithImageIO(to: CGSize(width: adjRatio * w, height: adjRatio * h))
+            let imageData = newImage!.jpegData(compressionQuality: 9)
+            let name = UUID()
+            S3.shared().uploadImage(data: imageData!, name: "\(name.uuidString).jpg", completion: { path in
+                ImageCache.shared().set(data: imageData!, path: path, completion: nil)
+            })
+        }
         
+        Socket.shared.publishBroadcast(editField.text, nil, nil)
     }
+    
+    func disableButton(_ disable: Bool) {
+        publishButton.isEnabled = !disable
+        if disable {
+            publishButton.customView?.alpha = 0.5
+        }else {
+            publishButton.customView?.alpha = 1
+        }
+    }
+    
     
     @objc func resign() {
         if editField.isFirstResponder {
@@ -153,16 +175,7 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         imagePicker.dismiss(animated: true, completion: nil)
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            let w = image.size.width
-            let h = image.size.height
-            let adjRatio = (w > h ? 720 / w : 720 / h)
-            let newImage = image.resizeWithImageIO(to: CGSize(width: adjRatio * w, height: adjRatio * h))
-            let imageData = newImage!.jpegData(compressionQuality: 9)
-            let name = UUID()
-            S3.shared().uploadImage(data: imageData!, name: "\(name.uuidString).jpg", completion: { path in
-                ImageCache.shared().set(data: imageData!, path: path, completion: nil)
-            })
-
+            mediaPhoto = image
             photo.image = image
             photo.isHidden = false
             messageWrap.constraints.forEach({ constraint in
@@ -183,16 +196,7 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
                 provider.loadObject(ofClass: UIImage.self) { uiImage, _ in
                     if let image = uiImage as? UIImage {
                         DispatchQueue.main.async {
-                            let w = image.size.width
-                            let h = image.size.height
-                            let adjRatio = (w > h ? 720 / w : 720 / h)
-                            let newImage = image.resize(CGSize(width: adjRatio * w, height: adjRatio * h))
-                            let imageData = newImage.jpegData(compressionQuality: 9)
-                            let name = UUID()
-                            S3.shared().uploadImage(data: imageData!, name: "\(name.uuidString).jpg", completion: { path in
-                                ImageCache.shared().set(data: imageData!, path: path, completion: nil)
-                            })
-
+                            self.mediaPhoto = image
                             self.photo.image = image
                             self.photo.isHidden = false
                             self.messageWrap.constraints.forEach({ constraint in
@@ -213,16 +217,26 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
         imagePicker.dismiss(animated: true, completion: nil)
     }
     
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.text == "What about?" {
+            textView.text = ""
+        }
+    }
+    
     func textViewDidChange(_ textView: UITextView) {
         let count = 200 - textView.text.count
         counter.text = "\(count)"
         DispatchQueue.main.async { [self] in
             if count < 0 {
                 counter.textColor = Color.red
-                button.isEnabled = false
+                disableButton(true)
             } else {
                 counter.textColor = Color.black_white
-                button.isEnabled = true
+                if textView.text.count > 0 {
+                    disableButton(false)
+                }else {
+                    disableButton(true)
+                }
             }
         }
     }

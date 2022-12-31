@@ -116,7 +116,8 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
                         let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
                         if response.code == 200 {
                             Progress.state = .InviteCodeVerified
-                            DispatchQueue.main.async {
+                            DispatchQueue.main.async { [self] in
+                                UserDefaults.standard.set(code, forKey: Constants.inviteCode)
                                 let controller = SignupViewController()
                                 controller.path = .InviteCode
                                 let navigationController = NavigationController(rootViewController: controller)
@@ -141,7 +142,7 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
                 }
             }else if path == .ClaimUsername {
                 view.showIndicator(size: .large, color: Color.darkBlue_white)
-                Api.main.verifyCode(code, phoneNumber!) { data, error in
+                Api.main.verifyCode(code, phoneNumber!, nil) { data, error in
                     DispatchQueue.main.async { self.view.hideIndicator() }
                     if error != nil  {
                         print("Error \(error.debugDescription)")
@@ -171,7 +172,8 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
                 }
             } else {
                 view.showIndicator(size: .large, color: Color.darkBlue_white)
-                Api.main.verifyCode(code, phoneNumber!) { data, error in
+                let inviteCode = UserDefaults.standard.string(forKey: Constants.inviteCode)
+                Api.main.verifyCode(code, phoneNumber!, inviteCode) { data, error in
                     DispatchQueue.main.async { self.view.hideIndicator() }
                     if error != nil  {
                         print("Error \(error.debugDescription)")
