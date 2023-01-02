@@ -53,7 +53,15 @@ class Socket {
                     "active": BroadcastType.Active.rawValue
                 ])
             }
-            
+        }
+        
+        socket.on(Constants.Events.Feed) { data, ack in
+            let response = Response<DataType.Feed>((data[0] as? NSDictionary)!)
+            if response.code == 200 {
+                if let data = response.data {
+                    DB.insertFeed(data)
+                }
+            }
         }
         
         socket.onAny({ socket in
@@ -73,6 +81,13 @@ class Socket {
                 "body": body.trimmingCharacters(in: .whitespacesAndNewlines)
             ])
         }
+    }
+    
+    func fetchFeed() {
+        let lastFeedCheck = UserDefaults.standard.string(forKey: Constants.lastFeedCheck)
+        Socket.shared.emit("feed", [
+            "lastFeedCheck": lastFeedCheck
+        ])
     }
     
     enum MediaType: String {

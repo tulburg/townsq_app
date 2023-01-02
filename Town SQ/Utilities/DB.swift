@@ -31,6 +31,8 @@ class DB: NSObject {
         self.context = context
     }
     
+    // MARK: - Static global calls
+    
     static func UserRecord() -> User? {
         let records = DB.shared.find(.User, predicate: NSPredicate(format: "primary = %@", NSNumber(booleanLiteral:  true)))
         if records.count > 0 {
@@ -44,11 +46,39 @@ class DB: NSObject {
         return activeBroadcast as? [Broadcast]
     }
     
-    // Base func
+    static func fetchFeed() -> [Broadcast] {
+        let request: NSFetchRequest = Broadcast.fetchRequest()
+        request.returnsObjectsAsFaults = false
+        return (DB.shared.fetch(request: (request as? NSFetchRequest<NSFetchRequestResult>)!) as [AnyObject] as? [Broadcast])!
+    }
+    
+    static func insertFeed(_ feed: DataType.Feed) {
+        UserDefaults.standard.set(Date().milliseconds, forKey: Constants.lastFeedCheck)
+        feed.broadcasts?.forEach({ broadcast in
+            let check = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", broadcast.id!))
+            if check.count > 0 {
+                
+            }else {
+                let new = Broadcast(context: DB.shared.context)
+                new.id = broadcast.id
+                new.body = broadcast.body
+                new.created = broadcast.created
+                new.user = User(context: DB.shared.context)
+                new.user?.profile_photo = broadcast.user?.profile_photo
+                new.user?.username = broadcast.user?.username
+                new.user?.name = broadcast.user?.name
+                new.user?.id = broadcast.user?.id
+                DB.shared.save()
+            }
+        })
+    }
+    
+    
+    // MARK: - Base functions
     
     @discardableResult func insert(_ model: Model, keyValue: Dictionary<String, Any>) -> Bool {
         let record = NSEntityDescription.insertNewObject(forEntityName: model.rawValue, into: context)
-        keyValue.forEach({ item  in
+        keyValue.forEach({ item in
             record.setValue(item.value, forKey: item.key)
         })
         return save()
@@ -97,9 +127,9 @@ class DB: NSObject {
         return delete(model, predicate: nil)
     }
     
-    // private primaries
+    // MARK: - Private primaries
     
-    private func save() -> Bool{
+    @discardableResult private func save() -> Bool{
         do{
             try context.save()
             return true

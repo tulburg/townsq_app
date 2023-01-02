@@ -595,13 +595,13 @@ extension Date {
         let components:DateComponents = Calendar.current.dateComponents(allComponents, from: fromDate, to: Date())
         
         for (period, timeAgo) in [
-            ("year", components.year ?? 0),
-            ("month", components.month ?? 0),
-            ("week", components.weekOfYear ?? 0),
-            ("day", components.day ?? 0),
-            ("hour", components.hour ?? 0),
-            ("minute", components.minute ?? 0),
-            ("second", components.second ?? 0),
+            ("yr", components.year ?? 0),
+            ("m", components.month ?? 0),
+            ("w", components.weekOfYear ?? 0),
+            ("d", components.day ?? 0),
+            ("hr", components.hour ?? 0),
+            ("min", components.minute ?? 0),
+            ("s", components.second ?? 0),
         ] {
             if timeAgo > 0 {
                 return "\(timeAgo.of(period)) ago"

@@ -18,18 +18,24 @@ class FeedCell: UITableViewCell {
         self.broadcast = broadcast
         
         let ownerImage = makeOwnerImage()
-        let ownerName = UILabel((broadcast.user?.name)!, Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
-        let ownerUsername = UILabel("@" + (broadcast.user?.username)!, Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
-        let feedTime = UILabel(Date.time(since: broadcast.created!), Color.darkBlue, UIFont.systemFont(ofSize: 12))
-        let feedText = UILabel(broadcast.body!, Color.black_white, UIFont.systemFont(ofSize: 16))
+        let ownerName = UILabel(broadcast.user?.name ?? "", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
+        let ownerUsername = UILabel("@" + (broadcast.user?.username ?? ""), Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
+        let feedTime = UILabel(Date.time(since: broadcast.created ?? Date()), Color.darkBlue, UIFont.systemFont(ofSize: 12))
+        let feedText = UILabel(broadcast.body ?? "", Color.black_white, UIFont.systemFont(ofSize: 16))
         feedText.numberOfLines = 6
-        let feedImage = UIImageView(link: "https://img5.goodfon.com/wallpaper/nbig/0/63/face-look-beautiful-girl-flowers-field-eyes.jpg", contentMode: .scaleAspectFill)
-        feedImage.layer.cornerRadius = 8
-        feedImage.clipsToBounds = true
         let feedBody = UIView()
-        feedBody.addSubviews(views: feedText, feedImage)
-        feedBody.constrain(type: .horizontalFill, feedText, feedImage)
-        feedBody.addConstraints(format: "V:|-0-[v0]-16-[v1(220)]-0-|", views: feedText, feedImage)
+        if broadcast.media == nil {
+            feedBody.addSubviews(views: feedText)
+            feedBody.constrain(type: .horizontalFill, feedText)
+            feedBody.addConstraints(format: "V:|-0-[v0]-4-|", views: feedText)
+        }else {
+            let feedImage = UIImageView(link: "https://img5.goodfon.com/wallpaper/nbig/0/63/face-look-beautiful-girl-flowers-field-eyes.jpg", contentMode: .scaleAspectFill)
+            feedImage.layer.cornerRadius = 8
+            feedImage.clipsToBounds = true
+            feedBody.addSubviews(views: feedText, feedImage)
+            feedBody.constrain(type: .horizontalFill, feedText, feedImage)
+            feedBody.addConstraints(format: "V:|-0-[v0]-16-[v1(220)]-0-|", views: feedText, feedImage)
+        }
         
         let activityCounter = activityBadge(activity)
         if activity == nil {
@@ -109,7 +115,12 @@ class FeedCell: UITableViewCell {
     }
     
     func makeOwnerImage() -> UIImageView {      
-        let imageView = UIImageView(link: (broadcast.user?.profile_photo)!, contentMode: .scaleAspectFill)
+        var imageView: UIImageView!
+        if let profile_photo = broadcast.user?.profile_photo {
+            imageView = UIImageView(link: profile_photo, contentMode: .scaleAspectFill)
+        }else {
+            imageView = UIImageView(image: UIImage(named: "profile_background"))
+        }
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
         return imageView

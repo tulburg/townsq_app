@@ -182,7 +182,8 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
                         if response.code == 200 {
                             Progress.state = .PhoneVerified
                             DB.shared.insert(.User, keyValue: ["phone": self.phoneNumber as Any, "primary": true])
-                            UserDefaults.standard.set(response.data as! String, forKey: Constants.authToken)
+                            print(response)
+                            UserDefaults.standard.set(response.data?.value, forKey: Constants.authToken)
                             DispatchQueue.main.async {
                                 let controller = DisplayNameViewController()
                                 let navigationController = NavigationController(rootViewController: controller)

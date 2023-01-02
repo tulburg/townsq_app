@@ -28,7 +28,8 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		self.view.constrain(type: .horizontalFill, feedTable)
 		self.view.addConstraints(format: "V:|-0-[v0]-0-|", views: feedTable)
         
-        self.feed = DB.activeBroadcasts()!
+        self.feed = DB.fetchFeed()
+        
         
 //        Linker(path: "/posts") {
 //            data, response, error in
@@ -60,6 +61,8 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.tabBarController?.title = "Feed"
+        
+        Socket.shared.fetchFeed()
     }
 	
 	func initFeedTableView() -> UITableView {
