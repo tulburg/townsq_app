@@ -13,10 +13,7 @@ class SearchViewController: ViewController, UITableViewDelegate, UITableViewData
     var tableView: UITableView!
     var searchController: UISearchController!
     
-    let data = [
-        "Hi, Please restore my account. My account couldn't have violated any policy. It may look like that because I only",
-        "Limiting your social media use to just 30 minutes a day can decrease feelings of loneliness and depression"
-    ]
+    var broadcasts: [Broadcast] = []
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -28,6 +25,8 @@ class SearchViewController: ViewController, UITableViewDelegate, UITableViewData
         tabImage?.withTintColor(Color.tabItemDisabled, renderingMode: .alwaysTemplate)
         self.tabBarItem = UITabBarItem(title: "", image: tabImage, tag: 1)
         self.tabBarItem.setBadgeTextAttributes([NSAttributedString.Key.backgroundColor: Color.red, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16)], for: .normal)
+        
+        broadcasts = DB.activeBroadcasts()!
         
         searchController = UISearchController()
         searchController.searchBar.layer.shadowOpacity = 0.0
@@ -57,13 +56,13 @@ class SearchViewController: ViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = FeedCell(feedText: data[indexPath.row], nil)
+        let cell = FeedCell(broadcasts[indexPath.row], nil)
         return cell
     }
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return data.count
+        return broadcasts.count
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

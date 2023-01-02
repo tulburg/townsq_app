@@ -39,12 +39,8 @@ class DB: NSObject {
         return nil
     }
     
-    enum BroadcastType: Int16 {
-        case Active, Normal
-    }
-    
     static func activeBroadcasts() -> [Broadcast]? {
-        let activeBroadcast = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "active = %@", BroadcastType.Active.rawValue))
+        let activeBroadcast = DB.shared.find(.Broadcast, props: ["id"], predicate: NSPredicate(format: "active = %@", BroadcastType.Active.rawValue))
         return activeBroadcast as? [Broadcast]
     }
     
@@ -59,14 +55,23 @@ class DB: NSObject {
     }
     
     func find(_ model: Model, predicate: NSPredicate?) -> [NSManagedObject] {
+        return self.find(model, props: nil, predicate: predicate)
+    }
+    
+    func find(_ model: Model, props: [String]?, predicate: NSPredicate?) -> [NSManagedObject] {
         let type: AnyClass? = ModelClass[model]
         let request: NSFetchRequest = type?.fetchRequest() as! NSFetchRequest
         if predicate != nil {
             request.predicate = predicate
         }
+        if props != nil {
+            request.propertiesToFetch = props!
+            request.resultType = .managedObjectResultType
+        }
         request.returnsObjectsAsFaults = false
         return fetch(request: request)
     }
+    
     
     @discardableResult func update(_ model: Model, predicate: NSPredicate?, keyValue: Dictionary<String, Any>) -> Bool {
         let records = find(model, predicate: predicate)
@@ -132,4 +137,8 @@ extension NSManagedObject {
         }
         return result
     }
+}
+
+enum BroadcastType: String {
+    case Active, Normal
 }

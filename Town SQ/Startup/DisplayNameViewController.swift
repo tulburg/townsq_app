@@ -63,7 +63,7 @@ class DisplayNameViewController: ViewController, UITextFieldDelegate {
             Api.main.setProfile("name", name) { data, error in
                 DispatchQueue.main.async { self.rootView.hideIndicator() }
                 if error == nil {
-                    let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                    let response = Response<DataType.None>((data?.toDictionary())! as NSDictionary)
                     if response.code == 200 {
                         Progress.state = .DisplayNameSet
                         DispatchQueue.main.async {

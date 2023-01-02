@@ -571,4 +571,50 @@ extension Date {
     var milliseconds: Int64 {
         Int64((self.timeIntervalSince1970 * 1000.0).rounded())
     }
+
+    static func from(string: String) -> Date? {
+        return self.from(string: string, with: "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX")
+    }
+    
+    static func from(string: String, with format: String) -> Date? {
+        let df = DateFormatter()
+        df.dateFormat = format
+        return df.date(from: string)
+    }
+
+    func string(with format: String) -> String{
+        let df = DateFormatter()
+        df.dateFormat = format
+        return df.string(from: self)
+    }
+    
+    static func time(since fromDate: Date) -> String {
+        guard fromDate < Date() else { return "Back to the future" }
+        
+        let allComponents: Set<Calendar.Component> = [.second, .minute, .hour, .day, .weekOfYear, .month, .year]
+        let components:DateComponents = Calendar.current.dateComponents(allComponents, from: fromDate, to: Date())
+        
+        for (period, timeAgo) in [
+            ("year", components.year ?? 0),
+            ("month", components.month ?? 0),
+            ("week", components.weekOfYear ?? 0),
+            ("day", components.day ?? 0),
+            ("hour", components.hour ?? 0),
+            ("minute", components.minute ?? 0),
+            ("second", components.second ?? 0),
+        ] {
+            if timeAgo > 0 {
+                return "\(timeAgo.of(period)) ago"
+            }
+        }
+        
+        return "Just now"
+    }
+}
+
+extension Int {
+    func of(_ name: String) -> String {
+        guard self != 1 else { return "\(self) \(name)" }
+        return "\(self) \(name)s"
+    }
 }

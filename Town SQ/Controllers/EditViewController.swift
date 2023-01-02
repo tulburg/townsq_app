@@ -136,8 +136,9 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
                 ImageCache.shared().set(data: imageData!, path: path, completion: nil)
             })
         }
-        
         Socket.shared.publishBroadcast(editField.text, nil, nil)
+        editField.text = ""
+        disableButton(true)
     }
     
     func disableButton(_ disable: Bool) {

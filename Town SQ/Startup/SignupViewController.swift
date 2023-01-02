@@ -105,7 +105,7 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
                         self.view.hideIndicator()
                     }
                     if error == nil {
-                        let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                        let response = Response<DataType.None>((data?.toDictionary())! as NSDictionary)
                         if response.code == 200 {
                             DispatchQueue.main.async {
                                 self.navigationController?.pushViewController(controller, animated: true)
@@ -130,7 +130,7 @@ class SignupViewController: ViewController, UITextFieldDelegate, CountryPickerDe
                 Api.main.verifyPhone(phone, completion: { data, error in
                     DispatchQueue.main.async { self.view.hideIndicator() }
                     if error == nil {
-                        let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                        let response = Response<DataType.None>((data?.toDictionary())! as NSDictionary)
                         if response.code == 200 {
                             Progress.state = .PhoneCodeSent
                             DispatchQueue.main.async {

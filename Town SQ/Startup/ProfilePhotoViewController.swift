@@ -93,7 +93,7 @@ class ProfilePhotoViewController: ViewController, UINavigationControllerDelegate
                             let fileAddr = Constants.S3Addr + "\(name.uuidString).jpg"
                             Api.main.setProfile("profile_photo", fileAddr) { data, error in
                                 DispatchQueue.main.async { self.view.hideIndicator() }
-                                let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                                let response = Response<DataType.None>((data?.toDictionary())! as NSDictionary)
                                 if response.code == 200 {
                                     Progress.state = .ProfilePhotoSet
                                     DispatchQueue.main.async {

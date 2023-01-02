@@ -10,7 +10,8 @@ import UIKit
 
 class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    var feed: [String]! = ["Hello world", "Here's another one", "There' something hiddne about the fact that this is not what i intended to do, but it happening anyway"]
+  
+    var activeBroadcasts: [Broadcast] = []
     
     
     required init?(coder: NSCoder) {
@@ -19,6 +20,10 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     init() {
         super.init(nibName: nil, bundle: nil)
+        
+        activeBroadcasts = DB.activeBroadcasts()!
+        print(activeBroadcasts)
+        
         let tabImage = UIImage(named: "active")
         tabImage?.withTintColor(Color.tabItemDisabled, renderingMode: .alwaysTemplate)
         self.tabBarItem = UITabBarItem(title: "", image: tabImage, tag: 1)
@@ -28,19 +33,19 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
         self.view.constrain(type: .horizontalFill, table)
         self.view.addConstraints(format: "V:|-0-[v0]-0-|", views: table)
         
-        Linker(path: "/posts") {
-            data, response, error in
-            if let json = data?.toJsonArray() {
-                for post in json {
-                    let value = (post as! Dictionary<String, Any>)["body"] as! String
-                    self.feed.append(value.replacingOccurrences(of: "\n", with: ""))
-                }
-            }
-            DispatchQueue.main.async {
-                table.reloadData()
-            }
-            
-        }.execute()
+//        Linker(path: "/posts") {
+//            data, response, error in
+//            if let json = data?.toJsonArray() {
+//                for post in json {
+//                    let value = (post as! Dictionary<String, Any>)["body"] as! String
+//                    self.activeBroadcasts.append(value.replacingOccurrences(of: "\n", with: ""))
+//                }
+//            }
+//            DispatchQueue.main.async {
+//                table.reloadData()
+//            }
+//
+//        }.execute()
     }
     
     override func viewDidLoad() {
@@ -70,15 +75,15 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return feed.count
+        return activeBroadcasts.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: FeedCell = FeedCell(feedText: feed[indexPath.row], 3)
+        let cell: FeedCell = FeedCell(activeBroadcasts[indexPath.row], 3)
         let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
         cell.selectedBackgroundView = background
-        if indexPath.row == feed.count - 1 {
+        if indexPath.row == activeBroadcasts.count - 1 {
             cell.hideSeparator()
         }
         return cell

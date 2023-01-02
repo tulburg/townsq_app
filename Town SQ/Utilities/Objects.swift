@@ -7,7 +7,7 @@
 //
 import Foundation
 
-struct Response<T> {
+class Response<T: ResponseData> {
     var code: Int?
     var status: Int?
     var message: String?
@@ -18,28 +18,30 @@ struct Response<T> {
         if let code = dict["code"] as? Int { self.code = code }
         if let status = dict["status"] as? Int { self.status = status }
         if let message = dict["message"] as? String { self.message = message }
-        if let data = dict["data"] as? T { self.data = data }
+        if let data = dict["data"] as? NSDictionary { self.data = T.init(data) }
         if let error = dict["error"] as? Int { self.error = Constants.ErrorMessages[error] }
     }
-    
-//    func export() -> [String: String] {
-//        return [
-//            "max_occupancy" : String(describing: self.max_occupancy!), "price_per_hour" : String(describing: self.price_per_hour!),
-//            "location" : self.location!, "description" : self.description!, "longitude" : String(describing: self.longitude!),
-//            "latitude" : String(describing: self.latitude!), "meta" : meta!
-//        ]
-//    }
-//
-//    private mutating func metaData(_ meta: String) {
-//        let ss: [Substring] = meta.split(separator: ",")
-//        let tt: [Substring] = ss[0].split(separator: ":")
-//        let vv: [Substring] = ss[1].split(separator: ":")
-//        self.type = tt[1].description
-//        self.size = Int(vv[1].description)
-//    }
 }
 
+class DataType {
+    class Broadcast: ResponseData {
+        var created: Date?
+        var id: String?
+        required init(_ dict: NSDictionary) {
+            if let created = dict["created"] as? String { self.created = Date.from(string: created) }
+            if let id = dict["id"] as? String { self.id = id }
+        }
+    }
+    
+    class None: ResponseData {
+        required init(_ dict: NSDictionary) {
+            
+        }
+    }
+}
 
-
+protocol ResponseData {
+    init(_ dict: NSDictionary)
+}
 
 

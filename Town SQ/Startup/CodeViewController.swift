@@ -113,7 +113,7 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
                     if error != nil {
                         print(error as Any)
                     }else {
-                        let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                        let response = Response<DataType.None>((data?.toDictionary())! as NSDictionary)
                         if response.code == 200 {
                             Progress.state = .InviteCodeVerified
                             DispatchQueue.main.async { [self] in
@@ -147,7 +147,7 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
                     if error != nil  {
                         print("Error \(error.debugDescription)")
                     }else {
-                        let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                        let response = Response<DataType.None>((data?.toDictionary())! as NSDictionary)
                         if response.code == 200 {
                             DispatchQueue.main.async {
                                 let controller = ClaimUsernameController()
@@ -178,7 +178,7 @@ class CodeViewController: ViewController, VerificationCodeProtocol {
                     if error != nil  {
                         print("Error \(error.debugDescription)")
                     }else {
-                        let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                        let response = Response<DataType.None>((data?.toDictionary())! as NSDictionary)
                         if response.code == 200 {
                             Progress.state = .PhoneVerified
                             DB.shared.insert(.User, keyValue: ["phone": self.phoneNumber as Any, "primary": true])

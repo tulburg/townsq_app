@@ -8,9 +8,9 @@
 
 import UIKit
 
-class FeedViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSource {
 	
-	var feed: [String]! = ["Hello world", "Here's another one", "There' something hiddne about the fact that this is not what i intended to do, but it happening anyway"]
+	var feed: [Broadcast] = []
   
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
@@ -22,26 +22,27 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		tabImage?.withTintColor(Color.homeTabLight, renderingMode: .alwaysTemplate)
 		self.tabBarItem = UITabBarItem(title: "", image: tabImage, tag: 1)
 		self.tabBarItem.setBadgeTextAttributes([NSAttributedString.Key.backgroundColor: Color.red, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16)], for: .normal)
-
 		
 		let feedTable = initFeedTableView()
 		self.view.addSubviews(views: feedTable)
 		self.view.constrain(type: .horizontalFill, feedTable)
 		self.view.addConstraints(format: "V:|-0-[v0]-0-|", views: feedTable)
         
-        Linker(path: "/posts") {
-            data, response, error in
-            if let json = data?.toJsonArray() {
-                for post in json {
-                    let value = (post as! Dictionary<String, Any>)["body"] as! String
-                    self.feed.append(value.replacingOccurrences(of: "\n", with: ""))
-                }
-            }
-            DispatchQueue.main.async {
-                feedTable.reloadData()
-            }
-            
-        }.execute()
+        self.feed = DB.activeBroadcasts()!
+        
+//        Linker(path: "/posts") {
+//            data, response, error in
+//            if let json = data?.toJsonArray() {
+//                for post in json {
+//                    let value = (post as! Dictionary<String, Any>)["body"] as! String
+//                    self.feed.append(value.replacingOccurrences(of: "\n", with: ""))
+//                }
+//            }
+//            DispatchQueue.main.async {
+//                feedTable.reloadData()
+//            }
+//
+//        }.execute()
 	}
 	
 	override func viewDidLoad() {
@@ -50,6 +51,9 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 		self.view.backgroundColor = Color.background
         
         Socket.shared.start()
+
+//        print(DB.shared.find(.Broadcast, predicate: nil))
+//        print(DB.shared.find(.Broadcast, predicate: NSPredicate(format: "user.id", user?.id as! CVarArg)))
 
 	}
     
@@ -74,7 +78,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: FeedCell = FeedCell(feedText: feed[indexPath.row], nil)
+        let cell: FeedCell = FeedCell(feed[indexPath.row], nil)
 		let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
 		cell.selectedBackgroundView = background

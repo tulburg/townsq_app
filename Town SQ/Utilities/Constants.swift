@@ -24,6 +24,10 @@ struct Constants {
         1003: "Invite code successful"
     ]
     
+    struct Events {
+        static let Broadcast = "broadcast"
+    }
+    
     static let Base = "http://192.168.18.3:5400"
     
     static let authToken = "auth-token"

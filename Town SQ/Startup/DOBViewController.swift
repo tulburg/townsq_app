@@ -107,7 +107,7 @@ class DOBViewController: ViewController, UITextFieldDelegate {
         if let date = selectedDate {
             Api.main.setProfile("date_of_birth", dateField.text!) { data, error in
                 DispatchQueue.main.async { self.rootView.hideIndicator() }
-                let response = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                let response = Response<DataType.None>((data?.toDictionary())! as NSDictionary)
                 if response.code == 200 {
                     Progress.state = .DOBSet
                     

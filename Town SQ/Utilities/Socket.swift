@@ -15,6 +15,7 @@ class Socket {
     let socket: SocketIOClient!
     var user: User!
     var lastJob: (() -> Void)? = nil
+    var broadcast: String!
     
     static let shared: Socket = {
         let delegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -27,7 +28,7 @@ class Socket {
         user = DB.UserRecord()
         socket.on(clientEvent: .connect) { data, ack in
             let lastFeedCheck = UserDefaults.standard.string(forKey: Constants.lastFeedCheck)
-            let activeBroadcasts = DB.activeBroadcasts()?.map{ $0.object() }
+            let activeBroadcasts = DB.activeBroadcasts()?.map{ $0.id }
             socket.emit("startup", [
                 "lastFeedCheck": lastFeedCheck as Any ,
                 "activeBroadcasts": activeBroadcasts as Any
@@ -41,6 +42,20 @@ class Socket {
             
         }
         
+        socket.on(Constants.Events.Broadcast) { data, ack in
+            let response = Response<DataType.Broadcast>((data[0] as? NSDictionary)!)
+            if response.code == 200 {
+                DB.shared.insert(.Broadcast, keyValue: [
+                    "user": self.user as Any,
+                    "body": self.broadcast as Any,
+                    "created": response.data?.created as Any,
+                    "id": response.data?.id as Any,
+                    "active": BroadcastType.Active.rawValue
+                ])
+            }
+            
+        }
+        
         socket.onAny({ socket in
             print(socket)
         })
@@ -50,14 +65,12 @@ class Socket {
     }
     
     func publishBroadcast(_ body: String, _ media: String?, _ mediaType: MediaType?) {
+        self.broadcast = body
         if media != nil {
             
         }else {
             emit("broadcast", [
-                "body": body.trimmingCharacters(in: .whitespacesAndNewlines),
-                "owner_name": user.name,
-                "owner_image": user.profile_photo,
-                "owner_username": user.username
+                "body": body.trimmingCharacters(in: .whitespacesAndNewlines)
             ])
         }
     }

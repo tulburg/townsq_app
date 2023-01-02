@@ -63,7 +63,7 @@ class UsernameViewController: ViewController, UITextFieldDelegate {
         if let username = usernameField.text {
             Api.main.verifyUsername(username) { data, error in
                 DispatchQueue.main.async { self.rootView.hideIndicator() }
-                let verifyResponse = Response<AnyObject>((data?.toDictionary())! as NSDictionary)
+                let verifyResponse = Response<DataType.None>((data?.toDictionary())! as NSDictionary)
                 if verifyResponse.code == 200 {
                     Progress.state = .UsernameSet
                     DispatchQueue.main.async {

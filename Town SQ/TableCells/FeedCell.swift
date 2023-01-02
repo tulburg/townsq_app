@@ -10,18 +10,18 @@ import UIKit
 
 class FeedCell: UITableViewCell {
     
-    var feed: String!
+    var broadcast: Broadcast!
     var separator: UIView!
     
-    init(feedText feed: String, _ activity: Int?) {
+    init(_ broadcast: Broadcast, _ activity: Int?) {
         super.init(style: .default, reuseIdentifier: .none)
-        self.feed = feed
+        self.broadcast = broadcast
         
         let ownerImage = makeOwnerImage()
-        let ownerName = UILabel("Simone biles", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
-        let ownerUsername = UILabel("@simone", Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
-        let feedTime = UILabel("2d ago", Color.darkBlue, UIFont.italicSystemFont(ofSize: 12))
-        let feedText = UILabel(feed, Color.black_white, UIFont.systemFont(ofSize: 16))
+        let ownerName = UILabel((broadcast.user?.name)!, Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
+        let ownerUsername = UILabel("@" + (broadcast.user?.username)!, Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
+        let feedTime = UILabel(Date.time(since: broadcast.created!), Color.darkBlue, UIFont.systemFont(ofSize: 12))
+        let feedText = UILabel(broadcast.body!, Color.black_white, UIFont.systemFont(ofSize: 16))
         feedText.numberOfLines = 6
         let feedImage = UIImageView(link: "https://img5.goodfon.com/wallpaper/nbig/0/63/face-look-beautiful-girl-flowers-field-eyes.jpg", contentMode: .scaleAspectFill)
         feedImage.layer.cornerRadius = 8
@@ -108,9 +108,8 @@ class FeedCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func makeOwnerImage() -> UIImageView {
-        let n = arc4random_uniform(80) + 1        
-        let imageView = UIImageView(link: "https://randomuser.me/api/portraits/med/men/\(n).jpg", contentMode: .scaleAspectFill)
+    func makeOwnerImage() -> UIImageView {      
+        let imageView = UIImageView(link: (broadcast.user?.profile_photo)!, contentMode: .scaleAspectFill)
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
         return imageView

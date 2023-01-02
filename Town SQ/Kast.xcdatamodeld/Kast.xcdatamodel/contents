@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Broadcast" representedClassName="Broadcast" syncable="YES" codeGenerationType="class">
-        <attribute name="active" optional="YES" attributeType="Integer 16" usesScalarValueType="YES"/>
+        <attribute name="active" optional="YES" attributeType="String"/>
         <attribute name="body" optional="YES" attributeType="String"/>
         <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="media" optional="YES" attributeType="String"/>
         <attribute name="media_type" optional="YES" attributeType="String"/>
-        <attribute name="owner_image" optional="YES" attributeType="String"/>
-        <attribute name="owner_name" optional="YES" attributeType="String"/>
-        <attribute name="owner_username" optional="YES" attributeType="String"/>
+        <relationship name="comments" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Comment" inverseName="broadcast" inverseEntity="Comment"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="broadcasts" inverseEntity="User"/>
     </entity>
     <entity name="Comment" representedClassName="Comment" syncable="YES" codeGenerationType="class">
         <attribute name="body" optional="YES" attributeType="String"/>
@@ -19,6 +18,7 @@
         <attribute name="owner_image" optional="YES" attributeType="String"/>
         <attribute name="owner_name" optional="YES" attributeType="String"/>
         <attribute name="owner_username" optional="YES" attributeType="String"/>
+        <relationship name="broadcast" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Broadcast" inverseName="comments" inverseEntity="Broadcast"/>
     </entity>
     <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
         <attribute name="date_of_birth" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -27,5 +27,6 @@
         <attribute name="primary" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="profile_photo" optional="YES" attributeType="String"/>
         <attribute name="username" optional="YES" attributeType="String"/>
+        <relationship name="broadcasts" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Broadcast" inverseName="user" inverseEntity="Broadcast"/>
     </entity>
 </model>
