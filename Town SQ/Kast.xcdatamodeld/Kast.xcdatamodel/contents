@@ -7,7 +7,7 @@
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="media" optional="YES" attributeType="String"/>
         <attribute name="media_type" optional="YES" attributeType="String"/>
-        <relationship name="comments" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Comment" inverseName="broadcast" inverseEntity="Comment"/>
+        <relationship name="comments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Comment" inverseName="broadcast" inverseEntity="Comment"/>
         <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="broadcasts" inverseEntity="User"/>
     </entity>
     <entity name="Comment" representedClassName="Comment" syncable="YES" codeGenerationType="class">
@@ -19,6 +19,7 @@
         <attribute name="owner_name" optional="YES" attributeType="String"/>
         <attribute name="owner_username" optional="YES" attributeType="String"/>
         <relationship name="broadcast" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Broadcast" inverseName="comments" inverseEntity="Broadcast"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="comments" inverseEntity="User"/>
     </entity>
     <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
         <attribute name="date_of_birth" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -28,6 +29,7 @@
         <attribute name="primary" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="profile_photo" optional="YES" attributeType="String"/>
         <attribute name="username" optional="YES" attributeType="String"/>
-        <relationship name="broadcasts" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Broadcast" inverseName="user" inverseEntity="Broadcast"/>
+        <relationship name="broadcasts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Broadcast" inverseName="user" inverseEntity="Broadcast"/>
+        <relationship name="comments" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Comment" inverseName="user" inverseEntity="Comment"/>
     </entity>
 </model>

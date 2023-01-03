@@ -64,23 +64,10 @@ class TabBarController: UITabBarController {
         self.navigationController?.present(editVC, animated: true)
 	}
 
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-	}
-
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupBadges()
     }
-    
-    override func beginAppearanceTransition(_ isAppearing: Bool, animated: Bool) {
-        super.beginAppearanceTransition(isAppearing, animated: animated)
-    }
-
-	override func viewWillDisappear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-
-	}
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)

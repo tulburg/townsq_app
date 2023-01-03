@@ -92,7 +92,10 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		self.presentMessages()
+        let messagesVC = MessagesViewController()
+        messagesVC.modalPresentationStyle = .fullScreen
+        messagesVC.broadcast = feed[indexPath.row]
+        self.navigationController?.pushViewController(messagesVC, animated: true)
 		tableView.deselectRow(at: indexPath, animated: true)
 	}
 	
@@ -111,11 +114,5 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		label.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
 		container.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
 		return container
-	}
-	
-	@objc func presentMessages() {
-		let messagesVC = MessagesViewController()
-		messagesVC.modalPresentationStyle = .fullScreen
-		self.navigationController?.pushViewController(messagesVC, animated: true)
 	}
 }

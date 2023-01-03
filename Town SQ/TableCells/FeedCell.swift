@@ -15,6 +15,15 @@ class FeedCell: UITableViewCell {
     
     init(_ broadcast: Broadcast, _ activity: Int?) {
         super.init(style: .default, reuseIdentifier: .none)
+        self.setup(broadcast, activity, asHeader: false)
+    }
+    
+    init(_ broadcast: Broadcast, _ activity: Int?, asHeader: Bool) {
+        super.init(style: .default, reuseIdentifier: .none)
+        self.setup(broadcast, activity, asHeader: asHeader)
+    }
+    
+    func setup(_ broadcast: Broadcast, _ activity: Int?, asHeader: Bool) {
         self.broadcast = broadcast
         
         let ownerImage = makeOwnerImage()
@@ -23,6 +32,9 @@ class FeedCell: UITableViewCell {
         let feedTime = UILabel(Date.time(since: broadcast.created ?? Date()), Color.darkBlue, UIFont.systemFont(ofSize: 12))
         let feedText = UILabel(broadcast.body ?? "", Color.black_white, UIFont.systemFont(ofSize: 16))
         feedText.numberOfLines = 6
+        if asHeader {
+            feedText.font = UIFont.systemFont(ofSize: 20)
+        }
         let feedBody = UIView()
         if broadcast.media == nil {
             feedBody.addSubviews(views: feedText)
@@ -38,7 +50,7 @@ class FeedCell: UITableViewCell {
         }
         
         let activityCounter = activityBadge(activity)
-        if activity == nil {
+        if activity == nil || activity == 0 {
             activityCounter.isHidden = true
         }
         
@@ -82,8 +94,17 @@ class FeedCell: UITableViewCell {
         
         let bodyContainer = UIView()
         bodyContainer.addSubviews(views: ownerContainer, ownerUsername, feedBody, bottomContainer)
-        bodyContainer.addConstraints(format: "V:|-16-[v0]-0-[v1]-4-[v2]-8-[v3]-8-|", views: ownerContainer, ownerUsername, feedBody, bottomContainer)
-        bodyContainer.constrain(type: .horizontalFill, ownerContainer, ownerUsername, feedBody, bottomContainer)
+        
+        if asHeader {
+            bodyContainer.add().vertical(16).view(ownerContainer).gap(0).view(ownerUsername).gap(16).view(feedBody).gap(8).view(bottomContainer).end(8)
+            bodyContainer.add().horizontal(-52).view(feedBody).end(0)
+            bodyContainer.add().horizontal(-52).view(bottomContainer).end(0)
+        }else {
+            bodyContainer.add().vertical(16).view(ownerContainer).gap(0).view(ownerUsername).gap(4).view(feedBody).gap(8).view(bottomContainer).end(8)
+            bodyContainer.add().horizontal(0).view(feedBody).end(0)
+            bodyContainer.add().horizontal(0).view(bottomContainer).end(0)
+        }
+        bodyContainer.constrain(type: .horizontalFill, ownerContainer, ownerUsername)
         
         let feedContainer = UIView()
         feedContainer.addSubviews(views: ownerImage, bodyContainer)

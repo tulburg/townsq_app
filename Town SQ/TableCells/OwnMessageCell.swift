@@ -11,13 +11,11 @@ import UIKit
 class OwnMessageCell: UITableViewCell {
 	
 	var message: Message!
+    var feedBody: UILabel!
 	
-	init(_ message: Message) {
-		super.init(style: .default  , reuseIdentifier: nil)
-		self.message = message
-		
+	func start() {
 		let ownerImage = makeOwnerImage()
-        let feedBody = UILabel(message.body!, Color.black_white, UIFont.systemFont(ofSize: 16))
+        feedBody = UILabel("", Color.black_white, UIFont.systemFont(ofSize: 16))
 		feedBody.numberOfLines = 6
 		
 		let time = UILabel("2d ago", Color.lightBlue, UIFont.systemFont(ofSize: 12))
@@ -41,10 +39,20 @@ class OwnMessageCell: UITableViewCell {
 		self.contentView.constrain(type: .horizontalFill, container, margin: 16)
 		self.contentView.constrain(type: .verticalFill, container)
 	}
+    
+    func build(_ message: Message) {
+        self.message = message
+        feedBody.text = message.body!
+    }
 	
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
 	}
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        start()
+    }
 	
     func makeOwnerImage() -> UIImageView {
         let imageView = UIImageView(link: "https://images.ctfassets.net/sc7uy4u0eewy/LPEpShMYorRpDnv0TU720/e279146d5feac47133ff1c1b0818752b/emil-pakarklis.jpg", contentMode: .scaleAspectFill)

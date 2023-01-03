@@ -11,16 +11,14 @@ import UIKit
 class MessageCell: UITableViewCell {
 	
 	var message: Message!
-	
-	init(_ message: Message) {
-		super.init(style: .default  , reuseIdentifier: nil)
-		self.message = message
+    var feedBody: UILabel!
+	func start() {
 		
 		let ownerImage = makeOwnerImage()
         let ownerName = UILabel("Simone biles", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
         let ownerUsername = UILabel("@simone_biles", Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
 		let feedTime = UILabel("2d ago", Color.darkBlue, UIFont.systemFont(ofSize: 12))
-		let feedBody = UILabel(message.body!, Color.black_white, UIFont.systemFont(ofSize: 16))
+		feedBody = UILabel("", Color.black_white, UIFont.systemFont(ofSize: 16))
 		feedBody.numberOfLines = 6
 		
 		let ownerContainer = UIView()
@@ -46,10 +44,21 @@ class MessageCell: UITableViewCell {
 		self.contentView.constrain(type: .verticalFill, container)
 		
 	}
+    
+    func build(_ message: Message) {
+        self.message = message
+        feedBody.text = message.body!
+    }
+    
 	
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
 	}
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.start()
+    }
 	
 	func makeOwnerImage() -> UIImageView {
         let n = arc4random_uniform(80) + 1
