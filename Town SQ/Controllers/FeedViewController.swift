@@ -29,21 +29,11 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		self.view.addConstraints(format: "V:|-0-[v0]-0-|", views: feedTable)
         
         self.feed = DB.fetchFeed()
+        Socket.shared.fetchFeed()
         
-        
-//        Linker(path: "/posts") {
-//            data, response, error in
-//            if let json = data?.toJsonArray() {
-//                for post in json {
-//                    let value = (post as! Dictionary<String, Any>)["body"] as! String
-//                    self.feed.append(value.replacingOccurrences(of: "\n", with: ""))
-//                }
-//            }
-//            DispatchQueue.main.async {
-//                feedTable.reloadData()
-//            }
-//
-//        }.execute()
+//        ImageCache.shared().drop()
+//        DB.shared.drop(.Comment)
+//        DB.shared.drop(.Broadcast)
 	}
 	
 	override func viewDidLoad() {
@@ -61,8 +51,6 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.tabBarController?.title = "Feed"
-        
-        Socket.shared.fetchFeed()
     }
 	
 	func initFeedTableView() -> UITableView {

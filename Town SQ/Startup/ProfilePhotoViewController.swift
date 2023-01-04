@@ -115,6 +115,7 @@ class ProfilePhotoViewController: ViewController, UINavigationControllerDelegate
     }
 	
 	@objc func complete() {
+        Socket.shared.restart()
 		let vc = NavigationController(rootViewController: TabBarController())
 		vc.modalPresentationStyle = .overCurrentContext
 		self.navigationController?.present(vc, animated: true, completion: nil)

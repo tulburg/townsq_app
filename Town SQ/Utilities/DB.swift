@@ -49,6 +49,7 @@ class DB: NSObject {
     static func fetchFeed() -> [Broadcast] {
         let request: NSFetchRequest = Broadcast.fetchRequest()
         request.returnsObjectsAsFaults = false
+        request.resultType = .managedObjectResultType
         return (DB.shared.fetch(request: (request as? NSFetchRequest<NSFetchRequestResult>)!) as [AnyObject] as? [Broadcast])!
     }
     
@@ -129,7 +130,7 @@ class DB: NSObject {
     
     // MARK: - Private primaries
     
-    @discardableResult private func save() -> Bool{
+    @discardableResult public func save() -> Bool{
         do{
             try context.save()
             return true

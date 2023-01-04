@@ -29,7 +29,7 @@ class FeedCell: UITableViewCell {
         let ownerImage = makeOwnerImage()
         let ownerName = UILabel(broadcast.user?.name ?? "", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
         let ownerUsername = UILabel("@" + (broadcast.user?.username ?? ""), Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
-        let feedTime = UILabel(Date.time(since: broadcast.created ?? Date()), Color.darkBlue, UIFont.systemFont(ofSize: 12))
+        let feedTime = UILabel(Date.time(since: broadcast.created ?? Date()) + " ago", Color.darkBlue, UIFont.systemFont(ofSize: 12))
         let feedText = UILabel(broadcast.body ?? "", Color.black_white, UIFont.systemFont(ofSize: 16))
         feedText.numberOfLines = 6
         if asHeader {
@@ -84,7 +84,7 @@ class FeedCell: UITableViewCell {
             let statusText = UILabel("Joined 2 mins ago", Color.darkBlue_white, UIFont.systemFont(ofSize: 12))
             let mutable = NSMutableAttributedString()
             mutable.normal("Joined ")
-            mutable.bold("2 mins", size: 12, weight: UIFont.Weight.heavy)
+            mutable.bold(Date.time(since: broadcast.joined ?? Date()), size: 12, weight: UIFont.Weight.heavy)
             mutable.normal(" ago")
             statusText.attributedText = mutable
             leaveContainer.addSubviews(views: statusText, leaveButton)

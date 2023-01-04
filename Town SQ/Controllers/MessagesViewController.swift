@@ -13,9 +13,9 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
 	
 	var tableView: UITableView!
 	var messageField: UITextView!
-	var messages: [Message] = []
     var messageContainer: UIView!
     var sendButton: UIImageView!
+    var tableContainer: UIView!
 	
 	var messageContainerBottomConstraint: NSLayoutConstraint!
 	var titleContainerHeightConstraint: NSLayoutConstraint!
@@ -24,19 +24,22 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
 	
 	var messageFieldHeight: CGFloat = 0
     var broadcast: Broadcast!
+    var comments: [Comment] = []
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-        Socket.shared.start()
-        navigationItem.title = "Broadcast"
+        if broadcast.active == nil {
+            Socket.shared.joinBroadcast(broadcast)
+            broadcast.active = BroadcastType.Active.rawValue
+            broadcast.joined = Date()
+            DB.shared.save()
+        }
+        broadcast.comments?.array.forEach { comment in
+            comments.append((comment as? Comment)!)
+        }
         
-		let text = "[{\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been going around about a guy that claims to have found big foot in his backyard.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Kim\", \"body\": \"There’s this story that has been. For some, somethings will never change\"},{\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been going around about a guy that claims to have found big foot in his backyard.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Kim\", \"body\": \"There’s this story that has been. For some, somethings will never change\"},{\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been going around about a guy that claims to have found big foot in his backyard.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Kim\", \"body\": \"There’s this story that has been. For some, somethings will never change\"},{\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been going around about a guy that claims to have found big foot in his backyard.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Simone biles\", \"body\": \"There’s this story that has been.\"}, {\"id\": \"Something\", \"date\": \"12-01-2020\", \"sender\": \"Kim\", \"body\": \"There’s this story that has been. For some, somethings will never change\"}]"
-		if let dicts = text.data(using: .utf8)?.toJsonArray() as? [NSDictionary] {
-			dicts.forEach({ dict in
-				messages.append(Message(dict))
-			})
-		}
+        navigationItem.title = "Broadcast"
 		
 		self.navigationItem.backBarButtonItem?.setBackButtonBackgroundVerticalPositionAdjustment(20, for: .default)
 	
@@ -51,7 +54,7 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
 		
 		self.view.backgroundColor = Color.background
 		
-		let tableContainer = UIView()
+		tableContainer = UIView()
 		tableContainer.backgroundColor = Color.darkBlue
 		
 		tableView = UITableView()
@@ -84,6 +87,8 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
         borderBottom.backgroundColor = UIColor.clear // Color.separator
         let buttonImage = UIImage(systemName: "arrow.up.circle.fill")?.withTintColor(Color.darkBlue_white, renderingMode: .alwaysOriginal)
         sendButton = UIImageView(image: buttonImage)
+        sendButton.isUserInteractionEnabled = true
+        sendButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(postComment)))
         
         let messageWrap = UIView()
         messageWrap.layer.cornerRadius = 20
@@ -112,21 +117,21 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return messages.count + 1
+		return comments.count + 1
 	}
     var messageCell: UITableViewCell!
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
             return FeedCell(broadcast, 0, asHeader: true)
         }
-        let message = messages[indexPath.row - 1]
-		if(message.sender == "Kim") {
+        let comment = comments[indexPath.row - 1]
+        if(comment.user?.id == user?.id) {
             let cell = (tableView.dequeueReusableCell(withIdentifier: "own_message_cell", for: indexPath) as? OwnMessageCell)!
-            cell.build(message)
+            cell.build(comment)
             return cell
 		}else {
             let cell = (tableView.dequeueReusableCell(withIdentifier: "message_cell", for: indexPath) as? MessageCell)!
-            cell.build(message)
+            cell.build(comment)
             return cell
 		}
 	}
@@ -138,7 +143,7 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
             }
             UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
                 self.view.layoutIfNeeded()
-                self.tableView.scrollToRow(at: IndexPath(row: self.messages.count - 1, section: 0), at: .bottom, animated: true)
+                self.tableView.scrollToRow(at: IndexPath(row: self.comments.count, section: 0), at: .bottom, animated: true)
             }, completion: { _ in
                 
             })
@@ -153,10 +158,19 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
             self.view.layoutIfNeeded()
         }, completion: nil)
 	}
+    
+    @objc func postComment() {
+        if let body = messageField.text {
+            messageField.resignFirstResponder()
+            messageField.text = "Message here"
+            messageField.textColor = Color.lightText
+            Socket.shared.publishComment(body, broadcast, nil, nil)
+        }
+    }
 	
 	func textViewDidBeginEditing(_ textView: UITextView) {
 		if textView.text == "Message here" {
-			textView.text = ""
+            textView.text = nil
             textView.textColor = Color.black_white
 		}
 	}
@@ -190,6 +204,7 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
                 constraint.constant = min(estimatedSize.height, 116) + 12
             }
         })
+        tableView.scrollToRow(at: IndexPath(row: self.comments.count, section: 0), at: .bottom, animated: false)
         messageFieldHeightConstraint.constant = min(estimatedSize.height, 116)
         self.messageField.superview?.layoutIfNeeded()
 	}

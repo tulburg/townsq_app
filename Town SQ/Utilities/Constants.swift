@@ -26,7 +26,11 @@ struct Constants {
     
     struct Events {
         static let Broadcast = "broadcast"
+        static let Comment = "comment"
         static let Feed = "feed"
+        static let JoinBroadcast = "join_broadcast"
+        static let GotComment = "got_comment"
+        static let Startup = "startup"
     }
     
     static let Base = "http://192.168.18.3:5400"

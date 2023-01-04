@@ -10,13 +10,15 @@ import UIKit
 
 class OwnMessageCell: UITableViewCell {
 	
-	var message: Message!
+	var comment: Comment!
     var feedBody: UILabel!
+    var image: UIImageView!
 	
 	func start() {
 		let ownerImage = makeOwnerImage()
         feedBody = UILabel("", Color.black_white, UIFont.systemFont(ofSize: 16))
 		feedBody.numberOfLines = 6
+        feedBody.interactions = [UITextInteraction(for: .editable)]
 		
 		let time = UILabel("2d ago", Color.lightBlue, UIFont.systemFont(ofSize: 12))
 		
@@ -40,9 +42,12 @@ class OwnMessageCell: UITableViewCell {
 		self.contentView.constrain(type: .verticalFill, container)
 	}
     
-    func build(_ message: Message) {
-        self.message = message
-        feedBody.text = message.body!
+    func build(_ comment: Comment) {
+        self.comment = comment
+        feedBody.text = comment.body!
+        if comment.user?.profile_photo != nil {
+            image.download(link: (comment.user?.profile_photo)!, contentMode: .scaleAspectFill)
+        }
     }
 	
 	required init?(coder: NSCoder) {
@@ -55,10 +60,11 @@ class OwnMessageCell: UITableViewCell {
     }
 	
     func makeOwnerImage() -> UIImageView {
-        let imageView = UIImageView(link: "https://images.ctfassets.net/sc7uy4u0eewy/LPEpShMYorRpDnv0TU720/e279146d5feac47133ff1c1b0818752b/emil-pakarklis.jpg", contentMode: .scaleAspectFill)
-        imageView.layer.cornerRadius = 8
-        imageView.clipsToBounds = true
-        return imageView
+        image = UIImageView(image: UIImage(named: "profile_background"))
+        image.contentMode = .scaleAspectFill
+        image.layer.cornerRadius = 8
+        image.clipsToBounds = true
+        return image
     }
 	
 	

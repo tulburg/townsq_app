@@ -22,7 +22,6 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
         super.init(nibName: nil, bundle: nil)
         
         activeBroadcasts = DB.activeBroadcasts()!
-        print(activeBroadcasts)
         
         let tabImage = UIImage(named: "active")
         tabImage?.withTintColor(Color.tabItemDisabled, renderingMode: .alwaysTemplate)
@@ -32,20 +31,6 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
         self.view.addSubviews(views: table)
         self.view.constrain(type: .horizontalFill, table)
         self.view.addConstraints(format: "V:|-0-[v0]-0-|", views: table)
-        
-//        Linker(path: "/posts") {
-//            data, response, error in
-//            if let json = data?.toJsonArray() {
-//                for post in json {
-//                    let value = (post as! Dictionary<String, Any>)["body"] as! String
-//                    self.activeBroadcasts.append(value.replacingOccurrences(of: "\n", with: ""))
-//                }
-//            }
-//            DispatchQueue.main.async {
-//                table.reloadData()
-//            }
-//
-//        }.execute()
     }
     
     override func viewDidLoad() {
@@ -90,13 +75,10 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        self.presentMessages()
-        tableView.deselectRow(at: indexPath, animated: true)
-    }
-    
-    @objc func presentMessages() {
         let messagesVC = MessagesViewController()
         messagesVC.modalPresentationStyle = .fullScreen
+        messagesVC.broadcast = activeBroadcasts[indexPath.row]
         self.navigationController?.pushViewController(messagesVC, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }

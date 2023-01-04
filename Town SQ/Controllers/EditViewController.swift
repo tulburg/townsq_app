@@ -264,7 +264,6 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("touched!")
         if editField.isFirstResponder {
             editField.resignFirstResponder()
         }

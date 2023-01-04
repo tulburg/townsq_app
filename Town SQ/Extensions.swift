@@ -297,7 +297,11 @@ extension Encodable {
 extension UIImageView {
 	convenience init(link: String, contentMode mode: UIView.ContentMode = .scaleAspectFit) {
         self.init()
-		contentMode = mode
+        self.download(link: link, contentMode: mode)
+	}
+    
+    func download(link: String, contentMode mode: UIView.ContentMode = .scaleAspectFit) {
+        contentMode = mode
         guard let url = URL(string: link) else { return }
         if let path = ImageCache.shared().fetch(url: url) {
             let image = UIImage(contentsOfFile: path)
@@ -316,7 +320,7 @@ extension UIImageView {
                 }
             }.resume()
         }
-	}
+    }
     
     func asButton() {
         contentMode = .center
@@ -324,7 +328,6 @@ extension UIImageView {
         layer.borderColor = Color.separator.cgColor
         layer.cornerRadius = 15
     }
-
 }
 
 extension UIButton {
@@ -597,14 +600,14 @@ extension Date {
         for (period, timeAgo) in [
             ("yr", components.year ?? 0),
             ("m", components.month ?? 0),
-            ("w", components.weekOfYear ?? 0),
+            ("wk", components.weekOfYear ?? 0),
             ("d", components.day ?? 0),
             ("hr", components.hour ?? 0),
             ("min", components.minute ?? 0),
-            ("s", components.second ?? 0),
+            ("", components.second ?? 0),
         ] {
             if timeAgo > 0 {
-                return "\(timeAgo.of(period)) ago"
+                return "\(timeAgo.of(period))"
             }
         }
         

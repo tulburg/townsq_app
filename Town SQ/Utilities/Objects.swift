@@ -38,6 +38,53 @@ class DataType {
         }
     }
     
+    class Startup: ResponseData {
+        var activeBroadcasts: [ActiveBroadcast]?
+        required init(_ dict: NSDictionary) {
+            if let activeBroadcasts = dict["activeBroadcasts"] as? [NSDictionary] { self.activeBroadcasts = activeBroadcasts.map{ ActiveBroadcast($0) }
+            }
+        }
+        
+        class ActiveBroadcast {
+            var actives: Int?
+            var comments: [NewComment]?
+            var id: String?
+            init(_ dict: NSDictionary) {
+                if let actives = dict["actives"] as? Int { self.actives = actives }
+                if let comments = dict["comments"] as? [NSDictionary] {
+                    self.comments = comments.map{ NewComment($0) }
+                }
+                if let id = dict["id"] as? String { self.id = id }
+            }
+        }
+    }
+    
+    class Comment: ResponseData {
+        var created: Date?
+        var id: String?
+        var broadcast_id: String?
+        required init(_ dict: NSDictionary) {
+            if let created = dict["created"] as? String { self.created = Date.from(string: created) }
+            if let id = dict["id"] as? String { self.id = id }
+            if let broadcast_id = dict["broadcast_id"] as? String { self.broadcast_id = broadcast_id }
+        }
+    }
+    
+    class NewComment: ResponseData {
+        var body: String?
+        var created: Date?
+        var id: String?
+        var broadcast_id: String?
+        var user: User?
+        required init(_ dict: NSDictionary) {
+            if let body = dict["body"] as? String { self.body = body }
+            if let created = dict["created"] as? String { self.created = Date.from(string: created) }
+            if let id = dict["id"] as? String { self.id = id }
+            if let broadcast_id = dict["broadcast_id"] as? String { self.broadcast_id = broadcast_id }
+            if let user = dict["user"] as? NSDictionary { self.user = User(user) }
+        }
+    }
+    
     class Feed: ResponseData {
         class Broadcast {
             var body: String?
@@ -48,19 +95,7 @@ class DataType {
                 if let body = dict["body"] as? String { self.body = body }
                 if let created = dict["created"] as? String { self.created = Date.from(string: created) }
                 if let id = dict["id"] as? String { self.id = id }
-                if let user = dict["owner"] as? NSDictionary { self.user = User(user) }
-            }
-        }
-        class User {
-            var id: String?
-            var name: String?
-            var profile_photo: String?
-            var username: String?
-            init(_ dict: NSDictionary) {
-                if let name = dict["owner_name"] as? String { self.name = name }
-                if let profile_photo = dict["owner_profile_photo"] as? String { self.profile_photo = profile_photo }
-                if let username = dict["owner_username"] as? String { self.username = username }
-                if let id = dict["owner_id"] as? String { self.id = id }
+                if let user = dict["user"] as? NSDictionary { self.user = User(user) }
             }
         }
         var broadcasts: [Broadcast]?
@@ -70,6 +105,18 @@ class DataType {
                     return Broadcast(item)
                 })
             }
+        }
+    }
+    class User {
+        var id: String?
+        var name: String?
+        var profile_photo: String?
+        var username: String?
+        init(_ dict: NSDictionary) {
+            if let name = dict["name"] as? String { self.name = name }
+            if let profile_photo = dict["profile_photo"] as? String { self.profile_photo = profile_photo }
+            if let username = dict["username"] as? String { self.username = username }
+            if let id = dict["id"] as? String { self.id = id }
         }
     }
     

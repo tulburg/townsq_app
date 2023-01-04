@@ -32,6 +32,19 @@ class ImageCache {
         }
     }
     
+    func drop() {
+        let manager = FileManager.default;
+        do {
+            let items = try manager.contentsOfDirectory(at: rootDir, includingPropertiesForKeys: nil)
+            try items.forEach({ item in
+                print("Clearning Cache :: " + item.absoluteString)
+                try manager.removeItem(at: item.absoluteURL)
+            })
+        }catch let e {
+            print(e)
+        }
+    }
+    
     func set(data: Data, path: String, completion: ((_ path: String) -> Void)?) {
         set(data: data, url: URL(string: path)!, completion: completion)
     }

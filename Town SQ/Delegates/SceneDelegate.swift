@@ -65,6 +65,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             window?.becomeKey()
         }
         
+        if DB.UserRecord() == nil {
+            DB.shared.drop(.User)
+            DB.shared.drop(.Broadcast)
+            DB.shared.drop(.Comment)
+            showNav([DemoWelcomeController()])
+        }
+        
 		// If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
 		// This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 		guard let _ = (scene as? UIWindowScene) else { return }

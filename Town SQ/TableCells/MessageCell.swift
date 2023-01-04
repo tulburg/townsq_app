@@ -10,14 +10,18 @@ import UIKit
 
 class MessageCell: UITableViewCell {
 	
-	var message: Message!
+	var comment: Comment!
     var feedBody: UILabel!
+    var image: UIImageView!
+    var ownerName: UILabel!
+    var ownerUsername: UILabel!
+    var feedTime: UILabel!
 	func start() {
 		
 		let ownerImage = makeOwnerImage()
-        let ownerName = UILabel("Simone biles", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
-        let ownerUsername = UILabel("@simone_biles", Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
-		let feedTime = UILabel("2d ago", Color.darkBlue, UIFont.systemFont(ofSize: 12))
+        ownerName = UILabel("Simone biles", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
+        ownerUsername = UILabel("@simone_biles", Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
+		feedTime = UILabel("2d ago", Color.darkBlue, UIFont.systemFont(ofSize: 12))
 		feedBody = UILabel("", Color.black_white, UIFont.systemFont(ofSize: 16))
 		feedBody.numberOfLines = 6
 		
@@ -45,9 +49,15 @@ class MessageCell: UITableViewCell {
 		
 	}
     
-    func build(_ message: Message) {
-        self.message = message
-        feedBody.text = message.body!
+    func build(_ comment: Comment) {
+        self.comment = comment
+        feedBody.text = comment.body!
+        if comment.user?.profile_photo != nil {
+            image.download(link: (comment.user?.profile_photo)!, contentMode: .scaleAspectFill)
+        }
+        ownerName.text = (comment.user?.name)!
+        ownerUsername.text = "@" + (comment.user?.username)!
+        feedTime.text = Date.time(since: comment.created!) + " ago"
     }
     
 	
@@ -61,11 +71,11 @@ class MessageCell: UITableViewCell {
     }
 	
 	func makeOwnerImage() -> UIImageView {
-        let n = arc4random_uniform(80) + 1
-        let imageView = UIImageView(link: "https://randomuser.me/api/portraits/med/men/\(n).jpg", contentMode: .scaleAspectFill)
-        imageView.layer.cornerRadius = 8
-        imageView.clipsToBounds = true
-        return imageView
+        image = UIImageView(image: UIImage(named: "profile_background"))
+        image.contentMode = .scaleAspectFill
+        image.layer.cornerRadius = 8
+        image.clipsToBounds = true
+        return image
 	}
 	
 	
