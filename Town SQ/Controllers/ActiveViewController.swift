@@ -56,6 +56,7 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.estimatedRowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Color.background
         tableView.separatorColor = UIColor.clear
+        tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell_as_active")
         return tableView
     }
     
@@ -64,7 +65,8 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: FeedCell = FeedCell(activeBroadcasts[indexPath.row], 3)
+        let cell: FeedCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_active") as! FeedCell
+        cell.setup(activeBroadcasts[indexPath.row])
         let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
         cell.selectedBackgroundView = background

@@ -6,10 +6,12 @@
         <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="joined" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="last_check" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="media" optional="YES" attributeType="String"/>
         <attribute name="media_type" optional="YES" attributeType="String"/>
         <attribute name="notification" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="people" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="unread" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="comments" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Comment" inverseName="broadcast" inverseEntity="Comment"/>
         <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="broadcasts" inverseEntity="User"/>
     </entity>
@@ -21,6 +23,7 @@
         <attribute name="owner_image" optional="YES" attributeType="String"/>
         <attribute name="owner_name" optional="YES" attributeType="String"/>
         <attribute name="owner_username" optional="YES" attributeType="String"/>
+        <attribute name="user_vote" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="vote" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="broadcast" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Broadcast" inverseName="comments" inverseEntity="Broadcast"/>
         <relationship name="user" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="User" inverseName="comments" inverseEntity="User"/>

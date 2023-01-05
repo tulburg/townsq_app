@@ -69,6 +69,7 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
 		tableView.keyboardDismissMode = .onDrag
         tableView.register(MessageCell.self, forCellReuseIdentifier: "message_cell")
         tableView.register(OwnMessageCell.self, forCellReuseIdentifier: "own_message_cell")
+        tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell_as_header")
 		
 		messageField = UITextView()
 		messageField.text = "Message here"
@@ -123,21 +124,27 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
     var messageCell: UITableViewCell!
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
-            return FeedCell(broadcast, 0, asHeader: true)
+            let headerCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_header") as? FeedCell
+            headerCell?.setup(broadcast)
+            return headerCell!
         }
         let comment = comments[indexPath.row - 1]
-        if(comment.user?.id == user?.id) {
-            let cell = (tableView.dequeueReusableCell(withIdentifier: "own_message_cell", for: indexPath) as? OwnMessageCell)!
-            cell.build(comment)
-            return cell
-		}else {
+//        if(comment.user?.id == user?.id) {
+//            let cell = (tableView.dequeueReusableCell(withIdentifier: "own_message_cell", for: indexPath) as? OwnMessageCell)!
+//            cell.build(comment)
+//            return cell
+//		}else {
             let cell = (tableView.dequeueReusableCell(withIdentifier: "message_cell", for: indexPath) as? MessageCell)!
             cell.build(comment)
             if (indexPath.row - 1) == self.comments.count - 1 {
                 cell.hideSeparator()
             }
+            cell.onVoteChange = { vote in
+                tableView.reloadRows(at: [indexPath], with: .none)
+                Socket.shared.publishVote(comment, vote)
+            }
             return cell
-		}
+//		}
 	}
 	
 	@objc func keyboardWillShow(notification: NSNotification) {
@@ -213,8 +220,16 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
         self.messageField.superview?.layoutIfNeeded()
 	}
     
-    func socket(didReceive event: Constants.Events, data: [Any]) {
+    func socket(didReceive event: Constants.Events, data: ResponseData) {
         if event == .GotComment {
+            comments = []
+            broadcast.comments?.array.forEach { comment in
+                comments.append((comment as? Comment)!)
+            }
+            tableView.reloadData()
+        }
+        
+        if event == .GotVote {
             comments = []
             broadcast.comments?.array.forEach { comment in
                 comments.append((comment as? Comment)!)

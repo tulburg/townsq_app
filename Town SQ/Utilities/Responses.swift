@@ -39,23 +39,23 @@ class DataType {
     }
     
     class Startup: ResponseData {
-        var activeBroadcasts: [ActiveBroadcast]?
+        var activeBroadcasts: [BroadcastUpdate]?
         required init(_ dict: NSDictionary) {
-            if let activeBroadcasts = dict["activeBroadcasts"] as? [NSDictionary] { self.activeBroadcasts = activeBroadcasts.map{ ActiveBroadcast($0) }
+            if let activeBroadcasts = dict["activeBroadcasts"] as? [NSDictionary] { self.activeBroadcasts = activeBroadcasts.map{ BroadcastUpdate($0) }
             }
         }
-        
-        class ActiveBroadcast {
-            var actives: Int?
-            var comments: [NewComment]?
-            var id: String?
-            init(_ dict: NSDictionary) {
-                if let actives = dict["actives"] as? Int { self.actives = actives }
-                if let comments = dict["comments"] as? [NSDictionary] {
-                    self.comments = comments.map{ NewComment($0) }
-                }
-                if let id = dict["id"] as? String { self.id = id }
+    }
+    
+    class BroadcastUpdate: ResponseData {
+        var actives: Int?
+        var comments: [NewComment]?
+        var id: String?
+        required init(_ dict: NSDictionary) {
+            if let actives = dict["actives"] as? Int { self.actives = actives }
+            if let comments = dict["comments"] as? [NSDictionary] {
+                self.comments = comments.map{ NewComment($0) }
             }
+            if let id = dict["id"] as? String { self.id = id }
         }
     }
     
@@ -82,6 +82,15 @@ class DataType {
             if let id = dict["id"] as? String { self.id = id }
             if let broadcast_id = dict["broadcast_id"] as? String { self.broadcast_id = broadcast_id }
             if let user = dict["user"] as? NSDictionary { self.user = User(user) }
+        }
+    }
+    
+    class NewVote: ResponseData {
+        var vote: Int?
+        var id: String?
+        required init(_ dict: NSDictionary) {
+            if let id = dict["id"] as? String { self.id = id }
+            if let vote = dict["vote"] as? Int { self.vote = vote }
         }
     }
     

@@ -535,7 +535,7 @@ struct Color {
 	static let settingsTab = darkBlue
 	
     static let separator = Color.create(0xE1E1E1, dark: 0x303030)
-    static let messageSeparator = Color.create(0xF5F5F5, dark: 0x4f4f4f)
+    static let messageSeparator = Color.create(0xF5F5F5, dark: 0x202020)
 	
 	static let formTitle = UIColor(dynamicProvider: { trait in
 		return trait.userInterfaceStyle == .dark ? UIColor.white : UIColor(hex: 0x686868)
@@ -589,6 +589,12 @@ extension Date {
     func string(with format: String) -> String{
         let df = DateFormatter()
         df.dateFormat = format
+        return df.string(from: self)
+    }
+    
+    func toString() -> String {
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
         return df.string(from: self)
     }
     

@@ -42,6 +42,7 @@ class SearchViewController: ViewController, UITableViewDelegate, UITableViewData
         tableView.separatorColor = UIColor.clear
         tableView.tableFooterView = UIView(frame: CGRect.zero)
         tableView.dataSource = self
+        tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell")
         view.add().vertical(0).view(tableView).end(">=0")
         view.constrain(type: .horizontalFill, tableView)
     }
@@ -56,7 +57,8 @@ class SearchViewController: ViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = FeedCell(broadcasts[indexPath.row], nil)
+        let cell: FeedCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell") as! FeedCell
+        cell.setup(broadcasts[indexPath.row])
         return cell
     }
     

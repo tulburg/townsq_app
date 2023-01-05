@@ -59,7 +59,7 @@
 		DFBC9ED6295311F700377DE8 /* DemoWelcomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC9ED5295311F700377DE8 /* DemoWelcomeController.swift */; };
 		DFBC9ED829533DC400377DE8 /* SuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC9ED729533DC400377DE8 /* SuccessViewController.swift */; };
 		DFBC9EDA2953624300377DE8 /* Api.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC9ED92953624300377DE8 /* Api.swift */; };
-		DFBC9EDC2953A6DD00377DE8 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC9EDB2953A6DD00377DE8 /* Models.swift */; };
+		DFBC9EDC2953A6DD00377DE8 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC9EDB2953A6DD00377DE8 /* Responses.swift */; };
 		DFBC9EDE2953B4BD00377DE8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC9EDD2953B4BD00377DE8 /* Constants.swift */; };
 		DFC658342948C581003E678C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC658332948C581003E678C /* ViewController.swift */; };
 		DFE277F3295F21DD00B13E40 /* Linker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFE277F2295F21DD00B13E40 /* Linker.swift */; };
@@ -124,7 +124,7 @@
 		DFBC9ED5295311F700377DE8 /* DemoWelcomeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoWelcomeController.swift; sourceTree = "<group>"; };
 		DFBC9ED729533DC400377DE8 /* SuccessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessViewController.swift; sourceTree = "<group>"; };
 		DFBC9ED92953624300377DE8 /* Api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Api.swift; sourceTree = "<group>"; };
-		DFBC9EDB2953A6DD00377DE8 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		DFBC9EDB2953A6DD00377DE8 /* Responses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Responses.swift; sourceTree = "<group>"; };
 		DFBC9EDD2953B4BD00377DE8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		DFC658332948C581003E678C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		DFE277F2295F21DD00B13E40 /* Linker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Linker.swift; sourceTree = "<group>"; };
@@ -241,7 +241,7 @@
 				DF38F4DD2950A59400C3C473 /* ImageCache.swift */,
 				DF0E84CB29511FD70055BA06 /* S3.swift */,
 				DFBC9ED92953624300377DE8 /* Api.swift */,
-				DFBC9EDB2953A6DD00377DE8 /* Models.swift */,
+				DFBC9EDB2953A6DD00377DE8 /* Responses.swift */,
 				DFBC9EDD2953B4BD00377DE8 /* Constants.swift */,
 				DF676FB0295C86ED0006A90E /* Progress.swift */,
 				DFA97538295E0CE3001DAAA2 /* DB.swift */,
@@ -476,7 +476,7 @@
 				DF01A20C294B37C200A8EC7E /* VerificationCode.swift in Sources */,
 				DF818BD6294A2BF00005F080 /* UIStackView+Extension.swift in Sources */,
 				DF83688F24B348CE004A471B /* MessagesViewController.swift in Sources */,
-				DFBC9EDC2953A6DD00377DE8 /* Models.swift in Sources */,
+				DFBC9EDC2953A6DD00377DE8 /* Responses.swift in Sources */,
 				DFBC9ED6295311F700377DE8 /* DemoWelcomeController.swift in Sources */,
 				DF9A7AD32943818900E8E2D3 /* FeedCell.swift in Sources */,
 				DF8EA28324BC1BE700C1A8DD /* LoginViewController.swift in Sources */,

@@ -18,6 +18,12 @@ class MessageCell: UITableViewCell {
     var feedTime: UILabel!
     var separator: UIView!
     
+    var upvote: UIImageView!
+    var downvote: UIImageView!
+    var vote: UILabel!
+    
+    var onVoteChange: ((_ vote: Int) -> Void)? = nil
+    
 	func start() {
 		
 		let ownerImage = makeOwnerImage()
@@ -33,19 +39,20 @@ class MessageCell: UITableViewCell {
 		ownerContainer.addConstraints(format: "V:|-2-[v0]-2-|", views: feedTime)
 		ownerContainer.addConstraints(format: "H:|-0-[v0]-8-[v1]-(>=0)-|", views: ownerName, feedTime)
         
-        let upvote = UIImageView(image: UIImage(systemName: "shift.fill"))
+        upvote = UIImageView(image: UIImage(systemName: "shift.fill"))
         upvote.contentMode = .center
         upvote.tintColor = Color.backgroundDark
         upvote.isUserInteractionEnabled = true
         upvote.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(upvoteFn)))
-        let downvote = UIImageView(image: UIImage(systemName: "shift.fill"))
+        downvote = UIImageView(image: UIImage(systemName: "shift.fill"))
         downvote.transform = CGAffineTransform(translationX: 0, y: 0).rotated(by: 3.14)
         downvote.tintColor = Color.backgroundDark
         downvote.contentMode = .center
+        downvote.isUserInteractionEnabled = true
         downvote.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(downvoteFn)))
-        let vote = UILabel("-", Color.gray, UIFont.systemFont(ofSize: 16))
+        vote = UILabel("-", Color.gray, UIFont.systemFont(ofSize: 16))
         let voteContainer = UIView()
-        voteContainer.add().horizontal(0).view(upvote).gap(8).view(vote).gap(8).view(downvote).end(0)
+        voteContainer.add().horizontal(0).view(upvote, 40).gap(4).view(vote).gap(4).view(downvote, 40).end(0)
         voteContainer.constrain(type: .verticalFill, downvote, vote, upvote)
         
         let nameGroup = UIView()
@@ -82,9 +89,23 @@ class MessageCell: UITableViewCell {
         if comment.user?.profile_photo != nil {
             image.download(link: (comment.user?.profile_photo)!, contentMode: .scaleAspectFill)
         }
-        ownerName.text = (comment.user?.name)!
-        ownerUsername.text = "@" + (comment.user?.username)!
+        ownerName.text = comment.user?.name ?? ""
+        ownerUsername.text = "@" + (comment.user?.username ?? "")
         feedTime.text = Date.time(since: comment.created!) + " ago"
+        let estVote = comment.vote + comment.user_vote
+        upvote.tintColor = Color.backgroundDark
+        downvote.tintColor = Color.backgroundDark
+        if estVote == 0 {
+            vote.text = "-"
+        }else {
+            vote.text = "\(estVote)"
+        }
+        if comment.user_vote == 1 {
+            upvote.tintColor = Color.purple
+        }
+        if comment.user_vote == -1 {
+            downvote.tintColor = Color.red
+        }
     }
     
     func hideSeparator() {
@@ -110,10 +131,35 @@ class MessageCell: UITableViewCell {
 	}
 	
     @objc func downvoteFn() {
-        
+        if comment.user_vote == 1 {
+            return
+        }
+        if comment.user_vote == -1 {
+            voteFn(1)
+        }else {
+            voteFn(-1)
+        }
     }
     
     @objc func upvoteFn() {
-        
+        if comment.user_vote == -1 {
+            return
+        }
+        if comment.user_vote == 1 {
+            voteFn(-1)
+        }else {
+            voteFn(1)
+        }
+    }
+    
+    func voteFn(_ vote: Int) {
+        guard
+            comment.user_vote != vote
+        else { return }
+        comment.user_vote = comment.user_vote + Int16(vote)
+        DB.shared.save()
+        if (onVoteChange != nil) {
+            onVoteChange!(vote)
+        }
     }
 }

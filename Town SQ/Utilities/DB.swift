@@ -85,6 +85,15 @@ class DB: NSObject {
         return save()
     }
     
+    func findById(_ model: Model, id: String) -> NSManagedObject? {
+        let find = self.find(model, predicate: NSPredicate(format: "id = %@", id))
+        if find.count > 0 {
+            return find[0]
+        }else {
+            return nil
+        }
+    }
+    
     func find(_ model: Model, predicate: NSPredicate?) -> [NSManagedObject] {
         return self.find(model, props: nil, predicate: predicate)
     }

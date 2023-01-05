@@ -29,8 +29,12 @@ struct Constants {
         case Comment = "comment"
         case Feed = "feed"
         case JoinBroadcast = "join_broadcast"
-        case GotComment = "got_comment"
         case Startup = "startup"
+        case CommentVote = "comment_vote"
+        
+        case GotComment = "got_comment"
+        case GotUser = "got_user"
+        case GotVote = "got_vote"
     }
     
     static let Base = "http://192.168.18.3:5400"

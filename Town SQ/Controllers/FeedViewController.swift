@@ -8,9 +8,10 @@
 
 import UIKit
 
-class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSource {
+class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSource, SocketDelegate {
 	
 	var feed: [Broadcast] = []
+    var tableView: UITableView!
   
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
@@ -30,6 +31,8 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
         
         self.feed = DB.fetchFeed()
         Socket.shared.fetchFeed()
+        
+        Socket.shared.registerDelegate(self)
         
 //        ImageCache.shared().drop()
 //        DB.shared.drop(.Comment)
@@ -54,13 +57,14 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
     }
 	
 	func initFeedTableView() -> UITableView {
-		let tableView = UITableView()
+		tableView = UITableView()
 		tableView.dataSource = self
 		tableView.delegate = self
 		tableView.tableFooterView = UIView(frame: CGRect.zero)
 		tableView.estimatedRowHeight = UITableView.automaticDimension
 		tableView.backgroundColor = Color.background
         tableView.separatorColor = UIColor.clear
+        tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell")
 		return tableView
 	}
 	
@@ -69,7 +73,8 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: FeedCell = FeedCell(feed[indexPath.row], nil)
+        let cell: FeedCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell") as! FeedCell
+        cell.setup(feed[indexPath.row])
 		let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
 		cell.selectedBackgroundView = background
@@ -103,4 +108,8 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		container.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
 		return container
 	}
+    
+    func socket(didReceive event: Constants.Events, data: ResponseData) {
+        tableView.reloadData()
+    }
 }

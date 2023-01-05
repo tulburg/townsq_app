@@ -34,7 +34,11 @@ class Socket {
         }
         socket.on(clientEvent: .connect) { data, ack in
             let lastFeedCheck = UserDefaults.standard.string(forKey: Constants.lastFeedCheck)
-            let activeBroadcasts = DB.activeBroadcasts()?.map{ $0.id }
+            let activeBroadcasts = DB.activeBroadcasts()?.map{ item in
+                let broadcast = item as Broadcast
+                let lastCheck = broadcast.last_check
+                return ["id": broadcast.id as Any, "last_check": lastCheck?.toString() as Any]
+            }
             self.socket.emit("startup", [
                 "lastFeedCheck": lastFeedCheck as Any ,
                 "activeBroadcasts": activeBroadcasts as Any
@@ -56,19 +60,31 @@ class Socket {
                     if broadcasts.count > 0 {
                         let broadcast: Broadcast = (broadcasts[0] as? Broadcast)!
                         broadcast.people = Int16(item.actives!)
+                        broadcast.last_check = Date()
                         item.comments?.forEach({ comment in
                             let index = broadcast.comments?.array.firstIndex(where: { oldComment in
                                 return (oldComment as? Comment)?.id == comment.id
                             })
                             if index == nil {
                                 let newComment = Comment(context: DB.shared.context)
-                                newComment.broadcast = broadcast
                                 newComment.id = comment.id
                                 newComment.body = comment.body
                                 newComment.created = comment.created
+                                
+                                var user = DB.shared.findById(.User, id: (comment.user?.id)!) as? User
+                                if user == nil {
+                                    user = User(context: DB.shared.context)
+                                    user?.id = comment.user?.id
+                                    user?.profile_photo = comment.user?.profile_photo
+                                    user?.name = comment.user?.name
+                                    user?.username = comment.user?.username
+                                }
+                                newComment.user = user
+                                newComment.broadcast = broadcast
                             }
                         })
-                        
+                        self.delegates.forEach{ $0.socket(didReceive: .GotComment, data: response.data!)}
+                        DB.shared.save()
                     }
                 }
             }
@@ -128,7 +144,29 @@ class Socket {
                     "id": response.data?.id as Any,
                     "broadcast": broadcasts[0] as Any
                 ])
-                self.delegates.forEach{ $0.socket(didReceive: .GotComment, data: data)}
+                self.delegates.forEach{ $0.socket(didReceive: .GotComment, data: response.data!)}
+            }
+        }
+        
+        socket.on(Constants.Events.GotUser.rawValue) { data, ack in
+            let response = Response<DataType.BroadcastUpdate>((data[0] as? NSDictionary)!)
+            if response.code == 200 {
+                if let broadcast: Broadcast = DB.shared.findById(.Broadcast, id: (response.data?.id)!) as? Broadcast {
+                    broadcast.people = Int16((response.data?.actives)!)
+                    DB.shared.save()
+                    self.delegates.forEach{ $0.socket(didReceive: .GotUser, data: response.data!)}
+                }
+            }
+        }
+        
+        socket.on(Constants.Events.GotVote.rawValue) { data, ack in
+            let response = Response<DataType.NewVote>((data[0] as? NSDictionary)!)
+            if response.code == 200 {
+                if let comment: Comment = DB.shared.findById(.Comment, id: (response.data?.id)!) as? Comment {
+                    comment.vote = comment.vote + Int16((response.data?.vote)!)
+                    DB.shared.save()
+                    self.delegates.forEach{ $0.socket(didReceive: .GotVote, data: response.data!)}
+                }
             }
         }
         
@@ -173,6 +211,13 @@ class Socket {
                 "broadcast_id": broadcast.id!
             ])
         }
+    }
+    
+    func publishVote(_ comment: Comment, _ vote: Int) {
+        emit(Constants.Events.CommentVote.rawValue, [
+            "id": comment.id,
+            "vote": vote
+        ])
     }
     
     func joinBroadcast(_ broadcast: Broadcast) {

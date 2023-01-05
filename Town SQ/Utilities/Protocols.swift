@@ -9,7 +9,7 @@
 import Foundation
 
 protocol SocketDelegate {
-    func socket(didReceive event: Constants.Events, data: [Any])
+    func socket(didReceive event: Constants.Events, data: ResponseData)
 }
 
 extension SocketDelegate {
