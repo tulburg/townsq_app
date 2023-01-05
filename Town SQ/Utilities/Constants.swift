@@ -24,13 +24,13 @@ struct Constants {
         1003: "Invite code successful"
     ]
     
-    struct Events {
-        static let Broadcast = "broadcast"
-        static let Comment = "comment"
-        static let Feed = "feed"
-        static let JoinBroadcast = "join_broadcast"
-        static let GotComment = "got_comment"
-        static let Startup = "startup"
+    enum Events: String {
+        case Broadcast = "broadcast"
+        case Comment = "comment"
+        case Feed = "feed"
+        case JoinBroadcast = "join_broadcast"
+        case GotComment = "got_comment"
+        case Startup = "startup"
     }
     
     static let Base = "http://192.168.18.3:5400"

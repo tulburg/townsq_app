@@ -16,6 +16,8 @@ class MessageCell: UITableViewCell {
     var ownerName: UILabel!
     var ownerUsername: UILabel!
     var feedTime: UILabel!
+    var separator: UIView!
+    
 	func start() {
 		
 		let ownerImage = makeOwnerImage()
@@ -30,11 +32,34 @@ class MessageCell: UITableViewCell {
 		ownerContainer.addConstraints(format: "V:|-2-[v0]-2-|", views: ownerName)
 		ownerContainer.addConstraints(format: "V:|-2-[v0]-2-|", views: feedTime)
 		ownerContainer.addConstraints(format: "H:|-0-[v0]-8-[v1]-(>=0)-|", views: ownerName, feedTime)
+        
+        let upvote = UIImageView(image: UIImage(systemName: "shift.fill"))
+        upvote.contentMode = .center
+        upvote.tintColor = Color.backgroundDark
+        upvote.isUserInteractionEnabled = true
+        upvote.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(upvoteFn)))
+        let downvote = UIImageView(image: UIImage(systemName: "shift.fill"))
+        downvote.transform = CGAffineTransform(translationX: 0, y: 0).rotated(by: 3.14)
+        downvote.tintColor = Color.backgroundDark
+        downvote.contentMode = .center
+        downvote.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(downvoteFn)))
+        let vote = UILabel("-", Color.gray, UIFont.systemFont(ofSize: 16))
+        let voteContainer = UIView()
+        voteContainer.add().horizontal(0).view(upvote).gap(8).view(vote).gap(8).view(downvote).end(0)
+        voteContainer.constrain(type: .verticalFill, downvote, vote, upvote)
+        
+        let nameGroup = UIView()
+        nameGroup.add().vertical(0).view(ownerContainer).gap(-2).view(ownerUsername).end(8)
+        nameGroup.constrain(type: .horizontalFill, ownerContainer, ownerUsername)
+        
+        let topContainer = UIView()
+        topContainer.add().horizontal(0).view(nameGroup).gap(">=0").view(voteContainer).end(0)
+        topContainer.constrain(type: .verticalFill, nameGroup, voteContainer)
+        
 		
 		let bodyContainer = UIView()
-		bodyContainer.addSubviews(views: ownerContainer, feedBody, ownerUsername)
-		bodyContainer.addConstraints(format: "V:|-8-[v0]-(-2)-[v1]-6-[v2]-8-|", views: ownerContainer, ownerUsername, feedBody)
-		bodyContainer.constrain(type: .horizontalFill, ownerUsername, ownerContainer, feedBody)
+        bodyContainer.add().vertical(8).view(topContainer).gap(0).view(feedBody).end(8)
+        bodyContainer.constrain(type: .horizontalFill, topContainer, feedBody)
 		
 		let container = UIView()
 		container.addSubviews(views: ownerImage, bodyContainer)
@@ -42,10 +67,12 @@ class MessageCell: UITableViewCell {
 		container.addConstraints(format: "V:|-0-[v0]-8-|", views: bodyContainer)
 		container.addConstraints(format: "H:|-0-[v0(40)]-8-[v1]-0-|", views: ownerImage, bodyContainer)
 		
-		self.contentView.addSubview(container)
-		self.contentView.backgroundColor = Color.background
-		self.contentView.constrain(type: .horizontalFill, container, margin: 16)
-		self.contentView.constrain(type: .verticalFill, container)
+        separator = UIView()
+        separator.backgroundColor = Color.messageSeparator
+        self.contentView.backgroundColor = Color.background
+        self.contentView.add().vertical(0).view(container).gap(0).view(separator, 1).end(0)
+        self.contentView.constrain(type: .horizontalFill, container, margin: 16)
+        self.contentView.constrain(type: .horizontalFill, separator)
 		
 	}
     
@@ -58,6 +85,10 @@ class MessageCell: UITableViewCell {
         ownerName.text = (comment.user?.name)!
         ownerUsername.text = "@" + (comment.user?.username)!
         feedTime.text = Date.time(since: comment.created!) + " ago"
+    }
+    
+    func hideSeparator() {
+        separator.isHidden = true
     }
     
 	
@@ -78,5 +109,11 @@ class MessageCell: UITableViewCell {
         return image
 	}
 	
-	
+    @objc func downvoteFn() {
+        
+    }
+    
+    @objc func upvoteFn() {
+        
+    }
 }

@@ -17,6 +17,7 @@ class Socket {
     var lastJob: (() -> Void)? = nil
     var broadcast: String!
     var comment: String!
+    var delegates: [SocketDelegate] = []
     
     static let shared: Socket = {
         return Socket()
@@ -43,14 +44,37 @@ class Socket {
             
         }
         
-        socket.on(Constants.Events.Startup) { data, ack in
+        socket.on(Constants.Events.Startup.rawValue) { data, ack in
             if let job = self.lastJob {
                 job()
                 self.lastJob = nil
             }
+            let response = Response<DataType.Startup>((data[0] as? NSDictionary)!)
+            if response.code == 200 {
+                response.data?.activeBroadcasts?.forEach{ item in
+                    let broadcasts = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", item.id!))
+                    if broadcasts.count > 0 {
+                        let broadcast: Broadcast = (broadcasts[0] as? Broadcast)!
+                        broadcast.people = Int16(item.actives!)
+                        item.comments?.forEach({ comment in
+                            let index = broadcast.comments?.array.firstIndex(where: { oldComment in
+                                return (oldComment as? Comment)?.id == comment.id
+                            })
+                            if index == nil {
+                                let newComment = Comment(context: DB.shared.context)
+                                newComment.broadcast = broadcast
+                                newComment.id = comment.id
+                                newComment.body = comment.body
+                                newComment.created = comment.created
+                            }
+                        })
+                        
+                    }
+                }
+            }
         }
         
-        socket.on(Constants.Events.Broadcast) { data, ack in
+        socket.on(Constants.Events.Broadcast.rawValue) { data, ack in
             let response = Response<DataType.Broadcast>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 DB.shared.insert(.Broadcast, keyValue: [
@@ -64,7 +88,7 @@ class Socket {
             self.lastJob = nil
         }
         
-        socket.on(Constants.Events.Comment) { data, ack in
+        socket.on(Constants.Events.Comment.rawValue) { data, ack in
             let response = Response<DataType.Comment>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 let broadcasts = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", (response.data?.broadcast_id)!))
@@ -79,7 +103,7 @@ class Socket {
             self.lastJob = nil
         }
         
-        socket.on(Constants.Events.GotComment) { data, ack in
+        socket.on(Constants.Events.GotComment.rawValue) { data, ack in
             let response = Response<DataType.NewComment>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 let broadcasts = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", (response.data?.broadcast_id)!))
@@ -104,10 +128,11 @@ class Socket {
                     "id": response.data?.id as Any,
                     "broadcast": broadcasts[0] as Any
                 ])
+                self.delegates.forEach{ $0.socket(didReceive: .GotComment, data: data)}
             }
         }
         
-        socket.on(Constants.Events.Feed) { data, ack in
+        socket.on(Constants.Events.Feed.rawValue) { data, ack in
             let response = Response<DataType.Feed>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 if let data = response.data {
@@ -133,7 +158,7 @@ class Socket {
         if media != nil {
             
         }else {
-            emit(Constants.Events.Broadcast, [
+            emit(Constants.Events.Broadcast.rawValue, [
                 "body": body.trimmingCharacters(in: .whitespacesAndNewlines)
             ])
         }
@@ -143,7 +168,7 @@ class Socket {
         self.comment = body
         if media != nil { }
         else {
-            emit(Constants.Events.Comment, [
+            emit(Constants.Events.Comment.rawValue, [
                 "body": body.trimmingCharacters(in: .whitespacesAndNewlines),
                 "broadcast_id": broadcast.id!
             ])
@@ -151,14 +176,14 @@ class Socket {
     }
     
     func joinBroadcast(_ broadcast: Broadcast) {
-        emit(Constants.Events.JoinBroadcast, [
+        emit(Constants.Events.JoinBroadcast.rawValue, [
             "id": broadcast.id as Any
         ])
     }
     
     func fetchFeed() {
         let lastFeedCheck = UserDefaults.standard.string(forKey: Constants.lastFeedCheck)
-        Socket.shared.emit(Constants.Events.Feed, [
+        Socket.shared.emit(Constants.Events.Feed.rawValue, [
             "lastFeedCheck": lastFeedCheck
         ])
     }
@@ -179,5 +204,9 @@ class Socket {
     
     func start() {
         emit("ready", ["ready": true])
+    }
+    
+    func registerDelegate(_ delegate: SocketDelegate) {
+        delegates.append(delegate)
     }
 }

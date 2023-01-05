@@ -13,6 +13,7 @@ class OwnMessageCell: UITableViewCell {
 	var comment: Comment!
     var feedBody: UILabel!
     var image: UIImageView!
+    var separator: UIView!
 	
 	func start() {
 		let ownerImage = makeOwnerImage()
@@ -36,10 +37,12 @@ class OwnMessageCell: UITableViewCell {
         container.add().horizontal(48).view(bodyContainer).gap(8).view(ownerImage, 40).end(0)
         container.add().horizontal(">=0").view(time).end(50)
 		
-		self.contentView.addSubview(container)
+        separator = UIView()
+        separator.backgroundColor = Color.background
 		self.contentView.backgroundColor = Color.background
+        self.contentView.add().vertical(0).view(container).gap(0).view(separator, 1).end(0)
 		self.contentView.constrain(type: .horizontalFill, container, margin: 16)
-		self.contentView.constrain(type: .verticalFill, container)
+		self.contentView.constrain(type: .horizontalFill, separator)
 	}
     
     func build(_ comment: Comment) {

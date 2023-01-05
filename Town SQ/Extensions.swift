@@ -535,6 +535,7 @@ struct Color {
 	static let settingsTab = darkBlue
 	
     static let separator = Color.create(0xE1E1E1, dark: 0x303030)
+    static let messageSeparator = Color.create(0xF5F5F5, dark: 0x4f4f4f)
 	
 	static let formTitle = UIColor(dynamicProvider: { trait in
 		return trait.userInterfaceStyle == .dark ? UIColor.white : UIColor(hex: 0x686868)
@@ -604,7 +605,7 @@ extension Date {
             ("d", components.day ?? 0),
             ("hr", components.hour ?? 0),
             ("min", components.minute ?? 0),
-            ("", components.second ?? 0),
+            ("sec", components.second ?? 0),
         ] {
             if timeAgo > 0 {
                 return "\(timeAgo.of(period))"

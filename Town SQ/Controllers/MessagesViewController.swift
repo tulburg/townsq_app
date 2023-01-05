@@ -9,7 +9,7 @@
 import UIKit
 import NotificationCenter
 
-class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
+class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
 	
 	var tableView: UITableView!
 	var messageField: UITextView!
@@ -28,6 +28,7 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
+        Socket.shared.registerDelegate(self)
 		
         if broadcast.active == nil {
             Socket.shared.joinBroadcast(broadcast)
@@ -132,6 +133,9 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
 		}else {
             let cell = (tableView.dequeueReusableCell(withIdentifier: "message_cell", for: indexPath) as? MessageCell)!
             cell.build(comment)
+            if (indexPath.row - 1) == self.comments.count - 1 {
+                cell.hideSeparator()
+            }
             return cell
 		}
 	}
@@ -208,4 +212,14 @@ class MessagesViewController: ViewController, UITableViewDelegate, UITableViewDa
         messageFieldHeightConstraint.constant = min(estimatedSize.height, 116)
         self.messageField.superview?.layoutIfNeeded()
 	}
+    
+    func socket(didReceive event: Constants.Events, data: [Any]) {
+        if event == .GotComment {
+            comments = []
+            broadcast.comments?.array.forEach { comment in
+                comments.append((comment as? Comment)!)
+            }
+            tableView.reloadData()
+        }
+    }
 }

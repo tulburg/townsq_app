@@ -16,6 +16,7 @@ class TabBarController: UITabBarController {
     var profileImage: UIImageView!
 	
 	var navigationBarConstraint: NSLayoutConstraint!
+    var user: User!
 	
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
@@ -33,6 +34,8 @@ class TabBarController: UITabBarController {
         self.tabBar.isTranslucent = false
 		self.tabBar.unselectedItemTintColor = UIColor.gray.withAlphaComponent(0.5)
 		self.tabBar.tintColor = Color.tabItem
+        
+        user = DB.UserRecord()
 
 		self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "edit"), style: .plain, target: self, action: #selector(presentEditor))
         self.navigationItem.rightBarButtonItem?.tintColor = Color.darkBlue_white
@@ -92,7 +95,10 @@ class TabBarController: UITabBarController {
         profileRing.backgroundColor = Color.homeTabLight
         profileRing.layer.cornerRadius = 15
         profileRing.clipsToBounds = true
-        profileImage = UIImageView(link: "https://t4.ftcdn.net/jpg/04/86/11/69/360_F_486116937_WzL9xLnHyQWlsnGTCwyLyWF8DAcEMIT5.jpg", contentMode: .scaleAspectFill)
+        profileImage = UIImageView(image: UIImage(named: "profile_background"))
+        if let photo = user.profile_photo {
+            profileImage = UIImageView(link: photo, contentMode: .scaleAspectFill)
+        }
         profileImage.backgroundColor = Color.white_black
         profileImage.layer.cornerRadius = 14
         profileImage.clipsToBounds = true
