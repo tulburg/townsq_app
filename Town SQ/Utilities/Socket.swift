@@ -55,6 +55,7 @@ class Socket {
             }
             let response = Response<DataType.Startup>((data[0] as? NSDictionary)!)
             if response.code == 200 {
+                UserDefaults.standard.set(Date().milliseconds, forKey: Constants.lastFeedCheck)
                 response.data?.activeBroadcasts?.forEach{ item in
                     let broadcasts = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", item.id!))
                     if broadcasts.count > 0 {
@@ -93,14 +94,21 @@ class Socket {
         socket.on(Constants.Events.Broadcast.rawValue) { data, ack in
             let response = Response<DataType.Broadcast>((data[0] as? NSDictionary)!)
             if response.code == 200 {
-                DB.shared.insert(.Broadcast, keyValue: [
+                var param = [
                     "user": self.user as Any,
                     "body": self.broadcast as Any,
                     "created": response.data?.created as Any,
                     "id": response.data?.id as Any,
                     "active": BroadcastType.Active.rawValue,
                     "joined": Date()
-                ])
+                ];
+                if response.data?.media_type != nil && response.data?.media != nil {
+                    param["media"] = response.data?.media
+                    param["media_type"] = response.data?.media_type?.rawValue
+                }
+                print("inserting... >>> ", param)
+                DB.shared.insert(.Broadcast, keyValue: param)
+                self.delegates.forEach{ $0.socket(didReceive: .GotBroadcast, data: response.data!)}
             }
             self.lastJob = nil
         }
@@ -126,6 +134,8 @@ class Socket {
                 let broadcasts = DB.shared.findById(.Broadcast, id: (response.data?.id)!)
             }
         }
+        
+        // MARK:  - Got Events from server
         
         socket.on(Constants.Events.GotComment.rawValue) { data, ack in
             let response = Response<DataType.NewComment>((data[0] as? NSDictionary)!)
@@ -203,10 +213,18 @@ class Socket {
         self.restart()
     }
     
+    // MARK: - Publish fuctions
+    
     func publishBroadcast(_ body: String, _ media: String?, _ mediaType: MediaType?) {
         self.broadcast = body
+        guard
+            body.trimmingCharacters(in: .whitespacesAndNewlines) != ""
+        else { return }
         if media != nil {
-            
+            emit(Constants.Events.Broadcast.rawValue,  [
+                "media": media, "media_type": mediaType?.rawValue,
+                "body": body.trimmingCharacters(in: .whitespacesAndNewlines)
+            ])
         }else {
             emit(Constants.Events.Broadcast.rawValue, [
                 "body": body.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -251,10 +269,6 @@ class Socket {
         delegates.forEach{ $0.socket(didMarkUnread: broadcast) }
     }
     
-    enum MediaType: String {
-        case photo, video, photos
-    }
-    
     func emit(_ event: String, _ data: [String: Any?]) {
         lastJob = {
             self.socket.emit(event, data)
@@ -265,10 +279,6 @@ class Socket {
         }
     }
     
-    func start() {
-        emit("ready", ["ready": true])
-    }
-    
     func registerDelegate(_ delegate: SocketDelegate) {
         delegates.append(delegate)
     }
@@ -276,4 +286,8 @@ class Socket {
     func unregisterDelegate(_ delegate: SocketDelegate) {
         delegates.removeAll(where: { return $0 === delegate })
     }
+}
+
+enum MediaType: String {
+    case photo, video, photos
 }

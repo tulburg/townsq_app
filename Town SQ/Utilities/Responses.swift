@@ -32,9 +32,13 @@ class DataType {
     class Broadcast: ResponseData {
         var created: Date?
         var id: String?
+        var media: String?
+        var media_type: MediaType?
         required init(_ dict: NSDictionary) {
             if let created = dict["created"] as? String { self.created = Date.from(string: created) }
             if let id = dict["id"] as? String { self.id = id }
+            if let media = dict["media"] as? String { self.media = media }
+            if let media_type = dict["media_type"] as? String { self.media_type = MediaType(rawValue: media_type) }
         }
     }
     

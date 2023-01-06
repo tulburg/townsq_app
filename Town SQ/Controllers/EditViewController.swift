@@ -131,14 +131,17 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
             let adjRatio = (w > h ? 720 / w : 720 / h)
             let newImage = image.resizeWithImageIO(to: CGSize(width: adjRatio * w, height: adjRatio * h))
             let imageData = newImage!.jpegData(compressionQuality: 9)
-            let name = UUID()
-            S3.shared().uploadImage(data: imageData!, name: "\(name.uuidString).jpg", completion: { path in
-                ImageCache.shared().set(data: imageData!, path: path, completion: nil)
-            })
+//            S3.shared().uploadImage(data: imageData!, name: "\(name.uuidString).jpg", completion: { path in
+//                ImageCache.shared().set(data: imageData!, path: path, completion: nil)
+//            })
+            
+            Socket.shared.publishBroadcast(editField.text, imageData?.base64EncodedString(), .photo)
+        }else {
+            Socket.shared.publishBroadcast(editField.text, nil, nil)
         }
-        Socket.shared.publishBroadcast(editField.text, nil, nil)
         editField.text = ""
         disableButton(true)
+        dismiss(animated: true)
     }
     
     func disableButton(_ disable: Bool) {
@@ -175,23 +178,32 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         imagePicker.dismiss(animated: true, completion: nil)
+        photo.isHidden = false
+        messageWrap.constraints.forEach({ constraint in
+            if (constraint.firstItem as! UIView) == photo && constraint.firstAttribute == .height {
+                constraint.constant = 240
+            }
+        })
+        messageWrap.layoutIfNeeded()
+        photo.showIndicator(size: .large, color: Color.purple)
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             mediaPhoto = image
             photo.image = image
-            photo.isHidden = false
-            messageWrap.constraints.forEach({ constraint in
-                if (constraint.firstItem as! UIView) == photo && constraint.firstAttribute == .height {
-                    constraint.constant = 240
-                }
-            })
-            messageWrap.layoutIfNeeded()
+            photo.hideIndicator()
         }
         
     }
     
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         phPicker.dismiss(animated: true)
-
+        self.photo.isHidden = false
+        self.messageWrap.constraints.forEach({ constraint in
+            if (constraint.firstItem as! UIView) == self.photo && constraint.firstAttribute == .height {
+                constraint.constant = 240
+            }
+        })
+        self.messageWrap.layoutIfNeeded()
+        photo.showIndicator(size: .large, color: Color.purple)
         if let provider = results.first?.itemProvider {
             if provider.canLoadObject(ofClass: UIImage.self) {
                 provider.loadObject(ofClass: UIImage.self) { uiImage, _ in
@@ -199,13 +211,7 @@ class EditViewController: ViewController, UITextViewDelegate, UIImagePickerContr
                         DispatchQueue.main.async {
                             self.mediaPhoto = image
                             self.photo.image = image
-                            self.photo.isHidden = false
-                            self.messageWrap.constraints.forEach({ constraint in
-                                if (constraint.firstItem as! UIView) == self.photo && constraint.firstAttribute == .height {
-                                    constraint.constant = 240
-                                }
-                            })
-                            self.messageWrap.layoutIfNeeded()
+                            self.photo.hideIndicator()
                         }
 
                     }

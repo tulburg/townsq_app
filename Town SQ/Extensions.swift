@@ -611,7 +611,7 @@ extension Date {
             ("d", components.day ?? 0),
             ("h", components.hour ?? 0),
             ("m", components.minute ?? 0),
-            ("", components.second ?? 0),
+            ("s", components.second ?? 0),
         ] {
             if timeAgo > 0 {
                 return "\(timeAgo.of(period))"

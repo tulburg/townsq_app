@@ -44,7 +44,6 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		super.viewDidLoad()
 		// Do any additional setup after loading the view.
 		self.view.backgroundColor = Color.background
-        Socket.shared.start()
 
 //        print(DB.shared.find(.Broadcast, predicate: nil))
 //        print(DB.shared.find(.Broadcast, predicate: NSPredicate(format: "user.id", user?.id as! CVarArg)))
@@ -63,7 +62,7 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(true)
-        Socket.shared.unregisterDelegate(self)
+//        Socket.shared.unregisterDelegate(self)
     }
 	
 	func initFeedTableView() -> UITableView {
@@ -75,6 +74,7 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		tableView.backgroundColor = Color.background
         tableView.separatorColor = UIColor.clear
         tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell")
+        tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell_with_media")
 		return tableView
 	}
 	
@@ -83,8 +83,14 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: FeedCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell") as! FeedCell
-        cell.setup(feed[indexPath.row])
+        let broadcast = feed[indexPath.row]
+        var cell: FeedCell!
+        if broadcast.media != nil && MediaType(rawValue: broadcast.media_type!) == .photo {
+            cell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_with_media") as? FeedCell
+        }else {
+            cell = tableView.dequeueReusableCell(withIdentifier: "feed_cell") as? FeedCell
+        }
+        cell.setup(broadcast)
 		let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
 		cell.selectedBackgroundView = background
@@ -126,6 +132,11 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
                     tableView.reloadData()
                 }
             }
+        }
+        
+        if event == .GotBroadcast {
+            self.feed = DB.fetchFeed()
+            tableView.reloadData()
         }
     }
 }

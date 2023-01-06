@@ -22,6 +22,8 @@ class FeedCell: UITableViewCell {
     var peopleCount: UILabel!
     var ownerImage: UIImageView!
     var statusText: UILabel!
+    var feedActivitySummary: UILabel!
+    var feedImage: UIImageView!
     
     var asHeader: Bool!
     var activity: Bool!
@@ -47,7 +49,7 @@ class FeedCell: UITableViewCell {
             feedBody.constrain(type: .horizontalFill, feedText)
             feedBody.addConstraints(format: "V:|-0-[v0]-4-|", views: feedText)
         }else {
-            let feedImage = UIImageView(link: "https://img5.goodfon.com/wallpaper/nbig/0/63/face-look-beautiful-girl-flowers-field-eyes.jpg", contentMode: .scaleAspectFill)
+            feedImage = UIImageView(link: "https://img5.goodfon.com/wallpaper/nbig/0/63/face-look-beautiful-girl-flowers-field-eyes.jpg", contentMode: .scaleAspectFill)
             feedImage.layer.cornerRadius = 8
             feedImage.clipsToBounds = true
             feedBody.addSubviews(views: feedText, feedImage)
@@ -66,7 +68,7 @@ class FeedCell: UITableViewCell {
         ownerContainer.addConstraints(format: "H:|-0-[v0]-[v1(40@1)]-(>=0)-[v2(>=22)]-0-|", views: ownerName, feedTime, unreadContainer)
         
         let feedActivityCounter = makeFeedAcitivityCounter()
-        let feedActivitySummary = UILabel("are talking about this", Color.darkBlue_white, UIFont.systemFont(ofSize: 12))
+        feedActivitySummary = UILabel("are talking about this", Color.darkBlue_white, UIFont.systemFont(ofSize: 12))
         let feedActivityContainer = UIView()
         feedActivityContainer.addSubviews(views: feedActivityCounter, feedActivitySummary)
         feedActivityContainer.addConstraints(format: "V:|-2-[v0]-2-|", views: feedActivityCounter)
@@ -144,7 +146,8 @@ class FeedCell: UITableViewCell {
         }
         feedText.text = broadcast.body
         feedTime.text = Date.time(since: broadcast.created!) + " ago"
-        peopleCount.text = "\(broadcast.people) People"
+        peopleCount.text = broadcast.people == 1 ? "\(broadcast.people) person" : "\(broadcast.people) people"
+        feedActivitySummary.text = broadcast.people == 1 ? " is talking about this" : " are talking about this"
         if activity {
             if (broadcast.unread != 0) && broadcast.unread > 0 {
                 unreadCount.text = "\(broadcast.unread)"
@@ -159,6 +162,10 @@ class FeedCell: UITableViewCell {
             mutable.bold(Date.time(since: broadcast.joined ?? Date()), size: 12, weight: UIFont.Weight.heavy)
             mutable.normal(" ago")
             statusText.attributedText = mutable
+        }
+        
+        if hasMedia {
+            feedImage.download(link: Constants.S3Addr + broadcast.media!, contentMode: .scaleAspectFill)
         }
     }
     
