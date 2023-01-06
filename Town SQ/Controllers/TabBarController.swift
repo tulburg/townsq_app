@@ -17,6 +17,7 @@ class TabBarController: UITabBarController {
 	
 	var navigationBarConstraint: NSLayoutConstraint!
     var user: User!
+    var hasUnread = false
 	
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
@@ -36,6 +37,8 @@ class TabBarController: UITabBarController {
 		self.tabBar.tintColor = Color.tabItem
         
         user = DB.UserRecord()
+        let activeBroadcasts = DB.activeBroadcasts()!
+        hasUnread = activeBroadcasts.filter{ return $0.unread > 0 }.count > 0
 
 		self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "edit"), style: .plain, target: self, action: #selector(presentEditor))
         self.navigationItem.rightBarButtonItem?.tintColor = Color.darkBlue_white
@@ -87,6 +90,7 @@ class TabBarController: UITabBarController {
         activeBadge.layer.cornerRadius = 3
         activeBadge.clipsToBounds = true
         activeBadge.tag = "tab-badge".hashValue
+        activeBadge.isHidden = !hasUnread
         barButton.addSubview(activeBadge)
         
         let profileButton = self.tabBar.subviews[4]

@@ -28,7 +28,6 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-        Socket.shared.registerDelegate(self)
 		
         if broadcast.active == nil {
             Socket.shared.joinBroadcast(broadcast)
@@ -38,6 +37,11 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
         }
         broadcast.comments?.array.forEach { comment in
             comments.append((comment as? Comment)!)
+        }
+        comments = comments.sorted{
+            return $0.created! > $1.created!
+        }.sorted{
+            return ($0.vote + $0.user_vote) > ($1.vote + $1.user_vote)
         }
         
         navigationItem.title = "Broadcast"
@@ -117,6 +121,22 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
         }
         
 	}
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Socket.shared.registerDelegate(self)
+        
+        Socket.shared.markUnread(broadcast)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: .none)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: .none)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardDidHideNotification, object: .none)
+        
+        Socket.shared.unregisterDelegate(self)
+    }
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return comments.count + 1
@@ -141,6 +161,7 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
             }
             cell.onVoteChange = { vote in
                 tableView.reloadRows(at: [indexPath], with: .none)
+                
                 Socket.shared.publishVote(comment, vote)
             }
             return cell
@@ -222,19 +243,37 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
     
     func socket(didReceive event: Constants.Events, data: ResponseData) {
         if event == .GotComment {
-            comments = []
-            broadcast.comments?.array.forEach { comment in
-                comments.append((comment as? Comment)!)
+            if let newComment = data as? DataType.NewComment {
+                if newComment.broadcast_id == broadcast.id {
+                    comments = []
+                    broadcast.comments?.array.forEach { comment in
+                        comments.append((comment as? Comment)!)
+                    }
+                    tableView.reloadData()
+                }
             }
-            tableView.reloadData()
         }
         
         if event == .GotVote {
-            comments = []
-            broadcast.comments?.array.forEach { comment in
-                comments.append((comment as? Comment)!)
+            if let comment = data as? DataType.NewVote {
+                if broadcast.comments?.first(where: {
+                    return ($0 as? Comment)?.id == comment.id
+                }) != nil {
+                    comments = []
+                    broadcast.comments?.array.forEach { comment in
+                        comments.append((comment as? Comment)!)
+                    }
+                    tableView.reloadData()
+                }
             }
-            tableView.reloadData()
+        }
+        
+        if event == .GotUser {
+            if let broadcast = data as? DataType.BroadcastUpdate {
+                if self.broadcast.id == broadcast.id {
+                    tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .none)
+                }
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 	
 	var feed: [Broadcast] = []
     var tableView: UITableView!
+    var initialized = false
   
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
@@ -31,8 +32,8 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
         
         self.feed = DB.fetchFeed()
         Socket.shared.fetchFeed()
+        initialized = true
         
-        Socket.shared.registerDelegate(self)
         
 //        ImageCache.shared().drop()
 //        DB.shared.drop(.Comment)
@@ -43,7 +44,6 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		super.viewDidLoad()
 		// Do any additional setup after loading the view.
 		self.view.backgroundColor = Color.background
-        
         Socket.shared.start()
 
 //        print(DB.shared.find(.Broadcast, predicate: nil))
@@ -54,6 +54,16 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.tabBarController?.title = "Feed"
+        Socket.shared.registerDelegate(self)
+        
+        if initialized {
+            tableView.reloadData()
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(true)
+        Socket.shared.unregisterDelegate(self)
     }
 	
 	func initFeedTableView() -> UITableView {
@@ -78,9 +88,9 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
 		cell.selectedBackgroundView = background
-        if indexPath.row == feed.count - 1 {
-            cell.hideSeparator()
-        }
+//        if indexPath.row == feed.count - 1 {
+//            cell.hideSeparator()
+//        }
 		return cell
 	}
 	
@@ -110,6 +120,12 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 	}
     
     func socket(didReceive event: Constants.Events, data: ResponseData) {
-        tableView.reloadData()
+        if event == .GotUser {
+            if let broadcast = data as? DataType.BroadcastUpdate {
+                if broadcast.id == broadcast.id {
+                    tableView.reloadData()
+                }
+            }
+        }
     }
 }

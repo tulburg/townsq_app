@@ -8,11 +8,12 @@
 
 import Foundation
 
-protocol SocketDelegate {
+protocol SocketDelegate: AnyObject {
     func socket(didReceive event: Constants.Events, data: ResponseData)
 }
 
 extension SocketDelegate {
     func connect() {}
     func disconnect() {}
+    func socket(didMarkUnread broadcast: Broadcast){}
 }

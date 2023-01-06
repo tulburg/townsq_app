@@ -63,14 +63,14 @@ class FeedCell: UITableViewCell {
         ownerContainer.addConstraints(format: "V:|-0-[v0]-0-|", views: ownerName)
         ownerContainer.addConstraints(format: "V:|-(>=0)-[v0]-2-|", views: feedTime)
         ownerContainer.addConstraints(format: "V:|-0-[v0(22)]-(>=0)-|", views: unreadContainer)
-        ownerContainer.addConstraints(format: "H:|-0-[v0]-[v1(40@1)]-(>=0)-[v2(>=22@1)]-0-|", views: ownerName, feedTime, unreadContainer)
+        ownerContainer.addConstraints(format: "H:|-0-[v0]-[v1(40@1)]-(>=0)-[v2(>=22)]-0-|", views: ownerName, feedTime, unreadContainer)
         
         let feedActivityCounter = makeFeedAcitivityCounter()
         let feedActivitySummary = UILabel("are talking about this", Color.darkBlue_white, UIFont.systemFont(ofSize: 12))
         let feedActivityContainer = UIView()
         feedActivityContainer.addSubviews(views: feedActivityCounter, feedActivitySummary)
         feedActivityContainer.addConstraints(format: "V:|-2-[v0]-2-|", views: feedActivityCounter)
-        feedActivityContainer.addConstraints(format: "H:|-0-[v0]-4-[v1(>=\(contentView.frame.width/2),<=\(contentView.frame.width))]-0-|", views: feedActivityCounter, feedActivitySummary)
+        feedActivityContainer.addConstraints(format: "H:|-0-[v0]-4-[v1(>=\(contentView.frame.width/2),<=\(contentView.frame.width))]-(>=0)-|", views: feedActivityCounter, feedActivitySummary)
         feedActivitySummary.centerYAnchor.constraint(equalTo: feedActivityContainer.centerYAnchor).isActive = true
         
         let bottomContainer = UIView()
@@ -122,7 +122,7 @@ class FeedCell: UITableViewCell {
         self.contentView.addSubviews(views: feedContainer, self.separator)
         self.contentView.constrain(type: .horizontalFill, feedContainer, margin: 16)
         self.contentView.constrain(type: .horizontalFill, self.separator)
-        self.contentView.addConstraints(format: "V:|-0-[v0]-2-[v1(1)]-0-|", views: feedContainer, self.separator)
+        self.contentView.addConstraints(format: "V:|-0-[v0]-2-[v1(1)]-(\(asHeader ? 24 : 0))-|", views: feedContainer, self.separator)
         
         
         
@@ -145,9 +145,13 @@ class FeedCell: UITableViewCell {
         feedText.text = broadcast.body
         feedTime.text = Date.time(since: broadcast.created!) + " ago"
         peopleCount.text = "\(broadcast.people) People"
-        if (broadcast.unread != 0) && broadcast.unread > 0 {
-            unreadCount.text = "\(broadcast.unread)"
-            unreadContainer.isHidden = false
+        if activity {
+            if (broadcast.unread != 0) && broadcast.unread > 0 {
+                unreadCount.text = "\(broadcast.unread)"
+                unreadContainer.isHidden = false
+            }else {
+                unreadContainer.isHidden = true
+            }
         }
         if statusText != nil {
             let mutable = NSMutableAttributedString()
@@ -190,7 +194,6 @@ class FeedCell: UITableViewCell {
         unreadCount = UILabel()
         unreadCount.font = UIFont.boldSystemFont(ofSize: 16)
         unreadCount.textColor = Color.white_black
-        unreadCount.isHidden = true
         
         container.addSubview(unreadCount)
         container.constrain(type: .horizontalFill, unreadCount, margin: 6)

@@ -98,7 +98,8 @@ class Socket {
                     "body": self.broadcast as Any,
                     "created": response.data?.created as Any,
                     "id": response.data?.id as Any,
-                    "active": BroadcastType.Active.rawValue
+                    "active": BroadcastType.Active.rawValue,
+                    "joined": Date()
                 ])
             }
             self.lastJob = nil
@@ -119,31 +120,42 @@ class Socket {
             self.lastJob = nil
         }
         
+        socket.on(Constants.Events.GotBroadcast.rawValue) { data, ack in
+            let response = Response<DataType.NewBroadcast>((data[0] as? NSDictionary)!)
+            if response.code == 200 {
+                let broadcasts = DB.shared.findById(.Broadcast, id: (response.data?.id)!)
+            }
+        }
+        
         socket.on(Constants.Events.GotComment.rawValue) { data, ack in
             let response = Response<DataType.NewComment>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 let broadcasts = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", (response.data?.broadcast_id)!))
-                let users = DB.shared.find(.User, predicate: NSPredicate(format: "id = %@", (response.data?.user?.id)!))
-                var user: User?
-                if users.count > 0 {
-                    user = (users[0] as? User)
-                }
-                if user == nil {
-                    if let rUser = response.data?.user {
-                        user = User(context: DB.shared.context)
-                        user?.id = rUser.id
-                        user?.name = rUser.name
-                        user?.username = rUser.username
-                        user?.profile_photo = rUser.profile_photo
+                if broadcasts.count > 0 {
+                    let users = DB.shared.find(.User, predicate: NSPredicate(format: "id = %@", (response.data?.user?.id)!))
+                    var user: User?
+                    if users.count > 0 {
+                        user = (users[0] as? User)
                     }
+                    if user == nil {
+                        if let rUser = response.data?.user {
+                            user = User(context: DB.shared.context)
+                            user?.id = rUser.id
+                            user?.name = rUser.name
+                            user?.username = rUser.username
+                            user?.profile_photo = rUser.profile_photo
+                        }
+                    }
+                    DB.shared.insert(.Comment, keyValue: [
+                        "user": user as Any,
+                        "body": response.data?.body as Any,
+                        "created": response.data?.created as Any,
+                        "id": response.data?.id as Any,
+                        "broadcast": broadcasts[0] as Any
+                    ])
+                    (broadcasts[0] as! Broadcast).unread = (broadcasts[0] as! Broadcast).unread + 1
+                    DB.shared.save()
                 }
-                DB.shared.insert(.Comment, keyValue: [
-                    "user": user as Any,
-                    "body": response.data?.body as Any,
-                    "created": response.data?.created as Any,
-                    "id": response.data?.id as Any,
-                    "broadcast": broadcasts[0] as Any
-                ])
                 self.delegates.forEach{ $0.socket(didReceive: .GotComment, data: response.data!)}
             }
         }
@@ -233,6 +245,12 @@ class Socket {
         ])
     }
     
+    func markUnread(_ broadcast: Broadcast) {
+        broadcast.unread = 0
+        DB.shared.save()
+        delegates.forEach{ $0.socket(didMarkUnread: broadcast) }
+    }
+    
     enum MediaType: String {
         case photo, video, photos
     }
@@ -253,5 +271,9 @@ class Socket {
     
     func registerDelegate(_ delegate: SocketDelegate) {
         delegates.append(delegate)
+    }
+    
+    func unregisterDelegate(_ delegate: SocketDelegate) {
+        delegates.removeAll(where: { return $0 === delegate })
     }
 }

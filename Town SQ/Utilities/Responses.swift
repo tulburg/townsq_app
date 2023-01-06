@@ -70,6 +70,15 @@ class DataType {
         }
     }
     
+    class NewBroadcast: ResponseData {
+        var id: String?
+        var created: Date?
+        required init(_ dict: NSDictionary) {
+            if let id = dict["id"] as? String { self.id = id }
+            if let created = dict["created"] as? String { self.created = Date.from(string: created) }
+        }
+    }
+    
     class NewComment: ResponseData {
         var body: String?
         var created: Date?

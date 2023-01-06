@@ -8,10 +8,12 @@
 
 import UIKit
 
-class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegate, UITableViewDataSource {
     
   
     var activeBroadcasts: [Broadcast] = []
+    var tableView: UITableView!
+    var hasUnread = false
     
     
     required init?(coder: NSCoder) {
@@ -22,6 +24,7 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
         super.init(nibName: nil, bundle: nil)
         
         activeBroadcasts = DB.activeBroadcasts()!
+        hasUnread = activeBroadcasts.filter{ return $0.unread > 0 }.count > 0
         
         let tabImage = UIImage(named: "active")
         tabImage?.withTintColor(Color.tabItemDisabled, renderingMode: .alwaysTemplate)
@@ -41,15 +44,22 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
         super.viewDidAppear(animated)
         self.tabBarController?.title = "Active"
         (self.tabBarController as! TabBarController).activeBadge?.isHidden = true
+        
+        self.activeBroadcasts = DB.activeBroadcasts()!
+        self.tableView.reloadData()
+        Socket.shared.registerDelegate(self)
+        
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        (self.tabBarController as! TabBarController).activeBadge?.isHidden = false
+        (self.tabBarController as! TabBarController).activeBadge?.isHidden = !hasUnread
+        
+        Socket.shared.unregisterDelegate(self)
     }
     
     func initTableView() -> UITableView {
-        let tableView = UITableView()
+        tableView = UITableView()
         tableView.dataSource = self
         tableView.delegate = self
         tableView.tableFooterView = UIView(frame: CGRect.zero)
@@ -82,5 +92,20 @@ class ActiveViewController: UIViewController, UITableViewDelegate, UITableViewDa
         messagesVC.broadcast = activeBroadcasts[indexPath.row]
         self.navigationController?.pushViewController(messagesVC, animated: true)
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func socket(didReceive event: Constants.Events, data: ResponseData) {
+        if event == .GotUser {
+            tableView.reloadData()
+        }
+        
+        if event == .GotComment {
+            tableView.reloadData()
+            hasUnread = true
+        }
+    }
+    
+    func socket(didMarkUnread broadcast: Broadcast) {
+        tableView.reloadData()
     }
 }

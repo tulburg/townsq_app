@@ -599,32 +599,31 @@ extension Date {
     }
     
     static func time(since fromDate: Date) -> String {
-        guard fromDate < Date() else { return "Back to the future" }
+        guard fromDate < Date() else { return "1s" }
         
         let allComponents: Set<Calendar.Component> = [.second, .minute, .hour, .day, .weekOfYear, .month, .year]
         let components:DateComponents = Calendar.current.dateComponents(allComponents, from: fromDate, to: Date())
         
         for (period, timeAgo) in [
-            ("yr", components.year ?? 0),
-            ("m", components.month ?? 0),
-            ("wk", components.weekOfYear ?? 0),
+            ("y", components.year ?? 0),
+            ("M", components.month ?? 0),
+            ("w", components.weekOfYear ?? 0),
             ("d", components.day ?? 0),
-            ("hr", components.hour ?? 0),
-            ("min", components.minute ?? 0),
-            ("sec", components.second ?? 0),
+            ("h", components.hour ?? 0),
+            ("m", components.minute ?? 0),
+            ("", components.second ?? 0),
         ] {
             if timeAgo > 0 {
                 return "\(timeAgo.of(period))"
             }
         }
         
-        return "Just now"
+        return "1s"
     }
 }
 
 extension Int {
     func of(_ name: String) -> String {
-        guard self != 1 else { return "\(self) \(name)" }
-        return "\(self) \(name)s"
+        return "\(self)\(name)"
     }
 }
