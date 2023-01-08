@@ -138,5 +138,10 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
             self.feed = DB.fetchFeed()
             tableView.reloadData()
         }
+        
+        if event == .GotFeed {
+            self.feed = DB.fetchFeed()
+            tableView.reloadData()
+        }
     }
 }

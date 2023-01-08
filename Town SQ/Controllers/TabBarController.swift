@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TabBarController: UITabBarController {
+class TabBarController: UITabBarController, SocketDelegate {
 	
 	var homeBadge: String!
     var activeBadge: UIView!
@@ -46,6 +46,7 @@ class TabBarController: UITabBarController {
 		self.navigationItem.backBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.clear
 		], for: .normal)
         
+        Socket.shared.registerDelegate(self)
 	}
     
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
@@ -128,6 +129,12 @@ class TabBarController: UITabBarController {
 
     @objc func openSettings() {
         self.navigationController?.pushViewController(SettingsViewController(), animated: true)
+    }
+    
+    func socket(didReceive event: Constants.Events, data: ResponseData) {
+        if event == .GotComment && self.selectedIndex != 2 {
+            self.activeBadge.isHidden = false
+        }
     }
 	
 }

@@ -67,6 +67,7 @@ class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegat
         tableView.backgroundColor = Color.background
         tableView.separatorColor = UIColor.clear
         tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell_as_active")
+        tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell_as_active_with_media")
         return tableView
     }
     
@@ -75,8 +76,14 @@ class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: FeedCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_active") as! FeedCell
-        cell.setup(activeBroadcasts[indexPath.row])
+        let broadcast = activeBroadcasts[indexPath.row]
+        var cell: FeedCell!
+        if broadcast.media != nil && broadcast.media_type != nil {
+            cell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_active_with_media") as? FeedCell
+        }else {
+            cell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_active") as? FeedCell
+        }
+        cell.setup(broadcast)
         let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
         cell.selectedBackgroundView = background

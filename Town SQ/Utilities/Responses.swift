@@ -113,11 +113,15 @@ class DataType {
             var created: Date?
             var id: String?
             var user: User?
+            var media: String?
+            var media_type: MediaType?
             init(_ dict: NSDictionary) {
                 if let body = dict["body"] as? String { self.body = body }
                 if let created = dict["created"] as? String { self.created = Date.from(string: created) }
                 if let id = dict["id"] as? String { self.id = id }
                 if let user = dict["user"] as? NSDictionary { self.user = User(user) }
+                if let media = dict["media"] as? String { self.media = media }
+                if let media_type = dict["media_type"] as? String { self.media_type = MediaType(rawValue: media_type) }
             }
         }
         var broadcasts: [Broadcast]?

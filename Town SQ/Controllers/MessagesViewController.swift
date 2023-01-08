@@ -74,6 +74,7 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
         tableView.register(MessageCell.self, forCellReuseIdentifier: "message_cell")
         tableView.register(OwnMessageCell.self, forCellReuseIdentifier: "own_message_cell")
         tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell_as_header")
+        tableView.register(FeedCell.self, forCellReuseIdentifier: "feed_cell_as_header_with_media")
 		
 		messageField = UITextView()
 		messageField.text = "Message here"
@@ -144,7 +145,12 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
     var messageCell: UITableViewCell!
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
-            let headerCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_header") as? FeedCell
+            var headerCell: FeedCell!
+            if broadcast.media != nil && broadcast.media_type != nil {
+                headerCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_header_with_media") as? FeedCell
+            }else {
+                headerCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_header") as? FeedCell
+            }
             headerCell?.setup(broadcast)
             return headerCell!
         }

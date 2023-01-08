@@ -64,6 +64,8 @@ class DB: NSObject {
                 new.id = broadcast.id
                 new.body = broadcast.body
                 new.created = broadcast.created
+                new.media = broadcast.media
+                new.media_type = broadcast.media_type?.rawValue
                 new.user = User(context: DB.shared.context)
                 new.user?.profile_photo = broadcast.user?.profile_photo
                 new.user?.username = broadcast.user?.username

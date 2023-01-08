@@ -31,10 +31,10 @@ class FeedCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-
-        asHeader = reuseIdentifier == "feed_cell_as_header"
-        activity = reuseIdentifier == "feed_cell_as_active"
-        hasMedia = reuseIdentifier == "feed_cell_with_media"
+        
+        hasMedia = reuseIdentifier?.contains("_with_media")
+        asHeader = reuseIdentifier?.contains("_as_header")
+        activity = reuseIdentifier?.contains("_as_active")
         
         let ownerImage = makeOwnerImage()
         ownerName = UILabel("", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
@@ -133,6 +133,9 @@ class FeedCell: UITableViewCell {
     }
     
     func setup(_ broadcast: Broadcast) {
+        if broadcast == nil {
+            return 
+        }
         self.broadcast = broadcast
         if asHeader {
             feedText.font = UIFont.systemFont(ofSize: 20)

@@ -53,6 +53,7 @@ class Socket {
                 job()
                 self.lastJob = nil
             }
+            var totalComment = 0
             let response = Response<DataType.Startup>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 UserDefaults.standard.set(Date().milliseconds, forKey: Constants.lastFeedCheck)
@@ -62,6 +63,7 @@ class Socket {
                         let broadcast: Broadcast = (broadcasts[0] as? Broadcast)!
                         broadcast.people = Int16(item.actives!)
                         broadcast.last_check = Date()
+                        totalComment = totalComment + item.comments!.count
                         item.comments?.forEach({ comment in
                             let index = broadcast.comments?.array.firstIndex(where: { oldComment in
                                 return (oldComment as? Comment)?.id == comment.id
@@ -84,7 +86,9 @@ class Socket {
                                 newComment.broadcast = broadcast
                             }
                         })
-                        self.delegates.forEach{ $0.socket(didReceive: .GotComment, data: response.data!)}
+                        if totalComment > 0 {
+                            self.delegates.forEach{ $0.socket(didReceive: .GotComment, data: response.data!)}
+                        }
                         DB.shared.save()
                     }
                 }
@@ -128,14 +132,14 @@ class Socket {
             self.lastJob = nil
         }
         
+        // MARK:  - Got Events from server
+        
         socket.on(Constants.Events.GotBroadcast.rawValue) { data, ack in
             let response = Response<DataType.NewBroadcast>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 let broadcasts = DB.shared.findById(.Broadcast, id: (response.data?.id)!)
             }
         }
-        
-        // MARK:  - Got Events from server
         
         socket.on(Constants.Events.GotComment.rawValue) { data, ack in
             let response = Response<DataType.NewComment>((data[0] as? NSDictionary)!)
@@ -198,6 +202,7 @@ class Socket {
                 if let data = response.data {
                     DB.insertFeed(data)
                 }
+                self.delegates.forEach{ $0.socket(didReceive: .GotFeed, data: response.data!)}
             }
             self.lastJob = nil
         }
