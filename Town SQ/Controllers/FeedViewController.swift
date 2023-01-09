@@ -44,6 +44,8 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		super.viewDidLoad()
 		// Do any additional setup after loading the view.
 		self.view.backgroundColor = Color.background
+        self.feed = DB.fetchFeed()
+        tableView.reloadData()
 
 //        print(DB.shared.find(.Broadcast, predicate: nil))
 //        print(DB.shared.find(.Broadcast, predicate: NSPredicate(format: "user.id", user?.id as! CVarArg)))

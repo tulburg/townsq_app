@@ -49,7 +49,6 @@ class Socket {
         }
         
         socket.on(Constants.Events.Startup.rawValue) { data, ack in
-            self.socket.emit(Constants.Events.Startup.receipt())
             if let job = self.lastJob {
                 job()
                 self.lastJob = nil
@@ -57,7 +56,6 @@ class Socket {
             var totalComment = 0
             let response = Response<DataType.Startup>((data[0] as? NSDictionary)!)
             if response.code == 200 {
-                UserDefaults.standard.set(Date().milliseconds, forKey: Constants.lastFeedCheck)
                 response.data?.activeBroadcasts?.forEach{ item in
                     let broadcasts = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", item.id!))
                     if broadcasts.count > 0 {
@@ -90,6 +88,7 @@ class Socket {
                         if totalComment > 0 {
                             self.delegates.forEach{ $0.socket(didReceive: .GotComment, data: response.data!)}
                         }
+                        UserDefaults.standard.set(Date().milliseconds, forKey: Constants.lastFeedCheck)
                         DB.shared.save()
                     }
                 }
@@ -97,7 +96,6 @@ class Socket {
         }
         
         socket.on(Constants.Events.Broadcast.rawValue) { data, ack in
-            self.socket.emit(Constants.Events.Broadcast.receipt())
             let response = Response<DataType.Broadcast>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 var param = [
@@ -106,6 +104,7 @@ class Socket {
                     "created": response.data?.created as Any,
                     "id": response.data?.id as Any,
                     "active": BroadcastType.Active.rawValue,
+                    "people": 1,
                     "joined": Date()
                 ];
                 if response.data?.media_type != nil && response.data?.media != nil {
@@ -114,13 +113,15 @@ class Socket {
                 }
                 print("inserting... >>> ", param)
                 DB.shared.insert(.Broadcast, keyValue: param)
+                if let broadcast: Broadcast = DB.shared.findById(.Broadcast, id: (response.data?.id)!) as? Broadcast {
+                    self.joinBroadcast(broadcast)
+                }
                 self.delegates.forEach{ $0.socket(didReceive: .GotBroadcast, data: response.data!)}
             }
             self.lastJob = nil
         }
         
         socket.on(Constants.Events.Comment.rawValue) { data, ack in
-            self.socket.emit(Constants.Events.Comment.receipt())
             let response = Response<DataType.Comment>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 let broadcasts = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", (response.data?.broadcast_id)!))
