@@ -23,6 +23,7 @@ class ProfileViewController: ViewController, SocketDelegate {
     var broadcastCount: UILabel!
     var locationLabel: UILabel!
     var joinedLabel: UILabel!
+    var followButton: UIButton!
     
     var properUser: User?
 	
@@ -45,30 +46,27 @@ class ProfileViewController: ViewController, SocketDelegate {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		self.view.backgroundColor = Color.background
-        
-        let user: User!
-        if properUser == nil {
-            user = self.user
-        }else {
-            user = properUser
-        }
-        
+        view.showIndicator(size: .large, color: Color.darkBlue_white)
+	}
+    
+    func setup(user: User) {
+        view.hideIndicator()
         rootView = UIView()
-		
+        
         profilePhoto = UIImageView(link: "https://t4.ftcdn.net/jpg/04/86/11/69/360_F_486116937_WzL9xLnHyQWlsnGTCwyLyWF8DAcEMIT5.jpg", contentMode: .scaleAspectFill)
-        if let photo = user?.profile_photo {
+        if let photo = user.profile_photo {
             profilePhoto = UIImageView(link: photo, contentMode: .scaleAspectFill)
         }
-		profilePhoto.clipsToBounds = true
-		profilePhoto.layer.cornerRadius = 12
+        profilePhoto.clipsToBounds = true
+        profilePhoto.layer.cornerRadius = 12
         profilePhoto.isUserInteractionEnabled = true
         profilePhoto.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openPhotoPicker)))
-        displayName = UILabel((user?.name)!, Color.grayDark, UIFont.boldSystemFont(ofSize: 24))
-		displayName.textAlignment = .center
-        username = UILabel("@" + (user?.username)!, Color.grayMid, UIFont.systemFont(ofSize: 14))
+        displayName = UILabel((user.name)!, Color.grayDark, UIFont.boldSystemFont(ofSize: 24))
+        displayName.textAlignment = .center
+        username = UILabel("@" + (user.username)!, Color.grayMid, UIFont.systemFont(ofSize: 14))
         username.textAlignment = .center
-		
-        let followButton = UIButton("Follow", font: UIFont.systemFont(ofSize: 14, weight: .semibold))
+        
+        followButton = UIButton("Follow", font: UIFont.systemFont(ofSize: 14, weight: .semibold))
         followButton.layer.cornerRadius = 15
         followButton.backgroundColor = Color.darkBlue
         followButton.addTarget(self, action: #selector(follow), for: .touchUpInside)
@@ -94,7 +92,7 @@ class ProfileViewController: ViewController, SocketDelegate {
         buttonContainer.addConstraints(format: "V:|-0-[v0(30)]-0-|", views: followButton)
         buttonContainer.addConstraints(format: "V:|-0-[v0(30)]-0-|", views: messageButton)
         buttonContainer.addConstraints(format: "V:|-0-[v0(30)]-0-|", views: moreButton)
-		
+        
         let (followers, followersCount) = makeCounter(245, "Followers")
         let (following, followingCount) = makeCounter(198, "Following")
         let (broadcasts, broadcastCount) = makeCounter(0, "Broadcasts")
@@ -120,6 +118,7 @@ class ProfileViewController: ViewController, SocketDelegate {
         statGroup.addSubviews(views: joined, location)
         statGroup.addConstraints(format: "H:|-0-[v0]-8-[v1]-0-|", views: joined, location)
         statGroup.constrain(type: .verticalFill, joined, location)
+        
         if properUser != nil && properUser != self.user {
             rootView.add().vertical(48).view(profilePhoto, 120).gap(16).view(displayName).gap(0).view(username).gap(16).view(buttonContainer).gap(16).view(counterContainer, 44).gap(16).view(separator, 1).gap(16).view(bio).gap(16).view(statGroup).end(">=0")
         }else {
@@ -146,18 +145,6 @@ class ProfileViewController: ViewController, SocketDelegate {
         view.add().horizontal(0).view(scrollView, view.frame.width).end(0)
         view.add().vertical(0).view(scrollView).end(0)
         
-	}
-    
-    func setup() {
-        let user: User!
-        if properUser == nil {
-            user = self.user
-        }else {
-            user = properUser
-        }
-        profilePhoto = UIImageView(link: user.profile_photo!, contentMode: .scaleAspectFill)
-        displayName.text = user.name
-        username.text = "@" + user.username!
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -205,11 +192,19 @@ class ProfileViewController: ViewController, SocketDelegate {
     
     func socket(didReceive event: Constants.Events, data: ResponseData) {
         if event == .User {
-            setup()
             if let user = data as? DataType.User {
+                setup(user: properUser!)
                 followersCount.text = "\(user.followers ?? 0)"
                 followingCount.text = "\(user.following ?? 0)"
                 joinedLabel.text = "Joined " + (user.created?.string(with: "MMM, yyyy"))!
+                profilePhoto.download(link: user.profile_photo!, contentMode: .scaleAspectFill)
+                displayName.text = user.name
+                username.text = "@" + user.username!
+                if user.isFollowing! {
+                    followButton.setTitle("Unfollow", for: .normal)
+                    followButton.backgroundColor = Color.red
+                }
+                self.view.hideIndicator()
             }
         }
     }

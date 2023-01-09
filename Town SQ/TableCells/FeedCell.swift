@@ -32,12 +32,19 @@ class FeedCell: UITableViewCell {
     var onLeave: (() -> Void)? = nil
     var onOpen: (() -> Void)? = nil
     
+    var winH: CGFloat = 0
+    var winW: CGFloat = 0
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         hasMedia = reuseIdentifier?.contains("_with_media")
         asHeader = reuseIdentifier?.contains("_as_header")
         activity = reuseIdentifier?.contains("_as_active")
+        
+        let delegate = UIApplication.shared.connectedScenes.first!.delegate as! SceneDelegate
+        winH = (delegate.window?.rootViewController!.view.frame.height)!
+        winW = (delegate.window?.rootViewController!.view.frame.width)!
         
         let ownerImage = makeOwnerImage()
         ownerImage.isUserInteractionEnabled = true
@@ -134,8 +141,6 @@ class FeedCell: UITableViewCell {
         self.contentView.constrain(type: .horizontalFill, self.separator)
         self.contentView.addConstraints(format: "V:|-0-[v0]-2-[v1(1)]-(\(asHeader ? 24 : 0))-|", views: feedContainer, self.separator)
         
-        
-        
         self.contentView.backgroundColor = UIColor.clear
         self.backgroundColor = Color.background
     }
@@ -173,7 +178,19 @@ class FeedCell: UITableViewCell {
         }
         
         if hasMedia {
-            feedImage.download(link: Constants.S3Addr + broadcast.media!, contentMode: .scaleAspectFill)
+            feedImage.download(link: Constants.S3Addr + broadcast.media!, sizeCb: { [self] image in
+                let w = image.size.width
+                let h = image.size.height
+                let adjRatio = w > h ? (winW / w) : ((winH * 0.42) / h)
+                let adjH = adjRatio * h
+                for c in (feedImage.superview?.constraints)! {
+                    if (c.firstItem as? UIImageView) == feedImage {
+                        if c.firstAttribute == .height {
+                            c.constant = adjH
+                        }
+                    }
+                }
+            })
         }
     }
     

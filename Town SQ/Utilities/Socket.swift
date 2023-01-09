@@ -307,7 +307,7 @@ class Socket {
     func fetchFeed() {
         let lastFeedCheck = UserDefaults.standard.string(forKey: Constants.lastFeedCheck)
         Socket.shared.emit(Constants.Events.Feed.rawValue, [
-            "lastFeedCheck": 100//lastFeedCheck
+            "lastFeedCheck": lastFeedCheck
         ])
     }
     

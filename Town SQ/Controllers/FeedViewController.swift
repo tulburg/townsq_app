@@ -101,10 +101,10 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 //        }
         cell.onOpen = { [self] in
             let vc = ProfileViewController()
+            vc.view.showIndicator(size: .large, color: Color.darkBlue)
             Socket.shared.fetchUser(broadcast.user!)
             Socket.shared.registerDelegate(vc as SocketDelegate)
             vc.properUser = broadcast.user
-            vc.modalPresentationStyle = .formSheet
             present(vc, animated: true)
         }
 		return cell

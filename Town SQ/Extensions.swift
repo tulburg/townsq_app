@@ -300,6 +300,29 @@ extension UIImageView {
         self.download(link: link, contentMode: mode)
 	}
     
+    func download(link: String, sizeCb: @escaping (_ image: UIImage) -> Void) {
+        guard let url = URL(string: link) else { return }
+        if let path = ImageCache.shared().fetch(url: url) {
+            let image = UIImage(contentsOfFile: path)
+            self.image = image
+            sizeCb(image!)
+        }else {
+            URLSession.shared.dataTask(with: url) { (data, response, error) in
+                guard
+                    let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
+                    let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
+                    let data = data, error == nil,
+                    let image = UIImage(data: data)
+                else { return }
+               sizeCb(image)
+                ImageCache.shared().set(data: image.jpegData(compressionQuality: 1)!, url: url, completion: nil)
+                DispatchQueue.main.async() { () -> Void in
+                    self.image = image
+                }
+            }.resume()
+        }
+    }
+    
     func download(link: String, contentMode mode: UIView.ContentMode = .scaleAspectFit) {
         contentMode = mode
         guard let url = URL(string: link) else { return }

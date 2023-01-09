@@ -140,6 +140,8 @@ class DataType {
         var username: String?
         var followers: Int?
         var following: Int?
+        var isFollowing: Bool?
+        var isFollower: Bool?
         var created: Date?
         required init(_ dict: NSDictionary) {
             if let name = dict["name"] as? String { self.name = name }
@@ -149,6 +151,8 @@ class DataType {
             if let followers = dict["followers"] as? Int { self.followers = followers }
             if let following = dict["following"] as? Int { self.following = following }
             if let created = dict["created"] as? String { self.created = Date.from(string: created) }
+            if let isFollowing = dict["isFollowing"] as? Bool { self.isFollowing = isFollowing }
+            if let isFollower = dict["isFollower"] as? Bool { self.isFollower = isFollower }
         }
     }
     
