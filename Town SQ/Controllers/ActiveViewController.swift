@@ -90,6 +90,16 @@ class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegat
         if indexPath.row == activeBroadcasts.count - 1 {
             cell.hideSeparator()
         }
+        cell.onLeave = {
+            Socket.shared.leaveBroadcast(broadcast)
+            broadcast.joined = nil
+            broadcast.active = BroadcastType.Normal.rawValue
+            DB.shared.save()
+            DispatchQueue.main.async { [self] in
+                activeBroadcasts.remove(at: indexPath.row)
+                tableView.reloadData()
+            }
+        }
         return cell
     }
     

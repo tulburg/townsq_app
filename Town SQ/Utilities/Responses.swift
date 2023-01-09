@@ -133,16 +133,22 @@ class DataType {
             }
         }
     }
-    class User {
+    class User: ResponseData {
         var id: String?
         var name: String?
         var profile_photo: String?
         var username: String?
-        init(_ dict: NSDictionary) {
+        var followers: Int?
+        var following: Int?
+        var created: Date?
+        required init(_ dict: NSDictionary) {
             if let name = dict["name"] as? String { self.name = name }
             if let profile_photo = dict["profile_photo"] as? String { self.profile_photo = profile_photo }
             if let username = dict["username"] as? String { self.username = username }
             if let id = dict["id"] as? String { self.id = id }
+            if let followers = dict["followers"] as? Int { self.followers = followers }
+            if let following = dict["following"] as? Int { self.following = following }
+            if let created = dict["created"] as? String { self.created = Date.from(string: created) }
         }
     }
     

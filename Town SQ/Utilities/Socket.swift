@@ -136,13 +136,29 @@ class Socket {
             self.lastJob = nil
         }
         
+        socket.on(Constants.Events.User.rawValue) { data, ack in
+            let response = Response<DataType.User>((data[0] as? NSDictionary)!)
+            if response.code == 200 {
+                if let user: User = DB.shared.findById(.User, id: (response.data?.id)!) as? User {
+                    user.username = response.data?.username
+                    user.name = response.data?.name
+                    user.profile_photo = response.data?.profile_photo
+                    user.following = Int64((response.data?.following)!)
+                    user.followers = Int64((response.data?.followers)!)
+                    DB.shared.save()
+                    self.delegates.forEach{ $0.socket(didReceive: .User, data: response.data!)}
+                }
+            }
+            self.lastJob = nil
+        }
+        
         // MARK:  - Got Events from server
         
         socket.on(Constants.Events.GotBroadcast.rawValue) { data, ack in
             self.socket.emit(Constants.Events.GotBroadcast.receipt())
             let response = Response<DataType.NewBroadcast>((data[0] as? NSDictionary)!)
             if response.code == 200 {
-                let broadcasts = DB.shared.findById(.Broadcast, id: (response.data?.id)!)
+//                let broadcasts = DB.shared.findById(.Broadcast, id: (response.data?.id)!)
             }
         }
         
@@ -182,6 +198,18 @@ class Socket {
         
         socket.on(Constants.Events.GotUser.rawValue) { data, ack in
             self.socket.emit(Constants.Events.GotUser.receipt())
+            let response = Response<DataType.BroadcastUpdate>((data[0] as? NSDictionary)!)
+            if response.code == 200 {
+                if let broadcast: Broadcast = DB.shared.findById(.Broadcast, id: (response.data?.id)!) as? Broadcast {
+                    broadcast.people = Int16((response.data?.actives)!)
+                    DB.shared.save()
+                    self.delegates.forEach{ $0.socket(didReceive: .GotUser, data: response.data!)}
+                }
+            }
+        }
+        
+        socket.on(Constants.Events.GotLeave.rawValue) { data, ack in
+            self.socket.emit(Constants.Events.GotLeave.receipt())
             let response = Response<DataType.BroadcastUpdate>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 if let broadcast: Broadcast = DB.shared.findById(.Broadcast, id: (response.data?.id)!) as? Broadcast {
@@ -270,10 +298,28 @@ class Socket {
         ])
     }
     
+    func leaveBroadcast(_ broadcast: Broadcast) {
+        emit(Constants.Events.LeaveBroadcast.rawValue, [
+            "id": broadcast.id as Any
+        ])
+    }
+    
     func fetchFeed() {
         let lastFeedCheck = UserDefaults.standard.string(forKey: Constants.lastFeedCheck)
         Socket.shared.emit(Constants.Events.Feed.rawValue, [
-            "lastFeedCheck": lastFeedCheck
+            "lastFeedCheck": 100//lastFeedCheck
+        ])
+    }
+    
+    func fetchUser(_ user: User) {
+        Socket.shared.emit(Constants.Events.User.rawValue, [
+            "id": user.id
+        ])
+    }
+    
+    func follow(_ user: User) {
+        Socket.shared.emit(Constants.Events.Follow.rawValue, [
+            "id": user.id
         ])
     }
     

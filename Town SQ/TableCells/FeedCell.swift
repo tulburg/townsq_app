@@ -29,6 +29,9 @@ class FeedCell: UITableViewCell {
     var activity: Bool!
     var hasMedia: Bool!
     
+    var onLeave: (() -> Void)? = nil
+    var onOpen: (() -> Void)? = nil
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -37,8 +40,11 @@ class FeedCell: UITableViewCell {
         activity = reuseIdentifier?.contains("_as_active")
         
         let ownerImage = makeOwnerImage()
+        ownerImage.isUserInteractionEnabled = true
+        ownerImage.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openProfile)))
         ownerName = UILabel("", Color.darkBlue_white, UIFont.systemFont(ofSize: 17, weight: .bold))
         ownerUsername = UILabel("@", Color.lightText, UIFont.systemFont(ofSize: 14, weight: .regular))
+        ownerUsername.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openProfile)))
         feedTime = UILabel("ago", Color.darkBlue, UIFont.systemFont(ofSize: 12))
         feedText = UILabel("", Color.black_white, UIFont.systemFont(ofSize: 16))
         feedText.numberOfLines = 6
@@ -66,6 +72,7 @@ class FeedCell: UITableViewCell {
         ownerContainer.addConstraints(format: "V:|-(>=0)-[v0]-2-|", views: feedTime)
         ownerContainer.addConstraints(format: "V:|-0-[v0(22)]-(>=0)-|", views: unreadContainer)
         ownerContainer.addConstraints(format: "H:|-0-[v0]-[v1(40@1)]-(>=0)-[v2(>=22)]-0-|", views: ownerName, feedTime, unreadContainer)
+        ownerContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openProfile)))
         
         let feedActivityCounter = makeFeedAcitivityCounter()
         feedActivitySummary = UILabel("are talking about this", Color.darkBlue_white, UIFont.systemFont(ofSize: 12))
@@ -86,6 +93,7 @@ class FeedCell: UITableViewCell {
             actionSeparator.isHidden = false
             let leaveButton = UIButton("Leave", font: UIFont.systemFont(ofSize: 12, weight: .bold), image: UIImage(named: "cancel")?.resize(CGSize(width: 8, height: 8)))
             leaveButton.backgroundColor = Color.red
+            leaveButton.addTarget(self, action: #selector(doLeave), for: .touchUpInside)
             
             statusText = UILabel("Joined 2 mins ago", Color.darkBlue_white, UIFont.systemFont(ofSize: 12))
             let mutable = NSMutableAttributedString()
@@ -133,9 +141,6 @@ class FeedCell: UITableViewCell {
     }
     
     func setup(_ broadcast: Broadcast) {
-        if broadcast == nil {
-            return 
-        }
         self.broadcast = broadcast
         if asHeader {
             feedText.font = UIFont.systemFont(ofSize: 20)
@@ -221,5 +226,16 @@ class FeedCell: UITableViewCell {
         return separator
     }
     
+    @objc func doLeave() {
+        if onLeave != nil {
+            onLeave!()
+        }
+    }
+    
+    @objc func openProfile() {
+        if onOpen != nil {
+            onOpen!()
+        }
+    }
     
 }

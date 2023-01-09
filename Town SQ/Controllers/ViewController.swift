@@ -30,7 +30,7 @@ class ViewController: UIViewController {
         }
     }
     
-    func TagButton(_ image: UIImage, _ title: String, color: UIColor?) -> UIView {
+    func TagButton(_ image: UIImage, _ title: String, color: UIColor?) -> (UIView, UILabel) {
         let container = UIView()
         container.layer.cornerRadius = 15
         container.layer.borderColor = Color.separator.cgColor
@@ -51,7 +51,7 @@ class ViewController: UIViewController {
         container.addConstraints(format: "H:|-12-[v0]-4-[v1]-12-|", views: imageView, label)
         container.constrain(type: .verticalFill, imageView, label, margin: 8)
         
-        return container
+        return (container, label)
     }
     
     func Title(text: String) -> UILabel {

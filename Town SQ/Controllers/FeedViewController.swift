@@ -99,6 +99,14 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 //        if indexPath.row == feed.count - 1 {
 //            cell.hideSeparator()
 //        }
+        cell.onOpen = { [self] in
+            let vc = ProfileViewController()
+            Socket.shared.fetchUser(broadcast.user!)
+            Socket.shared.registerDelegate(vc as SocketDelegate)
+            vc.properUser = broadcast.user
+            vc.modalPresentationStyle = .formSheet
+            present(vc, animated: true)
+        }
 		return cell
 	}
 	
