@@ -37,6 +37,10 @@ struct Constants {
         case GotVote = "got_vote"
         case GotBroadcast = "got_broadcast"
         case GotFeed = "got_feed"
+        
+        func receipt() -> String {
+            return self.rawValue + ":receipt"
+        }
     }
     
     static let Base = "http://192.168.18.3:5400"

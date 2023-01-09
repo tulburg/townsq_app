@@ -49,6 +49,7 @@ class Socket {
         }
         
         socket.on(Constants.Events.Startup.rawValue) { data, ack in
+            self.socket.emit(Constants.Events.Startup.receipt())
             if let job = self.lastJob {
                 job()
                 self.lastJob = nil
@@ -96,6 +97,7 @@ class Socket {
         }
         
         socket.on(Constants.Events.Broadcast.rawValue) { data, ack in
+            self.socket.emit(Constants.Events.Broadcast.receipt())
             let response = Response<DataType.Broadcast>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 var param = [
@@ -118,6 +120,7 @@ class Socket {
         }
         
         socket.on(Constants.Events.Comment.rawValue) { data, ack in
+            self.socket.emit(Constants.Events.Comment.receipt())
             let response = Response<DataType.Comment>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 let broadcasts = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", (response.data?.broadcast_id)!))
@@ -135,6 +138,7 @@ class Socket {
         // MARK:  - Got Events from server
         
         socket.on(Constants.Events.GotBroadcast.rawValue) { data, ack in
+            self.socket.emit(Constants.Events.GotBroadcast.receipt())
             let response = Response<DataType.NewBroadcast>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 let broadcasts = DB.shared.findById(.Broadcast, id: (response.data?.id)!)
@@ -142,6 +146,7 @@ class Socket {
         }
         
         socket.on(Constants.Events.GotComment.rawValue) { data, ack in
+            self.socket.emit(Constants.Events.GotComment.receipt())
             let response = Response<DataType.NewComment>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 let broadcasts = DB.shared.find(.Broadcast, predicate: NSPredicate(format: "id = %@", (response.data?.broadcast_id)!))
@@ -175,6 +180,7 @@ class Socket {
         }
         
         socket.on(Constants.Events.GotUser.rawValue) { data, ack in
+            self.socket.emit(Constants.Events.GotUser.receipt())
             let response = Response<DataType.BroadcastUpdate>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 if let broadcast: Broadcast = DB.shared.findById(.Broadcast, id: (response.data?.id)!) as? Broadcast {
@@ -186,6 +192,7 @@ class Socket {
         }
         
         socket.on(Constants.Events.GotVote.rawValue) { data, ack in
+            self.socket.emit(Constants.Events.GotVote.receipt())
             let response = Response<DataType.NewVote>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 if let comment: Comment = DB.shared.findById(.Comment, id: (response.data?.id)!) as? Comment {
@@ -197,6 +204,7 @@ class Socket {
         }
         
         socket.on(Constants.Events.Feed.rawValue) { data, ack in
+            self.socket.emit(Constants.Events.Feed.receipt())
             let response = Response<DataType.Feed>((data[0] as? NSDictionary)!)
             if response.code == 200 {
                 if let data = response.data {
