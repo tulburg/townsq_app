@@ -25,7 +25,7 @@ class ProfileViewController: ViewController, SocketDelegate {
     var joinedLabel: UILabel!
     var followButton: UIButton!
     
-    var properUser: User?
+    var external: Bool = false
 	
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
@@ -47,6 +47,10 @@ class ProfileViewController: ViewController, SocketDelegate {
 		super.viewDidLoad()
 		self.view.backgroundColor = Color.background
         view.showIndicator(size: .large, color: Color.darkBlue_white)
+        
+        if !external {
+            setup(user: self.user!)
+        }
 	}
     
     func setup(user: User) {
@@ -119,7 +123,7 @@ class ProfileViewController: ViewController, SocketDelegate {
         statGroup.addConstraints(format: "H:|-0-[v0]-8-[v1]-0-|", views: joined, location)
         statGroup.constrain(type: .verticalFill, joined, location)
         
-        if properUser != nil && properUser != self.user {
+        if external {
             rootView.add().vertical(48).view(profilePhoto, 120).gap(16).view(displayName).gap(0).view(username).gap(16).view(buttonContainer).gap(16).view(counterContainer, 44).gap(16).view(separator, 1).gap(16).view(bio).gap(16).view(statGroup).end(">=0")
         }else {
             rootView.add().vertical(48).view(profilePhoto, 120).gap(16).view(displayName).gap(0).view(username).gap(16).view(counterContainer, 44).gap(16).view(separator, 1).gap(16).view(bio).gap(16).view(statGroup).end(">=0")
@@ -129,7 +133,7 @@ class ProfileViewController: ViewController, SocketDelegate {
         rootView.addConstraints(format: "H:|-(>=0)-[v0(120)]-(>=0)-|", views: profilePhoto)
         profilePhoto.centerXAnchor.constraint(equalTo: rootView.centerXAnchor).isActive = true
         rootView.constrain(type: .horizontalFill, displayName, username, separator)
-        if properUser != nil && properUser != self.user {
+        if external {
             rootView.addConstraints(format: "H:|-(>=0)-[v0]-(>=0)-|", views: buttonContainer)
             buttonContainer.centerXAnchor.constraint(equalTo: rootView.centerXAnchor).isActive = true
         }
@@ -185,15 +189,13 @@ class ProfileViewController: ViewController, SocketDelegate {
     }
     
     @objc func follow() {
-        if properUser != nil {
-            Socket.shared.follow(properUser!)
-        }
+        Socket.shared.follow(user!)
     }
     
     func socket(didReceive event: Constants.Events, data: ResponseData) {
         if event == .User {
             if let user = data as? DataType.User {
-                setup(user: properUser!)
+                setup(user: self.user!)
                 followersCount.text = "\(user.followers ?? 0)"
                 followingCount.text = "\(user.following ?? 0)"
                 joinedLabel.text = "Joined " + (user.created?.string(with: "MMM, yyyy"))!

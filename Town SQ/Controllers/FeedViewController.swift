@@ -11,6 +11,7 @@ import UIKit
 class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSource, SocketDelegate {
 	
 	var feed: [Broadcast] = []
+    var feedMeta: [FeedCellMeta] = []
     var tableView: UITableView!
     var initialized = false
   
@@ -33,7 +34,7 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
         self.feed = DB.fetchFeed()
         Socket.shared.fetchFeed()
         initialized = true
-        
+        populateMeta()
         
 //        ImageCache.shared().drop()
 //        DB.shared.drop(.Comment)
@@ -46,6 +47,7 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		self.view.backgroundColor = Color.background
         self.feed = DB.fetchFeed()
         tableView.reloadData()
+        populateMeta()
 
 //        print(DB.shared.find(.Broadcast, predicate: nil))
 //        print(DB.shared.find(.Broadcast, predicate: NSPredicate(format: "user.id", user?.id as! CVarArg)))
@@ -65,6 +67,14 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(true)
 //        Socket.shared.unregisterDelegate(self)
+    }
+    
+    func populateMeta() {
+        self.feed.forEach {_ in
+            let meta = FeedCellMeta()
+            meta.size = CGSize(width: 0, height: 0)
+            self.feedMeta.append(meta)
+        }
     }
 	
 	func initFeedTableView() -> UITableView {
@@ -86,13 +96,14 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let broadcast = feed[indexPath.row]
+        let meta = feedMeta[indexPath.row]
         var cell: FeedCell!
         if broadcast.media != nil && MediaType(rawValue: broadcast.media_type!) == .photo {
             cell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_with_media") as? FeedCell
         }else {
             cell = tableView.dequeueReusableCell(withIdentifier: "feed_cell") as? FeedCell
         }
-        cell.setup(broadcast)
+        cell.setup(broadcast, meta)
 		let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
 		cell.selectedBackgroundView = background
@@ -104,7 +115,8 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
             vc.view.showIndicator(size: .large, color: Color.darkBlue)
             Socket.shared.fetchUser(broadcast.user!)
             Socket.shared.registerDelegate(vc as SocketDelegate)
-            vc.properUser = broadcast.user
+            vc.external = true
+            vc.user = broadcast.user
             present(vc, animated: true)
         }
 		return cell
@@ -147,11 +159,13 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
         if event == .GotBroadcast {
             self.feed = DB.fetchFeed()
             tableView.reloadData()
+            populateMeta()
         }
         
         if event == .GotFeed {
             self.feed = DB.fetchFeed()
             tableView.reloadData()
+            populateMeta()
         }
     }
 }

@@ -67,7 +67,7 @@ class FeedCell: UITableViewCell {
             feedImage.clipsToBounds = true
             feedBody.addSubviews(views: feedText, feedImage)
             feedBody.constrain(type: .horizontalFill, feedText, feedImage)
-            feedBody.addConstraints(format: "V:|-0-[v0]-16-[v1(220)]-0-|", views: feedText, feedImage)
+            feedBody.addConstraints(format: "V:|-0-[v0]-16-[v1(<=440)]-0-|", views: feedText, feedImage)
         }
         
         unreadContainer = activityBadge()
@@ -85,7 +85,7 @@ class FeedCell: UITableViewCell {
         feedActivitySummary = UILabel("are talking about this", Color.darkBlue_white, UIFont.systemFont(ofSize: 12))
         let feedActivityContainer = UIView()
         feedActivityContainer.addSubviews(views: feedActivityCounter, feedActivitySummary)
-        feedActivityContainer.addConstraints(format: "V:|-2-[v0]-2-|", views: feedActivityCounter)
+        feedActivityContainer.addConstraints(format: "V:|-2-[v0]-(>=0)-|", views: feedActivityCounter)
         feedActivityContainer.addConstraints(format: "H:|-0-[v0]-4-[v1(>=\(contentView.frame.width/2),<=\(contentView.frame.width))]-(>=0)-|", views: feedActivityCounter, feedActivitySummary)
         feedActivitySummary.centerYAnchor.constraint(equalTo: feedActivityContainer.centerYAnchor).isActive = true
         
@@ -146,6 +146,10 @@ class FeedCell: UITableViewCell {
     }
     
     func setup(_ broadcast: Broadcast) {
+        setup(broadcast, FeedCellMeta())
+    }
+    
+    func setup(_ broadcast: Broadcast, _ meta: FeedCellMeta) {
         self.broadcast = broadcast
         if asHeader {
             feedText.font = UIFont.systemFont(ofSize: 20)
@@ -178,15 +182,36 @@ class FeedCell: UITableViewCell {
         }
         
         if hasMedia {
+//            if meta.size != nil && meta.size.height != 0 {
+//                for c in (feedImage.superview?.constraints)! where (c.firstItem as? UIImageView) == feedImage && c.firstAttribute == .height {
+//                    c.constant = meta.size.height
+//                }
+//                return
+//            }
+            if meta.image != nil {
+                feedImage.image = meta.image
+                for c in (feedImage.superview?.constraints)! where (c.firstItem as? UIImageView) == feedImage && c.firstAttribute == .height {
+                    c.constant = meta.size.height
+                }
+                return;
+            }
             feedImage.download(link: Constants.S3Addr + broadcast.media!, sizeCb: { [self] image in
                 let w = image.size.width
                 let h = image.size.height
-                let adjRatio = w > h ? (winW / w) : ((winH * 0.42) / h)
+                
+                meta.image = image
+                
+                let adjRatio = w >= h ? (winW / w) : ((winH * 0.42) / h)
                 let adjH = adjRatio * h
-                for c in (feedImage.superview?.constraints)! {
-                    if (c.firstItem as? UIImageView) == feedImage {
-                        if c.firstAttribute == .height {
+                DispatchQueue.main.async { [self] in
+                    for c in (feedImage.superview?.constraints)! where (c.firstItem as? UIImageView) == feedImage && c.firstAttribute == .height {
+                        if w >= h {
+                            c.constant = 240
+                            meta.setSize(CGSize(width: 0, height: 240))
+                            return
+                        }else if meta.size != nil && meta.size.height == 0 {
                             c.constant = adjH
+                            meta.setSize(CGSize(width: 0, height: adjH))
                         }
                     }
                 }
@@ -226,7 +251,6 @@ class FeedCell: UITableViewCell {
         unreadCount = UILabel()
         unreadCount.font = UIFont.boldSystemFont(ofSize: 16)
         unreadCount.textColor = Color.white_black
-        
         container.addSubview(unreadCount)
         container.constrain(type: .horizontalFill, unreadCount, margin: 6)
         container.constrain(type: .verticalFill, unreadCount, margin: 2)
@@ -255,4 +279,14 @@ class FeedCell: UITableViewCell {
         }
     }
     
+}
+
+
+class FeedCellMeta {
+    var size: CGSize!
+    var image: UIImage!
+    
+    func setSize(_ size: CGSize) {
+        self.size = size
+    }
 }
