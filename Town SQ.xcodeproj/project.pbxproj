@@ -80,6 +80,7 @@
 		DF1F40AE24B8F80800FDA4CD /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		DF2C953F24BE25AB0066EF99 /* DOBViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DOBViewController.swift; sourceTree = "<group>"; };
 		DF38F4DD2950A59400C3C473 /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		DF532266296DA23D008090AE /* Town SQ.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Town SQ.entitlements"; sourceTree = "<group>"; };
 		DF65D4E024C20DBF0031A068 /* ProfilePhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePhotoViewController.swift; sourceTree = "<group>"; };
 		DF676FB0295C86ED0006A90E /* Progress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
 		DF818BC3294A2BF00005F080 /* CountryPickerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountryPickerCell.swift; sourceTree = "<group>"; };
@@ -272,6 +273,7 @@
 		DFA5398724B302D600316569 /* Town SQ */ = {
 			isa = PBXGroup;
 			children = (
+				DF532266296DA23D008090AE /* Town SQ.entitlements */,
 				DF01A206294B37C200A8EC7E /* VerificationCode */,
 				DF818BC2294A2BF00005F080 /* CountryPicker */,
 				DF9A7AD529438EDF00E8E2D3 /* Utilities */,
@@ -639,6 +641,7 @@
 			baseConfigurationReference = FCE7E00955241A253B5120E8 /* Pods-Town SQ.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Town SQ/Town SQ.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5W669BK4JQ;
 				INFOPLIST_FILE = "Town SQ/Info.plist";
@@ -661,6 +664,7 @@
 			baseConfigurationReference = BD12506D8753EBCEF326843D /* Pods-Town SQ.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Town SQ/Town SQ.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5W669BK4JQ;
 				INFOPLIST_FILE = "Town SQ/Info.plist";

@@ -67,7 +67,7 @@ class FeedCell: UITableViewCell {
             feedImage.clipsToBounds = true
             feedBody.addSubviews(views: feedText, feedImage)
             feedBody.constrain(type: .horizontalFill, feedText, feedImage)
-            feedBody.addConstraints(format: "V:|-0-[v0]-16-[v1(<=440)]-0-|", views: feedText, feedImage)
+            feedBody.addConstraints(format: "V:|-0-[v0]-16-[v1(<=400)]-0-|", views: feedText, feedImage)
         }
         
         unreadContainer = activityBadge()
@@ -182,16 +182,10 @@ class FeedCell: UITableViewCell {
         }
         
         if hasMedia {
-//            if meta.size != nil && meta.size.height != 0 {
-//                for c in (feedImage.superview?.constraints)! where (c.firstItem as? UIImageView) == feedImage && c.firstAttribute == .height {
-//                    c.constant = meta.size.height
-//                }
-//                return
-//            }
             if meta.image != nil {
                 feedImage.image = meta.image
                 for c in (feedImage.superview?.constraints)! where (c.firstItem as? UIImageView) == feedImage && c.firstAttribute == .height {
-                    c.constant = meta.size.height
+                    c.constant = asHeader ? (meta.size.height + 80) : meta.size.height
                 }
                 return;
             }
@@ -203,12 +197,16 @@ class FeedCell: UITableViewCell {
                 
                 let adjRatio = w >= h ? (winW / w) : ((winH * 0.42) / h)
                 let adjH = adjRatio * h
+                
                 DispatchQueue.main.async { [self] in
                     for c in (feedImage.superview?.constraints)! where (c.firstItem as? UIImageView) == feedImage && c.firstAttribute == .height {
-                        if w >= h {
-                            c.constant = 240
-                            meta.setSize(CGSize(width: 0, height: 240))
-                            return
+                        if w > h {
+                            let nh = ((w < h) ? (w/h) : (h/w)) * h
+                            c.constant = (winW / w) * nh
+                            meta.setSize(CGSize(width: 0, height: (winW / w) * nh))
+                        }else if w == h {
+                            c.constant = winW - 80
+                            meta.setSize(CGSize(width: 0, height: winW - 80))
                         }else if meta.size != nil && meta.size.height == 0 {
                             c.constant = adjH
                             meta.setSize(CGSize(width: 0, height: adjH))

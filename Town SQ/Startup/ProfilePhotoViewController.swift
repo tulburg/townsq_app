@@ -15,8 +15,6 @@ class ProfilePhotoViewController: ViewController, UINavigationControllerDelegate
 	var photo: UIImageView!
     var phPicker: PHPickerViewController!
 	
-	var delegate: UISceneDelegate!
-	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
@@ -24,8 +22,6 @@ class ProfilePhotoViewController: ViewController, UINavigationControllerDelegate
 		let backButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: nil)
 		backButtonItem.tintColor = Color.navigationItem
 		self.navigationItem.backBarButtonItem = backButtonItem
-		
-		delegate = UIApplication.shared.delegate as? UISceneDelegate
 		
 		let title = Title(text: "Choose your profile picture")
         title.textAlignment = .center
@@ -115,7 +111,10 @@ class ProfilePhotoViewController: ViewController, UINavigationControllerDelegate
     }
 	
 	@objc func complete() {
+        
         Socket.shared.restart()
+        delegate?.registerForPushNotification(application: UIApplication.shared)
+        
 		let vc = NavigationController(rootViewController: TabBarController())
 		vc.modalPresentationStyle = .overCurrentContext
 		self.navigationController?.present(vc, animated: true, completion: nil)

@@ -23,6 +23,10 @@ class ViewController: UIViewController {
         user = DB.UserRecord()
     }
     
+    var delegate: AppDelegate? {
+        return UIApplication.shared.delegate as? AppDelegate
+    }
+    
     var safeAreaInset: UIEdgeInsets? {
         get {
             let delegate = UIApplication.shared.connectedScenes.first!.delegate as! SceneDelegate

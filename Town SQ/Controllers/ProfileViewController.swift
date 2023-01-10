@@ -47,10 +47,6 @@ class ProfileViewController: ViewController, SocketDelegate {
 		super.viewDidLoad()
 		self.view.backgroundColor = Color.background
         view.showIndicator(size: .large, color: Color.darkBlue_white)
-        
-        if !external {
-            setup(user: self.user!)
-        }
 	}
     
     func setup(user: User) {
@@ -155,6 +151,10 @@ class ProfileViewController: ViewController, SocketDelegate {
         super.viewDidAppear(animated)
         self.tabBarController?.title = ""
         (self.navigationController as? NavigationController)?.hideTopBar()
+        
+        if !external {
+            setup(user: self.user!)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

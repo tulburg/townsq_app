@@ -45,13 +45,6 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		super.viewDidLoad()
 		// Do any additional setup after loading the view.
 		self.view.backgroundColor = Color.background
-        self.feed = DB.fetchFeed()
-        tableView.reloadData()
-        populateMeta()
-
-//        print(DB.shared.find(.Broadcast, predicate: nil))
-//        print(DB.shared.find(.Broadcast, predicate: NSPredicate(format: "user.id", user?.id as! CVarArg)))
-
 	}
     
     override func viewDidAppear(_ animated: Bool) {
@@ -59,9 +52,9 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
         self.tabBarController?.title = "Feed"
         Socket.shared.registerDelegate(self)
         
-        if initialized {
-            tableView.reloadData()
-        }
+        self.feed = DB.fetchFeed()
+        tableView.reloadData()
+        populateMeta()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -107,15 +100,12 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
 		let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
 		cell.selectedBackgroundView = background
-//        if indexPath.row == feed.count - 1 {
-//            cell.hideSeparator()
-//        }
         cell.onOpen = { [self] in
             let vc = ProfileViewController()
+            vc.external = true
             vc.view.showIndicator(size: .large, color: Color.darkBlue)
             Socket.shared.fetchUser(broadcast.user!)
             Socket.shared.registerDelegate(vc as SocketDelegate)
-            vc.external = true
             vc.user = broadcast.user
             present(vc, animated: true)
         }
@@ -126,6 +116,7 @@ class FeedViewController: ViewController, UITableViewDelegate, UITableViewDataSo
         let messagesVC = MessagesViewController()
         messagesVC.modalPresentationStyle = .fullScreen
         messagesVC.broadcast = feed[indexPath.row]
+        messagesVC.feedMeta = feedMeta[indexPath.row]
         self.navigationController?.pushViewController(messagesVC, animated: true)
 		tableView.deselectRow(at: indexPath, animated: true)
 	}

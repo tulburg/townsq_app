@@ -24,6 +24,7 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
 	
 	var messageFieldHeight: CGFloat = 0
     var broadcast: Broadcast!
+    var feedMeta: FeedCellMeta!
     var comments: [Comment] = []
 	
 	override func viewDidLoad() {
@@ -151,7 +152,7 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
             }else {
                 headerCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_header") as? FeedCell
             }
-            headerCell?.setup(broadcast)
+            headerCell?.setup(broadcast, feedMeta)
             return headerCell!
         }
         let comment = comments[indexPath.row - 1]
