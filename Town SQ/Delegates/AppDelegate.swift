@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
+        UIApplication.shared.applicationIconBadgeNumber = 0
         makeSocket()
         
 		return true
@@ -69,7 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) async -> UIBackgroundFetchResult {
         print("Got notification")
         
-        return .newData
+        return .noData
     }
     
     
@@ -81,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let token = tokenParts.joined()
         Api.shared().setProfile("device_token", token, completion: nil)
     }
-
+    
 	// MARK: - Core Data stack
 
 	lazy var persistentContainer: NSPersistentContainer = {

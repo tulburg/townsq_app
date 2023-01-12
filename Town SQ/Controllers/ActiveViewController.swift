@@ -10,11 +10,10 @@ import UIKit
 
 class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegate, UITableViewDataSource {
     
-  
     var activeBroadcasts: [Broadcast] = []
+    var feedMeta: [FeedCellMeta] = []
     var tableView: UITableView!
     var hasUnread = false
-    
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -24,6 +23,7 @@ class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegat
         super.init(nibName: nil, bundle: nil)
         
         activeBroadcasts = DB.activeBroadcasts()!
+        populateMeta()
         hasUnread = activeBroadcasts.filter{ return $0.unread > 0 }.count > 0
         
         let tabImage = UIImage(named: "active")
@@ -47,6 +47,7 @@ class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegat
         
         self.activeBroadcasts = DB.activeBroadcasts()!
         self.tableView.reloadData()
+        self.populateMeta()
         Socket.shared.registerDelegate(self)
         
     }
@@ -83,7 +84,7 @@ class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegat
         }else {
             cell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_active") as? FeedCell
         }
-        cell.setup(broadcast)
+        cell.setup(broadcast, feedMeta[indexPath.row])
         let background = UIView()
         background.backgroundColor = Color.create(0xf0f0f0, dark: 0x000000)
         cell.selectedBackgroundView = background
@@ -97,6 +98,7 @@ class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegat
             DB.shared.save()
             DispatchQueue.main.async { [self] in
                 activeBroadcasts.remove(at: indexPath.row)
+                feedMeta.remove(at: indexPath.row)
                 tableView.reloadData()
             }
         }
@@ -107,6 +109,7 @@ class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegat
         let messagesVC = MessagesViewController()
         messagesVC.modalPresentationStyle = .fullScreen
         messagesVC.broadcast = activeBroadcasts[indexPath.row]
+        messagesVC.feedMeta = feedMeta[indexPath.row]
         self.navigationController?.pushViewController(messagesVC, animated: true)
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -124,5 +127,13 @@ class ActiveViewController: UIViewController, SocketDelegate, UITableViewDelegat
     
     func socket(didMarkUnread broadcast: Broadcast) {
         tableView.reloadData()
+    }
+    
+    func populateMeta() {
+        self.activeBroadcasts.forEach {_ in
+            let meta = FeedCellMeta()
+            meta.size = CGSize(width: 0, height: 0)
+            self.feedMeta.append(meta)
+        }
     }
 }

@@ -166,8 +166,8 @@ class ProfileViewController: ViewController, SocketDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        self.tabBarItem.badgeColor = UIColor.red
-        self.tabBarItem.badgeValue = "3"
+//        self.tabBarItem.badgeColor = UIColor.red
+//        self.tabBarItem.badgeValue = "3"
         
         (self.navigationController as? NavigationController)?.showTopBar()
     }

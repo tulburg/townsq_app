@@ -29,7 +29,7 @@ class Api {
     func verifyCode(_ code: String, _ phone: String, _ inviteCode: String?, completion: ((_ data: Data?, _ error: Error?) -> Void)?) {
         path = "/verify-code"
         self.completion = completion
-        parameters = ["code": "\(code)", "phone": "\(phone)", "invite": "\(inviteCode as Any)"]
+        parameters = ["code": "\(code)", "phone": "\(phone)", "invite": "\(inviteCode!)"]
         execute(.POST)
     }
     

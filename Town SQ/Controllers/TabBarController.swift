@@ -118,7 +118,7 @@ class TabBarController: UITabBarController, SocketDelegate {
         profileButton.addConstraints(format: "H:|-(\((profileButton.frame.width / 2) - 24))-[v0]-(>=0)-|", views: profileRing)
         
         tabBar.items![3].badgeColor = Color.red
-        tabBar.items![3].badgeValue = "3"
+//        tabBar.items![3].badgeValue = "2"
     }
 
     @objc func selectProfile() {

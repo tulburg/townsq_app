@@ -149,18 +149,14 @@ class MessagesViewController: ViewController, SocketDelegate, UITableViewDelegat
             var headerCell: FeedCell!
             if broadcast.media != nil && broadcast.media_type != nil {
                 headerCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_header_with_media") as? FeedCell
+                headerCell?.setup(broadcast, feedMeta)
             }else {
                 headerCell = tableView.dequeueReusableCell(withIdentifier: "feed_cell_as_header") as? FeedCell
+                headerCell?.setup(broadcast)
             }
-            headerCell?.setup(broadcast, feedMeta)
             return headerCell!
         }
         let comment = comments[indexPath.row - 1]
-//        if(comment.user?.id == user?.id) {
-//            let cell = (tableView.dequeueReusableCell(withIdentifier: "own_message_cell", for: indexPath) as? OwnMessageCell)!
-//            cell.build(comment)
-//            return cell
-//		}else {
             let cell = (tableView.dequeueReusableCell(withIdentifier: "message_cell", for: indexPath) as? MessageCell)!
             cell.build(comment)
             if (indexPath.row - 1) == self.comments.count - 1 {
