@@ -17,7 +17,7 @@ class S3 {
     }()
     
     init() {
-        let provider = AWSStaticCredentialsProvider(accessKey: "AKIA3IRYCDWJ3J6NADQM", secretKey: "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")
+        let provider = AWSStaticCredentialsProvider()
         let configuration = AWSServiceConfiguration(region: .USEast1, credentialsProvider: provider)
         
         AWSServiceManager.default().defaultServiceConfiguration = configuration
